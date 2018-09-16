@@ -6,7 +6,6 @@ import {SpawnsHelper} from '../helpers/spawns'
 // amount
 // resource
 // Process to haul resources from terminal => storage
-// global.OS.kernel.addProcess('haulResources', {room: 'W56S33', resource: RESOURCE_ENERGY, amount: 200000}, 0)
 export class HaulResources extends Process
 {
 
