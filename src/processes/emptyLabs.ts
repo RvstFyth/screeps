@@ -3,7 +3,6 @@ import {SpawnsHelper} from '../helpers/spawns'
 
 // META:
 // room
-// global.OS.kernel.addProcess('emptyLabs', {room: 'W56S33'}, 0)
 export class EmptyLabs extends Process
 {
 
