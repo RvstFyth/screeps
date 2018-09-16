@@ -57,7 +57,7 @@ export class Mineral extends Process
       if(storageAmount && storageAmount > sellTreshould) {
         if(storageAmount && storageAmount > (sellTreshould + 10000)) {
           const amount = storageAmount - (sellTreshould + 10000);
-          if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sellResources', 'room', room.name)) {
+          if(amount > 10000 && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sellResources', 'room', room.name)) {
             global.OS.kernel.addProcess('sellResources', {room: room.name, resourceType: mineral.mineralType, amount: amount}, 0);
           }
         }
