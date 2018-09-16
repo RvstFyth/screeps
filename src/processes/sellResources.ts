@@ -9,7 +9,6 @@ import {SpawnsHelper} from '../helpers/spawns'
 // room
 // resourceType
 // amount
-// OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 30000}, 0);
 export class SellResources extends Process
 {
     private init()

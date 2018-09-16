@@ -4,8 +4,6 @@ import {SpawnsHelper} from 'helpers/spawns'
 // META
 // room
 // boosts
-// OS.kernel.addProcess('stockBoostsLab', {room: 'W59S21', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ACID, RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE]}, 0);
-// catalyzed zynthium alkalide
 export class StockBoostsLab extends Process
 {
 
