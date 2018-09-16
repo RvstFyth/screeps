@@ -1,9 +1,6 @@
 import {Process} from '../ROS/process'
 import {SpawnsHelper} from '../helpers/spawns'
 // META: room, boost
-// ghodium alkalide
-// OS.kernel.addProcess('makeBoosts', {room: 'W56S33', boost: RESOURCE_GHODIUM_ALKALIDE, amount: 3000}, 0);
-// OS.kernel.addProcess('makeBoosts', {room: 'W15S2', boost: RESOURCE_UTRIUM_HYDRIDE,transporter:'88_19283181', shouldBoost: true, labs:['5b532f554df916370860b91d','5b53327c4df916370860ba62','5b5336334df916370860bbc1']}, 0);
 export class MakeBoosts extends Process
 {
 
@@ -64,6 +61,9 @@ export class MakeBoosts extends Process
                 if(Game.creeps[this.meta.transporter].withdraw(containers[0], _.findKey(containers[0].store) as ResourceConstant) === ERR_NOT_IN_RANGE) {
                   Game.creeps[this.meta.transporter].moveTo(containers[0]);
                 }
+              }
+              else {
+                this.handleTransporter(room, labs);
               }
             }
             else {
