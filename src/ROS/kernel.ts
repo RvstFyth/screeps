@@ -25,6 +25,7 @@ import {ProcessPower} from '../processes/processPower'
 import {SellResources} from '../processes/sellResources'
 import {HarrasRemote} from '../processes/harrasRemote'
 import {StockBoostsLab} from 'processes/stockBoostsLab'
+import {DismantleWall} from '../processes/dismantleWall'
 
 class ProcessTable
 {
@@ -61,7 +62,8 @@ const Processes = <{[type: string]: any}> {
   'processPower': ProcessPower,
   'sellResources': SellResources,
   'harrasRemote': HarrasRemote,
-  'stockBoostsLab': StockBoostsLab
+  'stockBoostsLab': StockBoostsLab,
+  'dismantleWall': DismantleWall
 }
 
 export class Kernel
