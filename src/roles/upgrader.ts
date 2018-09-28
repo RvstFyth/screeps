@@ -10,7 +10,7 @@ export class Upgrader
       creep.memory.harvesting = false;
     }
     if(creep.memory.harvesting) {
-        if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] > creep.carryCapacity) {
+        if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] >= creep.carryCapacity) {
           if(creep.withdraw(creep.room.storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.moveTo(creep.room.storage);
           }
@@ -63,7 +63,12 @@ export class Upgrader
       }
     }
     else if(room.controller && room.controller.level ===  7) {
+      if(room.energyAvailable > 3000) {
+        return [MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE]
+      }
+      else {
         return [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE]; // 900
+      }
     }
     else {
       if (room.energyAvailable > 3500) {

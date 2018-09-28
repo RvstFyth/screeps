@@ -119,6 +119,18 @@ Object.defineProperty(Room.prototype, 'walls', {
     }
 });
 
+Object.defineProperty(Room.prototype, 'roads', {
+  get: function() {
+    if(!this._roads) {
+      this._roads = this.find(FIND_STRUCTURES, {
+        filter: (s: Structure) => s.structureType === STRUCTURE_ROAD
+      })
+    }
+
+    return this._roads;
+  }
+});
+
 Object.defineProperty(Room.prototype, 'ramparts', {
     get: function() {
       if(!this._ramparts) {

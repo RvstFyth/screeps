@@ -22,6 +22,7 @@ export class LootRoom extends Process
                 this.handleLooter(Game.rooms[this.meta.room]);
             }
             catch(e) {
+                this.state = 'killed';
                 console.log("HandleLooter failed in the lootRoom process: "+e.message);
             }
         }

@@ -60,6 +60,15 @@ export class Room_Bootstrap extends Process
         if(links.length) {
           link = links[0].id;
         }
+        const droppedResources = sourceObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
+          filter: (r: Resource) => r.resourceType === RESOURCE_ENERGY
+        });
+        if(droppedResources.length) {
+          if(droppedResources[0].amount > 0) {
+            numWorkers++;
+          }
+          numWorkers += Math.floor(droppedResources[0].amount / 1000);
+        }
       }
       //let dedicatedUpgrader = source.creeps.filter((c: any) => c.memory.upgrader).length;
       this.handleUpgrader(room);
@@ -140,6 +149,7 @@ export class Room_Bootstrap extends Process
   defineWorkersCount(room: Room)
   {
     if(!room.storage) {
+
       return 4;
     }
     if(typeof room.controller !== 'undefined'  && room.controller.level >= 3) {

@@ -76,7 +76,7 @@ export class Miner
         bodyParts = [WORK,WORK,MOVE,MOVE]; // 300
     }
     else if(room.energyAvailable <= 700 ){
-        bodyParts = [WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, CARRY]; // 550
+        bodyParts = [WORK, WORK, WORK, WORK, MOVE, MOVE]; // 550
     }
     else if(room.energyAvailable <= 800){
         bodyParts = [MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,CARRY];

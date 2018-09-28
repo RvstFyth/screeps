@@ -79,6 +79,32 @@ export class Room extends Process
       this.checkStructures(room);
       this.meta.lastStructureCheck = Game.time;
     }
+
+    if(room.storage && room.controller && room.controller.level === 8 && room.storage.store[RESOURCE_ENERGY] >= 150000) {
+      try {
+        if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', room.name)) {
+          let rooms: any[] = [];
+
+          for(let n in Game.rooms) {
+            const tr = Game.rooms[n];
+            if(tr.controller && tr.controller.my && tr.storage && tr.terminal && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', tr.name)) {
+              rooms.push(tr);
+            }
+          }
+
+          if(rooms.length) {
+            const target = _.min(rooms, r => r.storage.store[RESOURCE_ENERGY]);
+            let amount = 20000;
+            if(room.storage.store[RESOURCE_ENERGY] > 250000) amount = 50000;
+            else if(room.storage.store[RESOURCE_ENERGY] > 200000) amount = 30000;
+            global.OS.kernel.addProcess('sendResources', {room: room.name, target: target.name, resource: RESOURCE_ENERGY, amount: amount}, 0);
+          }
+        }
+      }
+      catch(e) {
+        console.log(`Error in roomProcess sending resources: ${e.message}`);
+      }
+    }
   }
 
   checkStructures(room: any)

@@ -58,7 +58,7 @@ export class SendResources extends Process
 
   transport(room: Room)
   {
-    if(!this.meta.transporter || !Game.creeps[this.meta.transporter]) {
+    if((!this.meta.transporter || !Game.creeps[this.meta.transporter]) && !this.meta.done) {
       if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
         const rcl = room.controller ? room.controller.level : null;
         let bodyParts = [CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];

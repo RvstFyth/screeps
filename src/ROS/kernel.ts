@@ -26,6 +26,12 @@ import {SellResources} from '../processes/sellResources'
 import {HarrasRemote} from '../processes/harrasRemote'
 import {StockBoostsLab} from 'processes/stockBoostsLab'
 import {DismantleWall} from '../processes/dismantleWall'
+import {AttackController} from '../processes/attackController'
+import {IntershardBuilder} from '../processes/intershardBuilder'
+import {IntershardClaim} from '../processes/intershardClaim'
+import {IntershardBuilder2} from '../processes/intershardBuilder2'
+import {IntershardClaim2} from '../processes/intershardClaim2'
+import {AutoMakeBoosts} from '../processes/autoMakeBoosts'
 
 class ProcessTable
 {
@@ -63,7 +69,13 @@ const Processes = <{[type: string]: any}> {
   'sellResources': SellResources,
   'harrasRemote': HarrasRemote,
   'stockBoostsLab': StockBoostsLab,
-  'dismantleWall': DismantleWall
+  'dismantleWall': DismantleWall,
+  'attackController': AttackController,
+  'intershardClaim': IntershardClaim,
+  'intershardClaim2': IntershardClaim2,
+  'intershardBuilder': IntershardBuilder,
+  'intershardBuilder2': IntershardBuilder2,
+  'autoMakeBoosts': AutoMakeBoosts
 }
 
 export class Kernel
@@ -93,9 +105,32 @@ export class Kernel
     Memory.ROS.nextProcessID++;
   }
 
+  checkIntershardSegment()
+  {
+    let intershardData = JSON.parse(RawMemory.interShardSegment);
+    if(!intershardData[Game.shard.name]) {
+      intershardData[Game.shard.name] = {};
+    }
+    if(!intershardData[Game.shard.name].processes) {
+      intershardData[Game.shard.name].processes = [];
+    }
+    if(intershardData[Game.shard.name] && intershardData[Game.shard.name].processes && intershardData[Game.shard.name].processes.length) {
+      // Spawn processes triggered by a other shard.
+      for(let p of intershardData[Game.shard.name].processes) {
+        this.addProcess(p.name, p.meta, p.parentID);
+      }
+
+      // Clear processes list
+      intershardData[Game.shard.name].processes = [];
+    }
+    // Save intershardData to the intershardSegment
+    RawMemory.interShardSegment = JSON.stringify(intershardData);
+  }
+
   run()
   {
     this.loadProcesses();
+    // this.checkIntershardSegment();
 
     this.limit = this.defineCpuLimit();
     while(true) {

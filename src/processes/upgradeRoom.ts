@@ -20,20 +20,42 @@ export class UpgradeRoom extends Process
           this.meta.creeps[n] = null;
         }
         else if(Game.creeps[this.meta.creeps[n]].spawning) {
-            // Maybe some fancy path finding calculations etc... To save on CPU
+            if(room.controller && room.controller.level === 8) {
+              Game.creeps[this.meta.creeps[n]].memory.initialized = true;
+            }
+            else {
+              Game.creeps[this.meta.creeps[n]].memory.initialized = false;
+            }
         }
         else if(Game.creeps[this.meta.creeps[n]]) {
-          Upgrader.run(Game.creeps[this.meta.creeps[n]]);
+          if(typeof Game.creeps[this.meta.creeps[n]].memory.initialized === 'undefined') {
+            Game.creeps[this.meta.creeps[n]].memory.initialized = true;
+          }
+          if(!Game.creeps[this.meta.creeps[n]].memory.initialized) {
+            // catalyzed ghodium acid
+            const labs = room.labs.filter((l: StructureLab) => l.mineralType === RESOURCE_CATALYZED_GHODIUM_ACID && l.mineralAmount >= 30);
+            if(labs.length) {
+              const result = labs[0].boostCreep(Game.creeps[this.meta.creeps[n]]);
+              if(result === ERR_NOT_IN_RANGE) {
+                Game.creeps[this.meta.creeps[n]].moveTo(labs[0]);
+              }
+              else if(result === OK) {
+                Game.creeps[this.meta.creeps[n]].memory.initialized = true;
+              }
+            }
+            else {
+              Game.creeps[this.meta.creeps[n]].memory.initialized = true;
+            }
+          }
+          else {
+            Upgrader.run(Game.creeps[this.meta.creeps[n]]);
+          }
         }
       }
       this.meta.creeps = this.meta.creeps.filter((n: any) => n); // Remove NULL values
 
       if(this.defineUpgradersCount(room) > 0 && this.meta.creeps.length < this.defineUpgradersCount(room)) {
         if(SpawnsHelper.spawnAvailable(room)) {
-          // let name = SpawnsHelper.spawnCreep(room, Upgrader.defineBodyParts(room), {role: 'upgrader'}, this.ID.toString());
-          // if(name) {
-          //   this.meta.creeps.push(name);
-          // }
           SpawnsHelper.requestSpawn(this.ID, room, Upgrader.defineBodyParts(room), {role: 'upgrader'}, 'creeps[]');
         }
       }

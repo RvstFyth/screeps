@@ -114,16 +114,28 @@ export class ClaimRoom extends Process
                 }
               }
               else {
-                const miners = source.pos.findInRange(FIND_MY_CREEPS, 2, {
-                  filter: (c: Creep) => c.memory.role === 'miner' && c.getActiveBodyparts(WORK) > 2
-                })
-                if(!miners.length) {
-                  if(creep.harvest(source) === ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source);
+                const hostileStructures = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+                  filter: (s: OwnedStructure) => (s.hasOwnProperty('store') && (s as any).store[RESOURCE_ENERGY] > 0) ||
+                    s.hasOwnProperty('energy') && (s as any).energy > 0
+                });
+                if(hostileStructures.length) {
+                  const target = creep.pos.findClosestByRange(hostileStructures);
+                  if(creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
                   }
                 }
                 else {
-                  // TODO:
+                  const miners = source.pos.findInRange(FIND_MY_CREEPS, 2, {
+                    filter: (c: Creep) => c.memory.role === 'miner' && c.getActiveBodyparts(WORK) > 2
+                  })
+                  if(!miners.length) {
+                    if(creep.harvest(source) === ERR_NOT_IN_RANGE) {
+                      creep.moveTo(source);
+                    }
+                  }
+                  else {
+                    // TODO:
+                  }
                 }
               }
             }
@@ -177,9 +189,18 @@ export class ClaimRoom extends Process
                   }
                 }
                 else { // Build the rampart
-                  const target = creep.pos.findInRange(Game.rooms[this.meta.target].constructionSites.filter((c: ConstructionSite) => c.structureType === STRUCTURE_RAMPART), 2);
-                  if(target.length) {
-                    creep.build(target[0]);
+                  const spawnsConstructionSite = creep.pos.findInRange(Game.rooms[this.meta.target].constructionSites.filter((c: ConstructionSite) => c.structureType === STRUCTURE_SPAWN), 2);
+                  if(spawnsConstructionSite.length) {
+                    creep.build(spawnsConstructionSite[0]);
+                  }
+                  else {
+                    const target = creep.pos.findInRange(Game.rooms[this.meta.target].constructionSites.filter((c: ConstructionSite) => c.structureType === STRUCTURE_RAMPART), 2);
+                    if(target.length) {
+                      creep.build(target[0]);
+                    }
+                    else {
+                      Game.rooms[this.meta.target].createConstructionSite(this.meta.spawnX, this.meta.spawnY, STRUCTURE_SPAWN);
+                    }
                   }
                 }
               }

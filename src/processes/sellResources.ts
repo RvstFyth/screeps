@@ -130,7 +130,6 @@ export class SellResources extends Process
             const remainingAmount = this.meta.amount - this.meta.amountSold;
             const amount = remainingAmount < highest.remainingAmount ? remainingAmount : highest.remainingAmount;
             const txCosts = Game.market.calcTransactionCost(amount, this.meta.room, highest.roomName || '');
-            console.log([energyAvailable, txCosts]);
             if(energyAvailable >= txCosts) {
                 if(Game.market.deal(highest.id, amount, this.meta.room) === OK) {
                     this.meta.amountSold += amount;

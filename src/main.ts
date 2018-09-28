@@ -32,8 +32,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
   let cpu = Game.cpu.getUsed();
   global.populateLOANlist();
   OS.run();
-
-  console.log(`Tick: ${Game.time} | CPU: ${(Game.cpu.getUsed() - cpu).toFixed(2)} | ${Object.keys(Game.rooms).length} rooms in vision | ${Memory.ROS.processes.length} processes in mem`);
+  //if(Game.time % 5 === 0) {
+    console.log(`Tick: ${Game.time} | CPU: ${(Game.cpu.getUsed() - cpu).toFixed(2)} | ${Object.keys(Game.rooms).length} rooms in vision | ${Memory.ROS.processes.length} processes in mem`);
+  //}
   // Automatically delete memory of missing creeps
   for (const name in Memory.creeps) {
     if (!(name in Game.creeps)) {

@@ -26,6 +26,7 @@ interface Room
   links: StructureLink[]
   recycleContainers: StructureContainer[]
   observer: StructureObserver|undefined
+  roads: StructureRoad[]
 }
 
 interface Creep
@@ -42,4 +43,7 @@ interface CreepMemory {
     target: string
     targetX: number
     targetY: number
+    needBoost: boolean
+    boosted: boolean
+    initialized: boolean
 }

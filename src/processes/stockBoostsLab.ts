@@ -18,6 +18,7 @@ export class StockBoostsLab extends Process
 
     public run()
     {
+        // this.state = 'killed';
         try {
             this.run2();
         }

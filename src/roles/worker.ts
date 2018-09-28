@@ -118,11 +118,12 @@ export class Worker
           creep.moveTo(recycleContainer);
         }
       }
-      else if(creep.room.storage) {
+      else if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 1500) {
         if(!creep.pos.isNearTo(creep.room.storage)) {
           creep.moveTo(creep.room.storage);
         }
         else {
+
           if(creep.withdraw(creep.room.storage, RESOURCE_ENERGY) === OK) {
             if(!creep.memory.targetID) {
               this.defineTarget(creep, hasLink);

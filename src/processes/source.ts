@@ -41,7 +41,7 @@ export class Source extends Process
 
       }
       else if(Game.creeps[this.meta.hauler]) {
-        if(source.room.controller.level === 8) {
+        if(source.room.controller.level === 8 && link) {
           Game.creeps[this.meta.hauler].suicide();
         }
         else {
