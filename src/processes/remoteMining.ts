@@ -9,7 +9,7 @@ import {PathingHelper} from '../helpers/pathing'
 // room
 // target
 // sourceID
-// global.OS.kernel.addProcess('remoteMining', {room: 'W51S32', target: 'W51S31', sourceID: '59bbc4192052a716c3ce75b5'}, 0)
+// global.OS.kernel.addProcess('remoteMining', {room: 'W58S23', target: 'W59S23', sourceID: '59bbc4192052a716c3ce75b5'}, 0)
 export class RemoteMining extends Process
 {
   initRoom(source: Source, mainRoom: Room)

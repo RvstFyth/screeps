@@ -32,6 +32,7 @@ import {IntershardClaim} from '../processes/intershardClaim'
 import {IntershardBuilder2} from '../processes/intershardBuilder2'
 import {IntershardClaim2} from '../processes/intershardClaim2'
 import {AutoMakeBoosts} from '../processes/autoMakeBoosts'
+import {SourceKeeperAttacker} from '../processes/sourceKeeperAttacker'
 
 class ProcessTable
 {
@@ -75,7 +76,8 @@ const Processes = <{[type: string]: any}> {
   'intershardClaim2': IntershardClaim2,
   'intershardBuilder': IntershardBuilder,
   'intershardBuilder2': IntershardBuilder2,
-  'autoMakeBoosts': AutoMakeBoosts
+  'autoMakeBoosts': AutoMakeBoosts,
+  'sourceKeeperAttacker': SourceKeeperAttacker
 }
 
 export class Kernel

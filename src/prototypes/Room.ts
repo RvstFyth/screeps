@@ -166,6 +166,20 @@ Object.defineProperty(Room.prototype, 'hostiles', {
   }
 });
 
+Object.defineProperty(Room.prototype, 'allies', {
+  get: function()
+  {
+    if(!this._allies) {
+      this._allies = this.find(FIND_HOSTILE_CREEPS, {
+        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) > -1 || c.owner.username === 'BarryOSeven'
+      });
+    }
+
+    return this._allies;
+  }
+});
+
+
 Object.defineProperty(Room.prototype, 'invaders', {
   get: function()
   {

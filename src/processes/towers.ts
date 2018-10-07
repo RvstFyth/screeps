@@ -42,7 +42,7 @@ export class Towers extends Process
               }
             }
             else {
-              if(numRepairs < 1) {
+              if(canRepair && numRepairs < 1) {
                 const ramparts = room.ramparts.filter((r: StructureRampart) => r.hits < 7000000); // 7 mill
                 if(Math.floor(Math.random() * 2) === 1) {
                   const rampart = _.min(ramparts, r => r.hits);

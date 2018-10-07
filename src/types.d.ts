@@ -27,6 +27,12 @@ interface Room
   recycleContainers: StructureContainer[]
   observer: StructureObserver|undefined
   roads: StructureRoad[]
+  allies: Creep[]
+}
+
+interface RoomObject
+{
+  say(value: string) : any
 }
 
 interface Creep

@@ -18,7 +18,7 @@ export class Source extends Process
       link = links[0].id;
     }
 
-    if(source) {
+    if(source && source.room && source.room.controller && source.room.controller.my) {
       if(!this.meta.miner || !Game.creeps[this.meta.miner]) {
         if(SpawnsHelper.spawnAvailable(source.room)) {
           SpawnsHelper.requestSpawn(this.ID, source.room, Miner.defineBodyParts(source.room), {role: 'miner'}, 'miner');

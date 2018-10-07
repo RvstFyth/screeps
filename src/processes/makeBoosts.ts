@@ -9,6 +9,7 @@ export class MakeBoosts extends Process
       if(!this.meta.amount) {
         this.meta.amount = 1000;
       }
+      // this.state = 'killed';
       // this.meta.labs = [];
       const room = Game.rooms[this.meta.room];
       // console.log("Making "+this.meta.boost);

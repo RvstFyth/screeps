@@ -35,7 +35,7 @@ export class Mineral extends Process
               continue;
             }
             const storageAmount = room.storage ? (room.storage.store as any)[n] : null;
-            if(storageAmount && storageAmount > 30000) { // over 30k send to other rooms that can use them
+            if(storageAmount && storageAmount > 20000) { // over 30k send to other rooms that can use them
               //if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', this.meta.room)) {
                 if(this.sendResourcesToOtherRooms(n as MineralConstant)) {
                   break;
@@ -103,7 +103,7 @@ export class Mineral extends Process
           if(!rAmount || rAmount < 5000) {
             if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', room.name)) {
               success = true;
-              global.OS.kernel.addProcess('sendResources', {room: this.meta.room, target: room.name, resource: mineral, amount: 10000}, 0);
+              global.OS.kernel.addProcess('sendResources', {room: this.meta.room, target: room.name, resource: mineral, amount: 5000}, 0);
               break;
             }
           }

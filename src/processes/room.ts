@@ -7,12 +7,13 @@ export class Room extends Process
 
   run()
   {
-    if(!Game.rooms[this.meta.name]) {
+    const room = Game.rooms[this.meta.name];
+
+    if(!room || (room.controller && !room.controller.my)) {
       this.state = 'killed';
       return;
     }
 
-    const room = Game.rooms[this.meta.name];
     if(typeof this.meta.publicRamparts === 'undefined') {
       this.meta.publicRamparts = !room.hostiles.length;
     }
@@ -80,6 +81,12 @@ export class Room extends Process
       this.meta.lastStructureCheck = Game.time;
     }
 
+    if(room.controller && room.controller.level > 6 && room.storage && room.terminal) {
+      if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('autoMakeBoosts', 'room', room.name)) {
+        global.OS.kernel.addProcess('autoMakeBoosts', {room: room.name}, this.ID);
+      }
+    }
+
     if(room.storage && room.controller && room.controller.level === 8 && room.storage.store[RESOURCE_ENERGY] >= 150000) {
       try {
         if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', room.name)) {
@@ -87,17 +94,19 @@ export class Room extends Process
 
           for(let n in Game.rooms) {
             const tr = Game.rooms[n];
-            if(tr.controller && tr.controller.my && tr.storage && tr.terminal && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', tr.name)) {
+            if(tr.controller && tr.controller.my && tr.controller.level < 8 && tr.storage && tr.terminal && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', tr.name)) {
               rooms.push(tr);
             }
           }
 
           if(rooms.length) {
             const target = _.min(rooms, r => r.storage.store[RESOURCE_ENERGY]);
-            let amount = 20000;
-            if(room.storage.store[RESOURCE_ENERGY] > 250000) amount = 50000;
-            else if(room.storage.store[RESOURCE_ENERGY] > 200000) amount = 30000;
-            global.OS.kernel.addProcess('sendResources', {room: room.name, target: target.name, resource: RESOURCE_ENERGY, amount: amount}, 0);
+            if(room.storage.store[RESOURCE_ENERGY] > target.storage.store[RESOURCE_ENERGY] * 1.5) {
+              let amount = 20000;
+              if(room.storage.store[RESOURCE_ENERGY] > 250000) amount = 50000;
+              else if(room.storage.store[RESOURCE_ENERGY] > 200000) amount = 30000;
+              global.OS.kernel.addProcess('sendResources', {room: room.name, target: target.name, resource: RESOURCE_ENERGY, amount: amount}, 0);
+            }
           }
         }
       }

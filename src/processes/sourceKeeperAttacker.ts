@@ -5,9 +5,20 @@ import {SpawnsHelper} from '../helpers/spawns'
 export class SourceKeeperAttacker extends Process
 {
 
-
     public run()
     {
+        try {
+            this.run2();
+        }
+        catch(e) {
+            console.log(`Error in SourceKeeperAttacker: ${e.message}`);
+        }
+    }
+
+    public run2()
+    {
+        this.state = 'killed';
+
         const room = Game.rooms[this.meta.room];
         if(room) {
             this.handleCreep(room);

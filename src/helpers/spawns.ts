@@ -37,9 +37,15 @@ export class SpawnsHelper
       if(!memory) {
         memory = {};
       }
-      if(spawn.spawnCreep(body, name, {memory: memory}) === OK) {
+      const result = spawn.spawnCreep(body, name, {memory: memory});
+      if(result === OK) {
         spawn.isSpawning = true;
         return name;
+      }
+      else {
+        // if(room.name === 'W47S31') {
+        //   console.log(result);
+        // }
       }
     }
 

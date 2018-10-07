@@ -9,7 +9,7 @@ export class ClaimRoom extends Process
   run()
   {
     // this.meta.target = "W51S32";
-    //this.state = 'killed';
+    // this.state = 'killed';
     if(this.shouldRun()) {
       // The room from where the creeps are spawned
       const room = Game.rooms[this.meta.room];
@@ -43,15 +43,6 @@ export class ClaimRoom extends Process
           reusePath: 17,
           range: 20,
           costCallback: function(roomName: string, costMatrix: CostMatrix) {
-            if(roomName === 'W55S33') {
-              return false;
-            }
-
-            if(roomName === 'W56S33') {
-              costMatrix.set(49,40,255);
-              costMatrix.set(49,41,255);
-            }
-
             const sourceKeepersLiar = creep.room.find(FIND_STRUCTURES, {
               filter: (s: Structure) => s.structureType === STRUCTURE_KEEPER_LAIR
             });

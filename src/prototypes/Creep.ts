@@ -2,7 +2,7 @@ Creep.prototype.moveToRoom = function(roomName: string)
 {
     this.moveTo(new RoomPosition(25,25,roomName), {
         reusePath: 9,
-        range: 15
+        range: 15,
     });
 }
 

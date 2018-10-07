@@ -26,11 +26,12 @@ export class Room_Bootstrap extends Process
 
   run()
   {
-    if(!Game.rooms[this.meta.room]) {
+    const room = Game.rooms[this.meta.room];
+
+    if(!room || (room.controller && !room.controller.my)) {
       this.state = 'killed';
       return;
     }
-    const room = Game.rooms[this.meta.room];
 
     if(!this.meta.targets) {
       this.meta.targets = [];

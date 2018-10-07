@@ -4,8 +4,7 @@ import {SpawnsHelper} from '../helpers/spawns'
 // META
 // room
 // target
-// global.OS.kernel.addProcess('harrasRemote', {room: 'W59S21', target: "W59S17", creeps: ['434_11600948']}, 0)
-// Multiple creeps support is important for pre-spawning
+// global.OS.kernel.addProcess('harrasRemote', {room: 'W56S33', target: "W57S38"}, 0)
 export class HarrasRemote extends Process
 {
 
@@ -17,7 +16,7 @@ export class HarrasRemote extends Process
 
     run()
     {
-        this.state = 'killed';
+        // this.state = 'killed';
         try {
             this.run2();
         }
@@ -29,9 +28,6 @@ export class HarrasRemote extends Process
 
     run2()
     {
-        // if(!this.meta.creeps['434_11600948']) {
-        //     this.meta.creeps.push('434_11600948');
-        // }
         const room = Game.rooms[this.meta.room];
         if(typeof this.meta.initialized === 'undefined') {
             this.init();
@@ -60,7 +56,8 @@ export class HarrasRemote extends Process
                 if(remainingTTL && remainingTTL <= 300 && this.meta.creeps.length < 2) {
                     if(SpawnsHelper.spawnAvailable(room)) {
                         const bodyParts: BodyPartConstant[] = [ // 3290 energy
-                            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                            //MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
                         SpawnsHelper.requestSpawn(this.ID, room,bodyParts,{role: 'remoteHarrasser'}, 'creeps[]');
                     }
                 }
@@ -71,7 +68,8 @@ export class HarrasRemote extends Process
         if(this.meta.creeps.length < 1) {
             if(SpawnsHelper.spawnAvailable(room)) {
                 const bodyParts: BodyPartConstant[] = [ // 3290 energy
-                    MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                    MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                    //MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
                 SpawnsHelper.requestSpawn(this.ID, room,bodyParts,{role: 'remoteHarrasser'}, 'creeps[]');
             }
         }
@@ -85,11 +83,33 @@ export class HarrasRemote extends Process
         }
 
         if(creep.room.name !== this.meta.target) {
+            let healed = false;
+            if(creep.hits < creep.hitsMax) {
+                creep.heal(creep);
+                healed = true;
+            }
+            let hostiles = creep.pos.findInRange(creep.room.hostiles, 1);
+            if(hostiles.length) {
+                if(healed && creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
+                    creep.rangedAttack(hostiles[0]);
+                }
+                else {
+                    if(!healed && creep.getActiveBodyparts(ATTACK) > 0) {
+                        creep.attack(hostiles[0]);
+                    }
+                    if(creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
+                        creep.rangedAttack(hostiles[0]);
+                    }
+                }
+            }
             creep.moveToRoom(this.meta.target);
         }
         else {
             if(Game.time % 5 === 0) {
                 creep.say('#overlords', true);
+            }
+            if(Game.time % 9 === 0 && creep.room.allies.length) {
+                creep.say(`Hi ${creep.room.allies[0].owner.username}! :)`);
             }
             // if(creep.room.controller && creep.room.controller.reservation && creep.room.controller.reservation.username !== 'GimmeCookies') {
             //     if(creep.room.controller.reservation.ticksToEnd < 150) {
@@ -102,9 +122,9 @@ export class HarrasRemote extends Process
 
                 const reserver = creep.room.hostiles.filter((c: Creep) => c.getActiveBodyparts(CLAIM));
                 const filteredDefenders: Creep[] =
-                creep.room.hostiles.filter((c: Creep) => (c.getActiveBodyparts(RANGED_ATTACK) || c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(HEAL) &&
-                    c.pos.x < 39 && c.pos.x > 10 && c.pos.y < 39 && c.pos.x > 10
-                ));
+                creep.room.hostiles.filter((c: Creep) => (c.getActiveBodyparts(RANGED_ATTACK) || c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(HEAL)) &&
+                    c.pos.x !== 0 && c.pos.x !== 49 && c.pos.y !== 0 && c.pos.y !== 49
+                );
 
                 if(reserver.length) {
                     this.harrasserAttack(creep, reserver[0]);
@@ -115,41 +135,74 @@ export class HarrasRemote extends Process
                     this.harrasserAttack(creep, target);
                 }
                 else {
-                    const target: Creep = creep.pos.findClosestByRange(creep.room.hostiles.filter((c: Creep) => (!c.getActiveBodyparts(RANGED_ATTACK) && !c.getActiveBodyparts(ATTACK) && !c.getActiveBodyparts(HEAL))));
+                    const target: Creep = creep.pos.findClosestByRange(creep.room.hostiles.filter((c: Creep) => (!c.getActiveBodyparts(RANGED_ATTACK) && !c.getActiveBodyparts(ATTACK) && !c.getActiveBodyparts(HEAL)) && c.pos.x !== 0 && c.pos.x !== 49 && c.pos.y !== 0 && c.pos.y !== 49));
                     if(target) {
                         this.harrasserAttack(creep, target);
                     }
                     else {
-                        const structures: Structure[] = creep.room.containers;
-                        if(structures.length) {
-                            const target = creep.pos.findClosestByRange(structures);
-                            this.harrasserAttack(creep, target);
+                        // const structures: Structure[] = creep.room.roads;
+                        // if(structures.length) {
+                        //     const target = creep.pos.findClosestByRange(structures);
+                        //     this.harrasserAttack(creep, target);
+                        // }
+                        const allies = creep.room.allies.filter((c: Creep) => c.hits < c.hitsMax);
+                        if(allies.length) {
+                            const closest = creep.pos.findClosestByRange(allies);
+                            // creep.moveTo(closest);
+                            if(creep.heal(closest) === ERR_NOT_IN_RANGE) {
+                                if(creep.rangedHeal(closest) === ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(closest)
+                                }
+                            }
                         }
                     }
                 }
             }
             else {
                 //const structures: Structure[] = creep.room.containers;
-                const structures: Structure[] = creep.room.find(FIND_STRUCTURES, {filter: (r: Structure) => r.structureType === STRUCTURE_ROAD || r.structureType === STRUCTURE_CONTAINER});
+                const structures: Structure[] = []; //creep.room.find(FIND_STRUCTURES, {filter: (r: Structure) => r.structureType === STRUCTURE_ROAD /*|| r.structureType === STRUCTURE_CONTAINER*/});
                 if(structures.length) {
                     const target = creep.pos.findClosestByRange(structures);
                     this.harrasserAttack(creep, target);
                 }
                 else {
+                    const allies = creep.room.allies.filter((c: Creep) => c.hits < c.hitsMax);
                     if(creep.hits < creep.hitsMax) {
                         creep.heal(creep);
                     }
-
-                    if(creep.room.controller) {
-                        if(!creep.pos.isNearTo(creep.room.controller)) {
-                            creep.moveTo(creep.room.controller);
-                        }
-                        else {
-                            if(creep.room.controller.sign && creep.room.controller.sign.username !== 'GimmeCookies') {
-                                creep.signController(creep.room.controller, "#overlords");
+                    else {
+                        if(allies.length) {
+                            const closest = creep.pos.findClosestByRange(allies);
+                            // creep.moveTo(closest);
+                            if(creep.heal(closest) === ERR_NOT_IN_RANGE) {
+                                if(creep.rangedHeal(closest) === ERR_NOT_IN_RANGE) {
+                                    creep.moveTo(closest)
+                                }
                             }
                         }
                     }
+                    if(allies.length) {
+                        if(!creep.pos.isNearTo(allies[0])) {
+                            creep.moveTo(allies[0]);
+                        }
+                    }
+                    else {
+                        const structures: Structure[] = creep.room.find(FIND_STRUCTURES, {filter: (r: Structure) => r.structureType === STRUCTURE_ROAD /*|| r.structureType === STRUCTURE_CONTAINER*/});
+                        if(structures.length) {
+                            const target = creep.pos.findClosestByRange(structures);
+                            this.harrasserAttack(creep, target);
+                        }
+                    }
+                    // else if(creep.room.controller) {
+                    //     if(!creep.pos.isNearTo(creep.room.controller)) {
+                    //         creep.moveTo(creep.room.controller);
+                    //     }
+                    //     else {
+                    //         if(creep.room.controller.sign && creep.room.controller.sign.username !== 'GimmeCookies') {
+                    //             creep.signController(creep.room.controller, "#overlords");
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }
@@ -164,10 +217,22 @@ export class HarrasRemote extends Process
                     creep.rangedAttack(target);
                 }
                 else {
-                    creep.rangedMassAttack();
+                    // creep.rangedMassAttack();
                 }
                 if(creep.hits < creep.hitsMax) {
                     creep.heal(creep);
+                }
+                else {
+                    const allies = creep.pos.findInRange(creep.room.allies, 3).filter((c: Creep) => c.hits < c.hitsMax);
+                    if(allies.length) {
+                        const closest = creep.pos.findClosestByRange(allies);
+                        if(creep.pos.isNearTo(closest)) {
+                            creep.heal(closest);
+                        }
+                        else {
+                            creep.rangedHeal(closest);
+                        }
+                    }
                 }
             }
             else {
@@ -182,10 +247,28 @@ export class HarrasRemote extends Process
                     if(creep.hits < creep.hitsMax) {
                         creep.heal(creep);
                     }
+                    else {
+                        const allies = creep.pos.findInRange(creep.room.allies, 1).filter((c: Creep) => c.hits < c.hitsMax);
+                        if(allies.length) {
+                            creep.heal(allies[0]);
+                        }
+                    }
                 }
                 else {
                     if(creep.hits < creep.hitsMax) {
                         creep.heal(creep);
+                    }
+                    else {
+                        const allies = creep.pos.findInRange(creep.room.allies, 3).filter((c: Creep) => c.hits < c.hitsMax);
+                        if(allies.length) {
+                            const closest = creep.pos.findClosestByRange(allies);
+                            if(creep.pos.isNearTo(closest)) {
+                                creep.heal(closest);
+                            }
+                            else {
+                                creep.rangedHeal(closest);
+                            }
+                        }
                     }
                 }
             }

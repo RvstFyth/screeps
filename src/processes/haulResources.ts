@@ -11,7 +11,7 @@ export class HaulResources extends Process
 
   run()
   {
-    // if(this.meta.resource === 'H') {
+    // if(this.meta.room === 'W56S33') {
     //   this.state = 'killed';
     // }
     if(!this.meta.transfered) {
