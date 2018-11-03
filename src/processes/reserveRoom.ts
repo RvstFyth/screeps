@@ -28,10 +28,7 @@ export class ReserveRoom extends Process
     const room = Game.rooms[this.meta.target];
     const needClaimer = !room || !room.controller || !room.controller.reservation || room.controller.reservation.ticksToEnd < 1000;
 
-    if(needClaimer && (!this.meta.creep || !Game.creeps[this.meta.creep])) {
-      if(this.meta.target === 'W59S17') {
-        this.state = 'killed';
-      }
+    if(needClaimer && !Game.creeps[this.meta.creep]) {
       if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
         SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], RemoteReserver.defineBodyParts(room), {role: 'remoteReserver'}, 'creep');
         //this.meta.creep = SpawnsHelper.spawnCreep(Game.rooms[this.meta.room], RemoteReserver.defineBodyParts(Game.rooms[this.meta.room]), {role: 'remoteReserver'}, this.ID.toString());

@@ -19,7 +19,7 @@ export class MakeBoosts extends Process
       }
 
       // Find labs to use
-      if(!this.meta.labs || !this.meta.labs.length) {
+      if(room.labs.length > 2 && (!this.meta.labs || !this.meta.labs.length)) {
         try {
           this.defineLabs(room.labs);
         }

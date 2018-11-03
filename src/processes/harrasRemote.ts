@@ -17,6 +17,10 @@ export class HarrasRemote extends Process
     run()
     {
         // this.state = 'killed';
+        if(this.meta.room === 'W52S35') {
+            this.meta.room = 'W53S39';
+            console.log(`Changed target to W53S39`);
+        }
         try {
             this.run2();
         }
@@ -34,6 +38,7 @@ export class HarrasRemote extends Process
         }
 
         if(room) {
+            this.meta.waypoint = !!Game.flags[this.ID];
             this.handleCreeps(room);
         }
         else {
@@ -53,10 +58,10 @@ export class HarrasRemote extends Process
             else if(Game.creeps[this.meta.creeps[i]]) {
                 this.handleHarrasser(Game.creeps[this.meta.creeps[i]]);
                 const remainingTTL = Game.creeps[this.meta.creeps[i]].ticksToLive;
-                if(remainingTTL && remainingTTL <= 300 && this.meta.creeps.length < 2) {
+                if(remainingTTL && remainingTTL <= 500 && this.meta.creeps.length < 2) {
                     if(SpawnsHelper.spawnAvailable(room)) {
                         const bodyParts: BodyPartConstant[] = [ // 3290 energy
-                            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,HEAL,HEAL,HEAL];
                             //MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
                         SpawnsHelper.requestSpawn(this.ID, room,bodyParts,{role: 'remoteHarrasser'}, 'creeps[]');
                     }
@@ -68,7 +73,7 @@ export class HarrasRemote extends Process
         if(this.meta.creeps.length < 1) {
             if(SpawnsHelper.spawnAvailable(room)) {
                 const bodyParts: BodyPartConstant[] = [ // 3290 energy
-                    MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                    MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,HEAL,HEAL,HEAL];
                     //MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
                 SpawnsHelper.requestSpawn(this.ID, room,bodyParts,{role: 'remoteHarrasser'}, 'creeps[]');
             }
@@ -80,6 +85,10 @@ export class HarrasRemote extends Process
 
         if(creep.hits < (creep.hitsMax / 4) * 3) {
             creep.heal(creep);
+        }
+
+        if(typeof creep.memory.arrived === 'undefined') {
+            creep.memory.arrived = false;
         }
 
         if(creep.room.name !== this.meta.target) {
@@ -102,7 +111,17 @@ export class HarrasRemote extends Process
                     }
                 }
             }
-            creep.moveToRoom(this.meta.target);
+            if(this.meta.waypoint && !creep.memory.arrived) {
+                if(!creep.pos.isNearTo(Game.flags[this.ID])) {
+                    creep.moveTo(Game.flags[this.ID]);
+                }
+                else {
+                    creep.memory.arrived = true;
+                }
+            }
+            else {
+                creep.moveToRoom(this.meta.target);
+            }
         }
         else {
             if(Game.time % 5 === 0) {
@@ -153,6 +172,12 @@ export class HarrasRemote extends Process
                                 if(creep.rangedHeal(closest) === ERR_NOT_IN_RANGE) {
                                     creep.moveTo(closest)
                                 }
+                            }
+                        }
+                        else {
+                            const inRange = creep.pos.findInRange(creep.room.hostiles, 3);
+                            if(inRange.length) {
+                                creep.rangedAttack(inRange[0]);
                             }
                         }
                     }

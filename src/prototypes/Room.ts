@@ -158,7 +158,7 @@ Object.defineProperty(Room.prototype, 'hostiles', {
   {
     if(!this._hostiles) {
       this._hostiles = this.find(FIND_HOSTILE_CREEPS, {
-        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) === -1 && c.owner.username !== 'BarryOSeven'
+        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) === -1
       });
     }
 
@@ -171,7 +171,7 @@ Object.defineProperty(Room.prototype, 'allies', {
   {
     if(!this._allies) {
       this._allies = this.find(FIND_HOSTILE_CREEPS, {
-        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) > -1 || c.owner.username === 'BarryOSeven'
+        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) > -1
       });
     }
 

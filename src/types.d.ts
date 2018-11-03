@@ -52,4 +52,5 @@ interface CreepMemory {
     needBoost: boolean
     boosted: boolean
     initialized: boolean
+    arrived: boolean
 }

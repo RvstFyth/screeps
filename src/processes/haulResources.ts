@@ -14,14 +14,20 @@ export class HaulResources extends Process
     // if(this.meta.room === 'W56S33') {
     //   this.state = 'killed';
     // }
-    if(!this.meta.transfered) {
-      this.meta.transfered = 0;
-    }
-    if(this.meta.transfered >= this.meta.amount) {
-      this.killProcess();
+    const room = Game.rooms[this.meta.room];
+    if(room) {
+      if(!this.meta.transfered) {
+        this.meta.transfered = 0;
+      }
+      if(this.meta.transfered >= this.meta.amount) {
+        this.killProcess();
+      }
+      else {
+        this.handleTransporter();
+      }
     }
     else {
-      this.handleTransporter();
+      this.state = 'killed';
     }
   }
 

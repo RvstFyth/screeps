@@ -19,7 +19,7 @@ export class Towers extends Process
           targetIDs = this.handleInvaders(room.towers[i], targetIDs);
         }
         else {
-          room.towers[i].attack(room.hostiles[0]);
+          this.handleHostiles(room.towers[i], targetIDs);
         }
       }
       else {
@@ -66,7 +66,7 @@ export class Towers extends Process
             }
             else {
               if(numRepairs < 1) {
-                const roads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax); // 7 mill
+                const roads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax);
                 if(Math.floor(Math.random() * 2) === 1) {
                   const road = _.min(roads, r => r.hits);
                   room.towers[i].repair(road);
@@ -78,6 +78,38 @@ export class Towers extends Process
         }
       }
     }
+  }
+
+  private handleHostiles(tower: StructureTower, targetIDs: string[]) : string[]
+  {
+    const healers = tower.room.hostiles.filter((c: Creep) => c.getActiveBodyparts(HEAL) > 0);
+    let target: Creep|undefined;
+
+    if(healers.length) {
+      const filteredTargets = healers.filter((c: Creep) => targetIDs.indexOf(c.id) < 0);
+      if(filteredTargets.length) {
+        target = tower.pos.findClosestByRange(filteredTargets);
+      }
+      else {
+        target = tower.pos.findClosestByRange(healers);
+      }
+    }
+    else {
+      const filteredTargets = tower.room.hostiles.filter((c: Creep) => targetIDs.indexOf(c.id) < 0);
+      if(filteredTargets.length) {
+        target = tower.pos.findClosestByRange(filteredTargets);
+      }
+      else {
+        target = tower.pos.findClosestByRange(healers);
+      }
+    }
+
+    if(target) {
+      tower.attack(target);
+      targetIDs.push(target.id);
+    }
+
+    return targetIDs;
   }
 
   private handleInvaders(tower: StructureTower, targetIDs: string[]) : string[]

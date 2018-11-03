@@ -2,7 +2,7 @@ import {Process} from '../ROS/process'
 import {SpawnsHelper} from '../helpers/spawns'
 
 // META: room, target, targetWall
-// OS.kernel.addProcess('dismantleWall', {room: 'W59S21', target: 'W59S14', targetWall: '5b68b001025e8513fe02c1f5'}, 0);
+// OS.kernel.addProcess('dismantleWall', {room: 'W51S31', target: 'W58S35', targetWall: '5bc616bc7d21e7597d46aef0'}, 0);
 export class DismantleWall extends Process
 {
 
@@ -29,21 +29,31 @@ export class DismantleWall extends Process
 
     public run2()
     {
+        //this.meta.target = 'W58S38';
+        //this.meta.targetWall = '5b9cf93798f0804d4200b4a0';
+        // this.meta.done = false;
+        this.state = 'killed';
+
         const room = Game.rooms[this.meta.room];
         const healer = Game.creeps[this.meta.healer];
         const dismantler = Game.creeps[this.meta.dismantler];
-
+        if(typeof this.meta.done === 'undefined') {
+            this.meta.done = false;
+        }
         if(typeof this.meta.initialized === 'undefined') {
             this.init();
         }
         if(!healer) {
+            if(typeof this.meta.done !== 'undefined' && this.meta.done) {
+                this.state = 'killed';
+            }
             this.meta.hBoosted = false;
             this.meta.hCurrent = 0;
             if(dismantler) {
                 dismantler.suicide();
                 //this.state = 'killed';
             }
-            if(SpawnsHelper.spawnAvailable(room)) {
+            if(!this.meta.done && SpawnsHelper.spawnAvailable(room)) {
                 SpawnsHelper.requestSpawn(this.ID, room, [
                     TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE
                 ], {role: 'dismantleHealer'}, 'healer');
@@ -67,8 +77,28 @@ export class DismantleWall extends Process
             }
             if(this.meta.hBoosted && this.meta.dBoosted) {
                 if(Game.flags[this.ID]) {
-                    healer.moveTo(Game.flags[this.ID]);
-                    dismantler.moveTo(Game.flags[this.ID]);
+                    // if(dismantler.pos.isNearTo(healer)) {
+                    //     dismantler.moveTo(Game.flags[this.ID]);
+                    //     healer.moveTo(dismantler);
+                    // }
+                    // else {
+                    //     healer.moveTo(dismantler);
+                    // }
+                    if(dismantler.pos.isNearTo(healer) && dismantler.fatigue === 0 && healer.fatigue === 0) {
+                        dismantler.moveTo(Game.flags[this.ID]);
+                    }
+                    else{
+                        if(dismantler.pos.x === 0 || dismantler.pos.x === 49 || dismantler.pos.y === 0 || dismantler.pos.y === 49) {
+                            dismantler.moveTo(Game.flags[this.ID]);
+                        }
+                    }
+                    healer.moveTo(dismantler);
+                    if(dismantler.hits < dismantler.hitsMax) {
+                        healer.heal(dismantler);
+                    }
+                    else {
+                        healer.heal(healer);
+                    }
                 }
                 else {
                     this.handleCreeps(healer, dismantler);
@@ -147,25 +177,42 @@ export class DismantleWall extends Process
             }
         }
         else {
+            if(Game.time % 5 === 0) {
+                dismantler.say('#overlords', true);
+            }
+
             if(!this.meta.targetWall) {
                 // Find a wall through code
             }
             if(this.meta.targetWall) {
-                const wall: StructureWall|null = Game.getObjectById(this.meta.targetWall);
+                let wall: StructureWall|StructureRampart|null = Game.getObjectById(this.meta.targetWall);
+                if(!wall) {
+                    wall = Game.getObjectById('5b9be992c176a8157dd3421a');
+                }
                 if(wall) {
                     if(!dismantler.pos.isNearTo(wall)) {
-                        dismantler.moveTo(wall);
+                        if(dismantler.pos.x !== 0 && dismantler.pos.x !== 49 && dismantler.pos.y !== 0 && dismantler.pos.y !== 49) {
+                            if(dismantler.pos.isNearTo(healer)) {
+                                dismantler.moveTo(wall);
+                            }
+                        }
+                        else {
+                            dismantler.moveTo(wall);
+                        }
                     }
                     else {
                         dismantler.dismantle(wall);
-                        if(Game.time % 5 === 0) {
-                            dismantler.say('#overlords', true);
-                        }
                     }
                 }
                 else {
                     let target;
-                    if(dismantler.room.towers.length) {
+                    // if(dismantler.room.spawns.length) {
+                    //     target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
+                    // }
+                    if(dismantler.room.extensions.length) {
+                        target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
+                    }
+                    else if(dismantler.room.towers.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.towers);
                     }
                     else if(dismantler.room.spawns.length) {
@@ -186,14 +233,22 @@ export class DismantleWall extends Process
                     else if(dismantler.room.containers.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.containers);
                     }
+                    else if(dismantler.room.links.length) {
+                        target = dismantler.pos.findClosestByRange(dismantler.room.links);
+                    }
                     if(target) {
                         if(dismantler.dismantle(target) === ERR_NOT_IN_RANGE) {
                             if(dismantler.pos.isNearTo(healer) && dismantler.fatigue === 0 && healer.fatigue === 0) {
                                 dismantler.moveTo(target);
                             }
+                            const structures = dismantler.pos.findInRange(dismantler.room.extensions, 1);
+                            if(structures.length) {
+                                dismantler.dismantle(structures[0]);
+                            }
                         }
                     }
                     else {
+                        this.meta.done = true;
                         const roads = dismantler.room.find(FIND_STRUCTURES, {
                             filter: (s: Structure) => s.structureType === STRUCTURE_ROAD
                         });
@@ -219,17 +274,26 @@ export class DismantleWall extends Process
             healer.moveTo(dismantler);
         }
         else {
+            //const sayings: any = ['You','only','have','one','safemode','use','it','wise!','...','..'];
+            // const sayings = ['Sie', 'haben', 'nur', 'ein', 'safemode', 'brauch', 'es', 'vernuuunftig','!!!!!'];
+            // for(let i = 0; i < 9; i++) {
+            //     if(Game.time % i === 0) {
+            //         //const string = sayings[i] ? sayings[i] : '';
+            //         healer.say(sayings[Game.time % sayings.length], true);
+            //         break;
+            //     }
+            // }
             if(healer.pos.x === 0) {
                 healer.moveTo(1, dismantler.pos.y + 1);
             }
             else if(healer.pos.x === 49) {
-                healer.moveTo(48, dismantler.pos.y + 1);
+                healer.moveTo(48, dismantler.pos.y - 1);
             }
             else if(healer.pos.y === 0) {
                 healer.moveTo(dismantler.pos.x + 1, 1);
             }
             else if(healer.pos.y === 49) {
-                healer.moveTo(dismantler.pos.x + 1, 48);
+                healer.moveTo(dismantler.pos.x, 48);
             }
             else {
                 healer.moveTo(dismantler);
@@ -250,12 +314,23 @@ export class DismantleWall extends Process
         }
         else {
             const hostiles = healer.pos.findInRange(healer.room.hostiles, 3);
+            let hasAttacked = false;
             if(hostiles.length) {
                 healer.rangedAttack(hostiles[0]);
+                hasAttacked = true;
             }
             else {
-                if(wall && healer.pos.inRangeTo(wall,3)) {
-                    healer.rangedAttack(wall);
+                const ramparts = healer.pos.findInRange(FIND_STRUCTURES, 3 ,{
+                    filter: (s: Structure) => s.structureType === STRUCTURE_RAMPART && s.hits < 5000
+                });
+                if(ramparts.length) {
+                    const target = healer.pos.findClosestByRange(ramparts);
+                    healer.rangedAttack(target);
+                }
+                else {
+                    if(wall && healer.pos.inRangeTo(wall,3)) {
+                        healer.rangedAttack(wall);
+                    }
                 }
             }
             if(dismantler.hits < dismantler.hitsMax) {
@@ -269,7 +344,24 @@ export class DismantleWall extends Process
                 }
             }
             else {
-                healer.heal(healer);
+                if(healer.hits < healer.hitsMax) {
+                    healer.heal(healer);
+                }
+                else {
+                    const allies = healer.pos.findInRange(healer.room.allies, 3).filter((c: Creep) => c.hits < c.hitsMax);
+                    if(allies.length) {
+                        const target = healer.pos.findClosestByRange(allies);
+                        if(healer.pos.isNearTo(target)) {
+                            healer.heal(target);
+                        }
+                        else {
+                            healer.rangedHeal(target);
+                        }
+                    }
+                    else {
+                        healer.heal(healer);
+                    }
+                }
             }
         }
     }

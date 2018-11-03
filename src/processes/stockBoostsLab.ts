@@ -136,16 +136,20 @@ export class StockBoostsLab extends Process
                 }
                 if(_.sum(creep.carry) === 0) {
                     const amountNeeded = 3000 - lab.mineralAmount >= creep.carryCapacity ? creep.carryCapacity : 3000 - lab.mineralAmount;
+                    let amountStored: number|undefined = 0;
                     let target: StructureStorage|StructureTerminal|null = null;
                     if(creep.room.storage && creep.room.storage.store[this.meta.current as ResourceConstant]) {
                         target = creep.room.storage;
+                        amountStored = creep.room.storage.store[this.meta.current as ResourceConstant];
                     }
                     else if(creep.room.terminal && creep.room.terminal.store[this.meta.current as ResourceConstant]) {
                         target = creep.room.terminal;
+                        amountStored = creep.room.terminal.store[this.meta.current as ResourceConstant]
                     }
 
-                    if(target) {
-                        if(creep.withdraw(target, this.meta.current, amountNeeded) === ERR_NOT_IN_RANGE) {
+                    if(target && amountStored) {
+                        const amount = amountStored >= amountNeeded ? amountNeeded : amountStored;
+                        if(creep.withdraw(target, this.meta.current, amount) === ERR_NOT_IN_RANGE) {
                             creep.moveTo(target);
                         }
                     }

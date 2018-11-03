@@ -9,6 +9,9 @@ export class UpgradeRoom extends Process
   run()
   {
     const room = Game.rooms[this.meta.room];
+    if(room.controller && room.controller.my && room.controller.level && room.controller.level < 8) {
+      room.controller.say(`${(room.controller.progress / room.controller.progressTotal * 100).toFixed(1)}%`);
+    }
     if(room) {
       if(!this.meta.creeps) {
         this.meta.creeps = [];
@@ -72,6 +75,9 @@ export class UpgradeRoom extends Process
     }
     else if(room.controller && room.controller.level === 8) {
       return 0;
+    }
+    else if(room.controller && room.controller.level === 7 && room.storage && room.storage.store[RESOURCE_ENERGY] < 150000) {
+      return 1;
     }
     if(room.storage && room.storage.store[RESOURCE_ENERGY] < 200000) {
       return 2;

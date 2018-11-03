@@ -24,28 +24,42 @@ export class RemoteMining extends Process
         this.meta.roads = PathingHelper.pathToString(path);
       }
     }
-    else {
-
-    }
   }
 
   checkRoads(room: Room)
   {
     const path = PathingHelper.stringToPath(this.meta.roads);
     for(let i in path) {
-      room.visual.circle(path[i].x, path[i].y, {stroke: 'orange'});
+      room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
+      //room.visual.circle(path[i].x, path[i].y, {stroke: 'orange'});
     }
   }
 
   run()
   {
     const room = Game.rooms[this.meta.room];
+    const source: Source|null = Game.getObjectById(this.meta.sourceID);
     if(this.suspendedTill && this.suspendedTill > 0 && Game.time < this.suspendedTill) {
       return;
     }
     else {
       this.suspendedTill = 0;
     }
+
+    // if(!this.meta.roads) {
+    //   if(source) {
+    //     this.initRoom(source, room);
+    //   }
+    // }
+
+    // if(!this.meta.lastRoadCheck || (this.meta.lastRoadCheck + 150 < Game.time)) {
+    //   if(source && Object.keys(Game.constructionSites).length < 10) {
+    //     console.log(`Triggering checking roads for remote: ${source.room.name}`);
+    //     this.meta.lastRoadCheck = Game.time;
+    //     this.checkRoads(source.room)
+    //   }
+    // }
+
 
     if(room) {
       if((!this.suspendedTill || this.suspendedTill === 0) && Game.rooms[this.meta.target] && Game.rooms[this.meta.target].hostiles) {

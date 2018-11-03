@@ -64,7 +64,9 @@ export class Rampart
               }
             }
             else {
-              creep.repair(target as StructureRampart);
+              const ramparts = creep.pos.findInRange(creep.room.ramparts, 3);
+              const ram = _.min(ramparts, c => c.hits);
+              creep.repair(ram as StructureRampart);
             }
           }
         }

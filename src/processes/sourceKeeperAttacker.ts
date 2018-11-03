@@ -34,7 +34,8 @@ export class SourceKeeperAttacker extends Process
         if(!this.meta.creep || !creep) {
             if(SpawnsHelper.spawnAvailable(room)) {
                 SpawnsHelper.requestSpawn(this.ID, room,
-                    [TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL],
+                    //[TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL],
+                    [TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL],
                     {role: 'skAttacker'}, 'creep')
             }
         }
@@ -49,12 +50,24 @@ export class SourceKeeperAttacker extends Process
                 const hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
                 if(hostiles.length) {
                     const target = creep.pos.findClosestByRange(hostiles);
-                    const res = creep.attack(target);
-                    if(res === ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
+                    const hostilesInRange = creep.pos.findInRange(hostiles, 3);
+
+                    // Ranged or massRanged
+                    if(hostilesInRange && hostilesInRange.length > 1) {
+                        creep.rangedMassAttack();
                     }
-                    if(res !== OK && creep.hits < creep.hitsMax) {
+                    else if(creep.pos.inRangeTo(target, 3)) {
+                        creep.rangedAttack(target);
+                    }
+                    // Attack or heal
+                    if(creep.pos.isNearTo(target)) {
+                        creep.attack(target);
+                    }
+                    else {
                         creep.heal(creep);
+                        if(creep.hits === creep.hitsMax || creep.pos.inRangeTo(target, 3)) {
+                            creep.moveTo(target);
+                        }
                     }
                 }
                 else {

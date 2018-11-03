@@ -4,3 +4,11 @@ clear
 gcl()
 roomStats()
 roomStats()
+test()
+test()
+gcl()
+test()
+test()
+test()
+test()
+Game.shard.name

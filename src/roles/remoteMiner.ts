@@ -42,7 +42,9 @@ export class RemoteMiner
             else if(creep.room.constructionSites.length) {
               const target = creep.pos.findClosestByRange(creep.room.constructionSites);
               if(!creep.pos.inRangeTo(target, 2)) {
-                creep.moveTo(target);
+                creep.moveTo(target, {
+                  maxRooms: 1
+                });
               }
               else {
                 creep.build(target);

@@ -3,6 +3,7 @@ import { ROS } from "ROS/ROS";
 import {PathingHelper} from 'helpers/pathing'
 import 'prototypes/Room';
 import 'prototypes/Creep';
+import 'prototypes/RoomObject';
 import 'globals'
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
@@ -22,6 +23,25 @@ global.sendResources = function(type: ResourceConstant, roomName: string, target
       terminal.send(type, amount, target);
     }
   }
+}
+
+global.test = function()
+{
+  const iterations = 10;
+  const cpuA = Game.cpu.getUsed();
+
+  for(let i = 0, iEnd = iterations; i < iEnd; i++) {
+    const a = _.values(Game.creeps);
+  }
+  const usedA = Game.cpu.getUsed() - cpuA;
+
+  const cpuB = Game.cpu.getUsed();
+  for(let i = 0, iEnd = iterations; i < iEnd; i++) {
+    const b = Object.values(Game.creeps);
+  }
+  const usedB = Game.cpu.getUsed() - cpuB;
+
+  console.log(`${iterations}x Lodash: ${usedA.toFixed(3)} (${(usedA / iterations).toFixed(5)}) | Native: ${usedB.toFixed(3)} (${(usedB / iterations).toFixed(5)})`);
 }
 
 if(!Memory.remotes) {
