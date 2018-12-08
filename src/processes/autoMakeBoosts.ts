@@ -66,129 +66,50 @@ export class AutoMakeBoosts extends Process
     private handle(room: Room)
     {
         if(room.storage && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('emptyLabs', 'room', room.name)) {
-            let triggered = false;
-            for(let i in global.BOOST_COMPONENTS) {
-
-                const storageAmount = room.storage.store[i as ResourceConstant];
-                if(!storageAmount || storageAmount < 3000) {
-                    // check if there are enough ingredients in terminal AND storage
-                    // if there are enough, trigger a process to create the boos
-                    const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[i];
-                    const fAmount = room.storage.store[ingredients[0]];
-                    const sAmount = room.storage.store[ingredients[1]];
-                    if(fAmount && fAmount >= 3000 && sAmount && sAmount >= 3000) {
-                        global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: i, amount: 3000}, 0);
-                        triggered = true;
-                        break;
-                    }
-                    else {
-                        if(fAmount && fAmount < 3000) {
-                            this.requestResources(room, (ingredients[0] as ResourceConstant));
-                        }
-                        if(sAmount && sAmount < 3000) {
-                            this.requestResources(room, (ingredients[1] as ResourceConstant));
-                        }
-                        if(room.terminal) {
-                            const fAmount = room.terminal.store[ingredients[0]];
-                            const sAmount = room.terminal.store[ingredients[1]];
-                            if(fAmount && fAmount >= 3000 && sAmount && sAmount >= 3000) {
-                                global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: i, amount: 3000}, 0);
-                                triggered = true;
-                                break;
-                            }
-                            else {
-
-                            }
-                        }
-                    }
-                }
-                else {
-                    // Go fishing
-                }
-            }
-            // Als er nog geen process getriggerd is, check op het aantal van 6000
-            if(!triggered) {
-                for(let i in global.BOOST_COMPONENTS) {
-
-                    const storageAmount = room.storage.store[i as ResourceConstant];
-                    if(!storageAmount || storageAmount < 6000) {
-                        // check if there are enough ingredients in terminal AND storage
-                        // if there are enough, trigger a process to create the boos
-                        const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[i];
-                        const fAmount = room.storage.store[ingredients[0]];
-                        const sAmount = room.storage.store[ingredients[1]];
-                        if(fAmount && fAmount >= 3000 && sAmount && sAmount >= 3000) {
-                            global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: i, amount: 3000}, 0);
-                            triggered = true;
-                            break;
-                        }
-                        else {
-                            if(fAmount && fAmount < 3000) {
-                                this.requestResources(room, (ingredients[0] as ResourceConstant));
-                            }
-                            if(sAmount && sAmount < 3000) {
-                                this.requestResources(room, (ingredients[1] as ResourceConstant));
-                            }
-                            if(room.terminal) {
-                                const fAmount = room.terminal.store[ingredients[0]];
-                                const sAmount = room.terminal.store[ingredients[1]];
-                                if(fAmount && fAmount >= 3000 && sAmount && sAmount >= 3000) {
-                                    global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: i, amount: 3000}, 0);
-                                    triggered = true;
-                                    break;
-                                }
-                                else {
-
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        // Go fishing or something
-                    }
-                }
-            }
-            if(!triggered) {
-                for(let i in global.BOOST_COMPONENTS) {
-
-                    const storageAmount = room.storage.store[i as ResourceConstant];
-                    if(!storageAmount || storageAmount < 12000) {
-                        // check if there are enough ingredients in terminal AND storage
-                        // if there are enough, trigger a process to create the boos
-                        const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[i];
-                        const fAmount = room.storage.store[ingredients[0]];
-                        const sAmount = room.storage.store[ingredients[1]];
-                        if(fAmount && fAmount >= 3000 && sAmount && sAmount >= 3000) {
-                            global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: i, amount: 3000}, 0);
-                            triggered = true;
-                            break;
-                        }
-                        else {
-                            if(fAmount && fAmount < 3000) {
-                                this.requestResources(room, (ingredients[0] as ResourceConstant));
-                            }
-                            if(sAmount && sAmount < 3000) {
-                                this.requestResources(room, (ingredients[1] as ResourceConstant));
-                            }
-                            if(room.terminal) {
-                                const fAmount = room.terminal.store[ingredients[0]];
-                                const sAmount = room.terminal.store[ingredients[1]];
-                                if(fAmount && fAmount >= 3000 && sAmount && sAmount >= 3000) {
-                                    global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: i, amount: 3000}, 0);
-                                    triggered = true;
-                                    break;
-                                }
-                                else {
-
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        // Go fishing or something
-                    }
-                }
+            const reaction = this.defineReaction(room);
+            if(reaction) {
+                global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: reaction, amount: 3000}, 0);
             }
         }
+    }
+
+    private defineReaction(room: Room) : string|null
+    {
+        if(room.storage) {
+            let minerals: {resource: string, amount: number}[] = [];
+            for(let x in global.BOOST_COMPONENTS) {
+                minerals.push({
+                    resource: x,
+                    amount: room.storage.store[x as ResourceConstant] || 0
+                });
+            }
+
+            let filteredMinerals = minerals.filter((m) => m.amount < 3000);
+            if(!filteredMinerals.length) {
+                filteredMinerals = minerals.filter((m) => m.amount < 6000);
+            }
+            if(!filteredMinerals.length) {
+                filteredMinerals = minerals.filter((m) => m.amount < 12000);
+            }
+            if(filteredMinerals.length) {
+                for(let i in filteredMinerals) {
+                    const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[filteredMinerals[i].resource];
+                    let fAmount = room.storage.store[ingredients[0]] || 0;
+                    let sAmount = room.storage.store[ingredients[1]] || 0;
+                    if(room.terminal) {
+                        fAmount += room.terminal.store[ingredients[0]] || 0;
+                        sAmount += room.terminal.store[ingredients[1]] || 0;
+                    }
+                    if(fAmount >= 3000 && sAmount >= 3000) {
+                        return filteredMinerals[i].resource;
+                    }
+                }
+            }
+            else {
+                return _.min(minerals, (m) => m.amount).resource;
+            }
+        }
+
+        return null;
     }
 }

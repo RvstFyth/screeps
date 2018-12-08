@@ -27,6 +27,10 @@ export class ReserveRoom extends Process
 
     const room = Game.rooms[this.meta.target];
     const needClaimer = !room || !room.controller || !room.controller.reservation || room.controller.reservation.ticksToEnd < 1000;
+    const origin = Game.rooms[this.meta.room];
+    if(!origin || !origin.controller || !origin.controller.my) {
+      this.state = 'killed';
+    }
 
     if(needClaimer && !Game.creeps[this.meta.creep]) {
       if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {

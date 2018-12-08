@@ -10,6 +10,7 @@ export class LootRoom extends Process
 
     run ()
     {
+        // this.state = 'killed';
         if(typeof this.meta.doneLooting === 'undefined') {
             this.meta.doneLooting = false;
             this.meta.shouldKill = false;
@@ -53,8 +54,33 @@ export class LootRoom extends Process
             }
             if(creep.memory.harvesting) {
                 if(creep.room.name !== this.meta.target) {
-                    creep.moveToRoom(this.meta.target);
-                }
+                    creep.moveTo(new RoomPosition(25,25,this.meta.target), {
+                      reusePath: 17,
+                      range: 20,
+                      costCallback: function(roomName: string, costMatrix: CostMatrix) {
+                        const sourceKeepersLiar = creep.room.find(FIND_STRUCTURES, {
+                          filter: (s: Structure) => s.structureType === STRUCTURE_KEEPER_LAIR
+                        });
+
+                        if(sourceKeepersLiar.length) {
+                          for(let i in sourceKeepersLiar) {
+                            const sX = sourceKeepersLiar[i].pos.x;
+                            const sY = sourceKeepersLiar[i].pos.y;
+                            //costMatrix.set(sX,sY,255);
+                            // Loop throug Y
+                            for(let y = (sY - 5), yEnd = (sY + 5); y < yEnd; y++) {
+                              for(let x = (sX - 5), xEnd = (sX + 5); x < xEnd; x++) {
+                                costMatrix.set(x,y,60);
+                              }
+                            }
+                            costMatrix.set(sX,sY,255);
+                          }
+                        }
+
+                        return costMatrix;
+                      }
+                    });
+                  }
                 else {
                     if(!this.meta.shouldKill) {
                         this.loot(creep);
@@ -73,8 +99,33 @@ export class LootRoom extends Process
     deliver(creep: Creep)
     {
         if(creep.room.name !== this.meta.room) {
-            creep.moveToRoom(this.meta.room);
-        }
+            creep.moveTo(new RoomPosition(25,25,this.meta.room), {
+              reusePath: 17,
+              range: 20,
+              costCallback: function(roomName: string, costMatrix: CostMatrix) {
+                const sourceKeepersLiar = creep.room.find(FIND_STRUCTURES, {
+                  filter: (s: Structure) => s.structureType === STRUCTURE_KEEPER_LAIR
+                });
+
+                if(sourceKeepersLiar.length) {
+                  for(let i in sourceKeepersLiar) {
+                    const sX = sourceKeepersLiar[i].pos.x;
+                    const sY = sourceKeepersLiar[i].pos.y;
+                    //costMatrix.set(sX,sY,255);
+                    // Loop throug Y
+                    for(let y = (sY - 5), yEnd = (sY + 5); y < yEnd; y++) {
+                      for(let x = (sX - 5), xEnd = (sX + 5); x < xEnd; x++) {
+                        costMatrix.set(x,y,60);
+                      }
+                    }
+                    costMatrix.set(sX,sY,255);
+                  }
+                }
+
+                return costMatrix;
+              }
+            });
+          }
         else {
             // Look at area. Check if there is a link within 10 tiles from the exit. Check the entire height/width
             // So we check on a stroke of 49x10

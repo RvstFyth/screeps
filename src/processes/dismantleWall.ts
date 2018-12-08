@@ -29,19 +29,33 @@ export class DismantleWall extends Process
 
     public run2()
     {
-        //this.meta.target = 'W58S38';
-        //this.meta.targetWall = '5b9cf93798f0804d4200b4a0';
+        // this.meta.target = 'W54S39';
+        // this.meta.targetWall = '5bf84cacb4a5532a2db37788';
         // this.meta.done = false;
         this.state = 'killed';
+        //this.meta.healer = '486_11251055';
+
+        //  if(this.ID == 506) {
+        //     this.meta.targetWall = '5bf84d5f57542e5b73d6e3c4';
+        // }
 
         const room = Game.rooms[this.meta.room];
         const healer = Game.creeps[this.meta.healer];
         const dismantler = Game.creeps[this.meta.dismantler];
+        if(dismantler && !dismantler.spawning && Game.flags[dismantler.name]) {
+            dismantler.moveTo(Game.flags[dismantler.name]);
+        }
+        if(healer && !healer.spawning && Game.flags[healer.name]) {
+            healer.moveTo(Game.flags[healer.name]);
+        }
         if(typeof this.meta.done === 'undefined') {
             this.meta.done = false;
         }
         if(typeof this.meta.initialized === 'undefined') {
             this.init();
+        }
+        if(this.meta.done && !healer && !dismantler) {
+            this.state = 'killed';
         }
         if(!healer) {
             if(typeof this.meta.done !== 'undefined' && this.meta.done) {
@@ -62,7 +76,7 @@ export class DismantleWall extends Process
         else if(healer && !dismantler) {
             this.meta.dBoosted = false;
             this.meta.dCurrent = 0;
-            if(SpawnsHelper.spawnAvailable(room)) {
+            if(!this.meta.done && SpawnsHelper.spawnAvailable(room)) {
                 SpawnsHelper.requestSpawn(this.ID, room, [
                     TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE,MOVE,MOVE
                 ],{role: 'boostedDismantler'}, 'dismantler');
@@ -209,8 +223,20 @@ export class DismantleWall extends Process
                     // if(dismantler.room.spawns.length) {
                     //     target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
                     // }
-                    if(dismantler.room.extensions.length) {
+                    // if(dismantler.room.towers.length) {
+                    //     target = dismantler.pos.findClosestByRange(dismantler.room.towers);
+                    // }
+                    // if(dismantler.room.storage) {
+                    //     target = dismantler.room.storage;
+                    // }
+                    if(dismantler.room.spawns.length) {
+                        target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
+                    }
+                    else if(dismantler.room.extensions.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
+                    }
+                    else if(dismantler.room.terminal) {
+                        target = dismantler.room.terminal;
                     }
                     else if(dismantler.room.towers.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.towers);
@@ -221,12 +247,12 @@ export class DismantleWall extends Process
                     else if(dismantler.room.extensions.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
                     }
-                    else if(dismantler.room.terminal) {
-                        target = dismantler.room.terminal;
-                    }
-                    else if(dismantler.room.storage) {
-                        target = dismantler.room.storage;
-                    }
+                    // else if(dismantler.room.terminal) {
+                    //     target = dismantler.room.terminal;
+                    // }
+                    // else if(dismantler.room.storage) {
+                    //     target = dismantler.room.storage;
+                    // }
                     else if(dismantler.room.labs.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.labs);
                     }

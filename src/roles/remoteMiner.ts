@@ -89,7 +89,9 @@ export class RemoteMiner
     }
     if(creep.memory.targetX && creep.memory.targetY) {
       if(creep.pos.x !== creep.memory.targetX || creep.pos.y !== creep.memory.targetY) {
-        creep.moveTo(creep.memory.targetX, creep.memory.targetY);
+        creep.moveTo(creep.memory.targetX, creep.memory.targetY, {
+          maxRooms: 1
+        });
       }
       if(creep.pos.isNearTo(source)) {
         creep.harvest(source);
@@ -97,7 +99,9 @@ export class RemoteMiner
     }
     else {
       if(!creep.pos.isNearTo(source)) {
-        creep.moveTo(source);
+        creep.moveTo(source, {
+          maxRooms: 1
+        });
       }
       else {
         creep.harvest(source);

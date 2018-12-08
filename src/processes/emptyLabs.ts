@@ -9,7 +9,7 @@ export class EmptyLabs extends Process
   run()
   {
     const room: Room = Game.rooms[this.meta.room];
-
+    // this.state = 'killed';
     if(!this.meta.creep || !Game.creeps[this.meta.creep]) {
       if(SpawnsHelper.spawnAvailable(room)) {
         this.meta.creep = SpawnsHelper.spawnCreep(room, [CARRY,CARRY,MOVE,MOVE,CARRY,CARRY,MOVE,MOVE], {role: 'labsTransporter'}, this.ID.toString());

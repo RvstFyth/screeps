@@ -17,6 +17,12 @@ export class MineralMiner
 
     const mineral: Mineral|null = Game.getObjectById(creep.memory.targetID);
 
+    if(creep.ticksToLive && creep.ticksToLive <= 51) {
+      creep.memory.harvesting = false;
+      if(_.sum(creep.carry) === 0) {
+        creep.suicide();
+      }
+    }
     if(_.sum(creep.carry) === 0) {
       creep.memory.harvesting = true;
     }
@@ -61,5 +67,19 @@ export class MineralMiner
         }
       }
     }
+  }
+
+  static defineBodyParts(room: Room) : BodyPartConstant[]
+  {
+    if(room.controller) {
+      if(room.controller.level === 7) {
+        return [WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+      }
+      else if(room.controller.level === 8) {
+        // 25 MOVE 15 WORK 10 CARRY
+        return [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
+      }
+    }
+    return [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
   }
 }

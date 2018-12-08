@@ -4,7 +4,7 @@ import {SpawnsHelper} from '../helpers/spawns'
 // META
 // room
 // target
-// global.OS.kernel.addProcess('harrasRemote', {room: 'W56S33', target: "W57S38"}, 0)
+// global.OS.kernel.addProcess('harrasRemote', {room: 'W51S32', target: "W51S31"}, 0)
 export class HarrasRemote extends Process
 {
 
@@ -16,11 +16,7 @@ export class HarrasRemote extends Process
 
     run()
     {
-        // this.state = 'killed';
-        if(this.meta.room === 'W52S35') {
-            this.meta.room = 'W53S39';
-            console.log(`Changed target to W53S39`);
-        }
+        this.state = 'killed';
         try {
             this.run2();
         }
@@ -61,8 +57,8 @@ export class HarrasRemote extends Process
                 if(remainingTTL && remainingTTL <= 500 && this.meta.creeps.length < 2) {
                     if(SpawnsHelper.spawnAvailable(room)) {
                         const bodyParts: BodyPartConstant[] = [ // 3290 energy
-                            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,HEAL,HEAL,HEAL];
-                            //MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                            //MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,HEAL,HEAL,HEAL];
+                            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
                         SpawnsHelper.requestSpawn(this.ID, room,bodyParts,{role: 'remoteHarrasser'}, 'creeps[]');
                     }
                 }

@@ -12,7 +12,7 @@ export class UpgradeRoom extends Process
     if(room.controller && room.controller.my && room.controller.level && room.controller.level < 8) {
       room.controller.say(`${(room.controller.progress / room.controller.progressTotal * 100).toFixed(1)}%`);
     }
-    if(room) {
+    if(room && room.controller && room.controller.my) {
       if(!this.meta.creeps) {
         this.meta.creeps = [];
       }

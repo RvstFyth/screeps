@@ -63,7 +63,7 @@ export class Room extends Process
     }
 
     if(rcl && rcl >= 5) {
-      if(rcl > 6 && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('mineral', 'room', room.name)) {
+      if(rcl > 5 && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('mineral', 'room', room.name)) {
         global.OS.kernel.addProcess('mineral', {room: room.name}, this.ID);
       }
       if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('repairRoom', 'room', room.name)) {
@@ -81,7 +81,7 @@ export class Room extends Process
       this.meta.lastStructureCheck = Game.time;
     }
 
-    if(room.controller && room.controller.level > 6 && room.storage && room.terminal && room.labs.length > 2) {
+    if(room.controller && room.controller.level >= 6 && room.storage && room.terminal && room.labs.length > 2) {
       if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('autoMakeBoosts', 'room', room.name)) {
         global.OS.kernel.addProcess('autoMakeBoosts', {room: room.name}, this.ID);
       }

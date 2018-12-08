@@ -7,7 +7,7 @@ export class RepairRoom extends Process
   run()
   {
     const room = Game.rooms[this.meta.room];
-    if(room) {
+    if(room && room.controller && room.controller.my) {
       this.handleRamparts(room);
     }
     else {

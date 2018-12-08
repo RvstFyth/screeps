@@ -11,7 +11,7 @@ export class HaulResources extends Process
 
   run()
   {
-    // if(this.meta.room === 'W56S33') {
+    // if(this.meta.room === 'W54S29') {
     //   this.state = 'killed';
     // }
     const room = Game.rooms[this.meta.room];

@@ -89,6 +89,21 @@ export class Transporter
               creep.moveTo(target);
             }
           }
+          else {
+            // Get off the road
+            creep.say('!!!!!!');
+            const {x,y} = creep.pos;
+            // const r = creep.room.lookForAtArea(LOOK_TERRAIN, y - 1, x - 1, y + 1, x + 1, true);
+            // for(let i in r) {
+            //   if(r[i].terrain === 'plain') {
+            //     if(!creep.room.lookForAt(LOOK_STRUCTURES, r[i].x, r[i].y).length) {
+            //       if(creep.moveTo(r[i].x, r[i].y) === OK) {
+            //         break;
+            //       }
+            //     }
+            //   }
+            // }
+          }
         }
       }
     }

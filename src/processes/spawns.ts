@@ -19,7 +19,10 @@ export class Spawns extends Process
     if(!Memory.spawnQueue[this.meta.room]) {
       Memory.spawnQueue[this.meta.room] = [];
     }
-    const room = Game.rooms[this.meta.room];
+    let room: Room|undefined = Game.rooms[this.meta.room];
+    if(!room || !room.controller || !room.controller.my) {
+      room = undefined;
+    }
     if(room && Memory.spawnQueue[this.meta.room].length) {
       if(SpawnsHelper.spawnAvailable(room)) {
         const req = this.getNextSpawn(room, Memory.spawnQueue[this.meta.room]);

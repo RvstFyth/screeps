@@ -12,6 +12,9 @@ export class Mineral extends Process
   run()
   {
     const room = Game.rooms[this.meta.room];
+    if(!room || !room.controller || !room.controller.my) {
+      this.state = 'killed';
+    }
     const mineral = room.find(FIND_MINERALS)[0];
     const extractor = room.find(FIND_STRUCTURES, {
       filter: (s: Structure) => s.structureType === STRUCTURE_EXTRACTOR
@@ -52,7 +55,7 @@ export class Mineral extends Process
       }
 
       const storageAmount = room.storage ? room.storage.store[mineral.mineralType] : null;
-      const sellTreshould = 80000; // replace with a constant
+      const sellTreshould = 300000; // replace with a constant
 
       if(storageAmount && storageAmount > sellTreshould) {
         if(storageAmount && storageAmount > (sellTreshould + 10000)) {
@@ -152,7 +155,7 @@ export class Mineral extends Process
   {
     if(!this.meta.miner || !Game.creeps[this.meta.miner]) {
       if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
-        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'mineralMiner'}, 'miner');
+        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], MineralMiner.defineBodyParts(Game.rooms[this.meta.room]), {role: 'mineralMiner'}, 'miner');
       }
     }
     else if(Game.creeps[this.meta.miner].spawning) {

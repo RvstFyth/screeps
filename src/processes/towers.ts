@@ -5,7 +5,8 @@ export class Towers extends Process
 
   run()
   {
-    if(!Game.rooms[this.meta.room]) {
+    const room = Game.rooms[this.meta.room];
+    if(!room || !room.controller || !room.controller.my) {
       this.state = 'killed';
       return;
     }
@@ -26,14 +27,20 @@ export class Towers extends Process
         const damagedCreeps = room.find(FIND_MY_CREEPS, {
           filter: (c: Creep) => c.hits < c.hitsMax
         });
+        const damagedRoads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax && targetIDs.indexOf(r.id) < 0);
         if(!healed && damagedCreeps.length) {
           room.towers[i].heal(damagedCreeps[0]);
           healed = true;
         }
+        else if(damagedRoads.length) {
+          const target = _.min(damagedRoads, r => r.hits);
+          room.towers[i].repair(target);
+          targetIDs.push(target.id);
+        }
         else if(Game.time % 7 === 0) {
           const canRepair = room.towers[i].energy > (room.towers[i].energyCapacity / 4)
           if(canRepair) {
-            const ramparts = room.ramparts.filter((r: StructureRampart) => r.hits < 100000); // 100K
+            const ramparts = room.ramparts.filter((r: StructureRampart) => r.hits < 50000); // 50K
             if(numRepairs < 2 && ramparts.length) {
               if(Math.floor(Math.random() * 4) === 3) {
                 const rampart = _.min(ramparts, r => r.hits);
@@ -42,39 +49,39 @@ export class Towers extends Process
               }
             }
             else {
-              if(canRepair && numRepairs < 1) {
-                const ramparts = room.ramparts.filter((r: StructureRampart) => r.hits < 7000000); // 7 mill
-                if(Math.floor(Math.random() * 2) === 1) {
-                  const rampart = _.min(ramparts, r => r.hits);
-                  room.towers[i].repair(rampart);
-                  numRepairs++;
-                }
-              }
+              // if(canRepair && numRepairs < 1) {
+              //   const ramparts = room.ramparts.filter((r: StructureRampart) => r.hits < 7000000); // 7 mill
+              //   if(Math.floor(Math.random() * 2) === 1) {
+              //     const rampart = _.min(ramparts, r => r.hits);
+              //     room.towers[i].repair(rampart);
+              //     numRepairs++;
+              //   }
+              // }
             }
           }
         }
         else {
-          const canRepair = room.towers[i].energy > (room.towers[i].energyCapacity / 4)
-          if(canRepair) {
-            const roads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax); // 100K
-            if(numRepairs < 2 && roads.length) {
-              if(Math.floor(Math.random() * 4) === 3) {
-                const road = _.min(roads, r => r.hits);
-                room.towers[i].repair(road);
-                numRepairs++;
-              }
-            }
-            else {
-              if(numRepairs < 1) {
-                const roads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax);
-                if(Math.floor(Math.random() * 2) === 1) {
-                  const road = _.min(roads, r => r.hits);
-                  room.towers[i].repair(road);
-                  numRepairs++;
-                }
-              }
-            }
-          }
+          // const canRepair = room.towers[i].energy > (room.towers[i].energyCapacity / 4)
+          // if(canRepair) {
+          //   const roads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax); // 100K
+          //   if(numRepairs < 2 && roads.length) {
+          //     if(Math.floor(Math.random() * 4) === 3) {
+          //       const road = _.min(roads, r => r.hits);
+          //       room.towers[i].repair(road);
+          //       numRepairs++;
+          //     }
+          //   }
+          //   else {
+          //     if(numRepairs < 1) {
+          //       const roads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax);
+          //       if(Math.floor(Math.random() * 2) === 1) {
+          //         const road = _.min(roads, r => r.hits);
+          //         room.towers[i].repair(road);
+          //         numRepairs++;
+          //       }
+          //     }
+          //   }
+          // }
         }
       }
     }

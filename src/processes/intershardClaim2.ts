@@ -15,6 +15,7 @@ export class IntershardClaim2 extends Process
     {
         const creep = Game.creeps[this.meta.creep];
         if(creep) {
+            creep.say('1');
             if(creep.room.name !== this.meta.target) {
                 creep.moveToRoom(this.meta.target);
             }

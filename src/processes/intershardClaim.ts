@@ -6,7 +6,7 @@ import {SpawnsHelper} from '../helpers/spawns'
 // room
 // target
 // flag
-// global.OS.kernel.addProcess('intershardClaim', {room: 'W51S32', target: 'W51S31', flag: '123'}, 0)
+// global.OS.kernel.addProcess('intershardClaim', {room: 'W51S31', target: 'W59S39', flag: '123'}, 0)
 export class IntershardClaim extends Process
 {
 
@@ -17,7 +17,7 @@ export class IntershardClaim extends Process
 
     public run()
     {
-        // this.state = 'killed';
+        this.state = 'killed';
         if(typeof this.meta.initialized === 'undefined') {
             this.init();
         }

@@ -8,7 +8,7 @@ export class Links extends Process
     run()
     {
         const room = Game.rooms[this.meta.room];
-        if(room) {
+        if(room && room.controller && room.controller.my) {
             if(room.storage && room.links.length) {
                 const upgradersLink = room.storage.pos.findInRange(room.links, 3);
                 if(upgradersLink.length) {

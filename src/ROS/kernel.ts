@@ -33,6 +33,8 @@ import {IntershardBuilder2} from '../processes/intershardBuilder2'
 import {IntershardClaim2} from '../processes/intershardClaim2'
 import {AutoMakeBoosts} from '../processes/autoMakeBoosts'
 import {SourceKeeperAttacker} from '../processes/sourceKeeperAttacker'
+import {AlliResourceRequests} from '../processes/alliResourceRequests'
+import {Chemist} from '../processes/chemist';
 
 class ProcessTable
 {
@@ -77,7 +79,9 @@ const Processes = <{[type: string]: any}> {
   'intershardBuilder': IntershardBuilder,
   'intershardBuilder2': IntershardBuilder2,
   'autoMakeBoosts': AutoMakeBoosts,
-  'sourceKeeperAttacker': SourceKeeperAttacker
+  'sourceKeeperAttacker': SourceKeeperAttacker,
+  'alliResourceRequests': AlliResourceRequests,
+  'chemist': Chemist
 }
 
 export class Kernel
@@ -129,11 +133,32 @@ export class Kernel
     RawMemory.interShardSegment = JSON.stringify(intershardData);
   }
 
+  private intershard()
+  {
+    for(let i in Game.creeps) {
+      const nameParsed = Game.creeps[i].name.split('_');
+      if(nameParsed[0] === 'IB' && !this.hasProcessForNameAndMetaKeyValue('intershardBuilder2', 'creep', Game.creeps[i].name)) {
+        this.addProcess('intershardBuilder2', {
+          creep: Game.creeps[i].name,
+          target: nameParsed[1]
+        }, 0);
+      }
+      if(nameParsed[0] === 'IC' && !this.hasProcessForNameAndMetaKeyValue('intershardClaim2', 'creep', Game.creeps[i].name)) {
+        this.addProcess('intershardClaim2', {
+          creep: Game.creeps[i].name,
+          target: nameParsed[1]
+        }, 0);
+      }
+    }
+  }
+
   run()
   {
     this.loadProcesses();
     // this.checkIntershardSegment();
-
+    if(Game.shard.name.toLowerCase() === 'shard3') {
+      this.intershard();
+    }
     this.limit = this.defineCpuLimit();
     while(true) {
       const p = this.ProcessTable.queue.shift();
@@ -190,6 +215,11 @@ export class Kernel
   getProcessForNameAndMetaKeyValueCLI(name: string, mKey: string, mValue: string)
   {
     return Memory.ROS.processes.filter((s: any) => s.name === name && s.meta[mKey] === mValue);
+  }
+
+  getProcessForMetaKeyValueCLI(mKey: string, mValue: string)
+  {
+    return Memory.ROS.processes.filter((s: any) => s.meta[mKey] === mValue);
   }
 
   getProcessForNameAndMetaKeyValue(name: string, mKey: string, mValue: string)

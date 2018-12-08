@@ -5,7 +5,7 @@ import {SpawnsHelper} from '../helpers/spawns'
 // room
 // target
 // flag
-// global.OS.kernel.addProcess('intershardBuilder', {room: 'W51S32', target: 'W51S31', flag: '123'}, 0)
+// global.OS.kernel.addProcess('intershardBuilder', {room: 'W51S31', target: 'W59S39', flag: '123'}, 0)
 export class IntershardBuilder extends Process
 {
 

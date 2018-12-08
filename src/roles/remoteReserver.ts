@@ -11,7 +11,9 @@ export class RemoteReserver
     else {
       if(creep.room.controller) {
         if(!creep.pos.isNearTo(creep.room.controller)) {
-          creep.moveTo(creep.room.controller);
+          creep.moveTo(creep.room.controller, {
+            maxRooms:1
+          });
         }
         else {
           creep.reserveController(creep.room.controller);

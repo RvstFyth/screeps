@@ -126,3 +126,106 @@ global.gcl = function()
 {
     console.log(`GCL: ${Game.gcl.level} (${((Game.gcl.progress / Game.gcl.progressTotal) * 100).toFixed(2)}%)`);
 }
+
+global.highestBuy = function(resource: ResourceConstant)
+{
+    const orders = Game.market.getAllOrders({type: ORDER_BUY, resourceType: resource}).sort((a,b) => b.price - a.price);
+    if(orders && orders.length) {
+        const iEnd: number = orders.length > 3 ? 3 : orders.length;
+        let msg: string = `Found ${orders.length} buy orders for ${resource}`;
+        for(let i = 0; i < iEnd; i++) {
+            msg += `\n ${orders[i].price} C`;
+        }
+        console.log(msg);
+    }
+
+    console.log(`No buy orders found for ${resource}`);
+}
+
+global.buyEnergy = function(price: number, amount: number, room: string)
+{
+    Game.market.createOrder(ORDER_BUY, RESOURCE_ENERGY, price, amount, room);
+}
+
+global.listSellOrders = function (resource: ResourceConstant, maxOrders: number)
+{
+    const orders = Game.market.getAllOrders({type: ORDER_SELL, resourceType: resource}).sort((a,b) => a.price - b.price);
+    if(orders.length) {
+        const max = maxOrders || (orders.length > 4 ? 4 : ORDER_SELL.length);
+        let msg = `Listing orders for ${resource}. ${orders.length} orders found`;
+        for(let i = 0; i < max; i++) {
+            msg += `\n Price: ${orders[i].price} | Amount: ${orders[i].remainingAmount} | id: ${orders[i].id}`;
+        }
+        console.log(msg);
+    }
+}
+
+global.listBuyOrders = function (resource: ResourceConstant, maxOrders: number)
+{
+    const orders = Game.market.getAllOrders({type: ORDER_BUY, resourceType: resource}).sort((a,b) => b.price - a.price);
+    if(orders.length) {
+        const max = maxOrders || (orders.length > 4 ? 4 : orders.length);
+        let msg = `Listing orders for ${resource}. ${orders.length} orders found`;
+        for(let i = 0; i < max; i++) {
+            msg += `\n Price: ${orders[i].price} | Amount: ${orders[i].remainingAmount} | id: ${orders[i].id}`;
+        }
+        console.log(msg);
+    }
+}
+
+global.defineReaction = function (roomname: string) : string|null
+{
+    const room = Game.rooms[roomname];
+
+    if(room.storage) {
+        let minerals: {resource: string, amount: number}[] = [];
+        for(let x in global.BOOST_COMPONENTS) {
+            minerals.push({
+                resource: x,
+                amount: room.storage.store[x as ResourceConstant] || 0
+            });
+        }
+
+        let filteredMinerals = minerals.filter((m) => m.amount < 3000);
+        if(!filteredMinerals.length) {
+            filteredMinerals = minerals.filter((m) => m.amount < 6000);
+        }
+        if(!filteredMinerals.length) {
+            filteredMinerals = minerals.filter((m) => m.amount < 12000);
+        }
+        if(filteredMinerals.length) {
+            for(let i in filteredMinerals) {
+                const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[filteredMinerals[i].resource];
+                let fAmount = room.storage.store[ingredients[0]] || 0;
+                let sAmount = room.storage.store[ingredients[1]] || 0;
+                if(room.terminal) {
+                    fAmount += room.terminal.store[ingredients[0]] || 0;
+                    sAmount += room.terminal.store[ingredients[1]] || 0;
+                }
+                if(fAmount >= 3000 && sAmount >= 3000) {
+                    return filteredMinerals[i].resource;
+                }
+            }
+        }
+        else {
+            return _.min(minerals, (m) => m.amount).resource;
+        }
+    }
+
+    return null;
+}
+
+
+global.cpu = function()
+{
+    let msg = '';
+    if(Memory.cpu.last === 0) {
+        msg += `Measured over ${Memory.cpu.cnt} ticks: ${(Memory.cpu.used / Memory.cpu.cnt).toFixed(3)} CPU`;
+    }
+    else {
+        msg += `Last 100 ticks: ${Memory.cpu.last.toFixed(3)} CPU`;
+    }
+
+    console.log(msg);
+    console.log(JSON.stringify(Memory.cpu));
+}

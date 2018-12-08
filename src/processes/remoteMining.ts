@@ -61,7 +61,7 @@ export class RemoteMining extends Process
     // }
 
 
-    if(room) {
+    if(room && room.controller && room.controller.my) {
       if((!this.suspendedTill || this.suspendedTill === 0) && Game.rooms[this.meta.target] && Game.rooms[this.meta.target].hostiles) {
         const invaders: Creep[] = Game.rooms[this.meta.target].hostiles.filter((c: Creep) => c.owner.username.toLowerCase() === 'invader');
         if(invaders.length) {

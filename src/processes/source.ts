@@ -32,7 +32,7 @@ export class Source extends Process
       }
 
       // hauler
-      if(!link && source.room.storage && (!this.meta.hauler || !Game.creeps[this.meta.hauler])) {
+      if(!link && source.room.storage && source.room.storage.my && (!this.meta.hauler || !Game.creeps[this.meta.hauler])) {
         if(SpawnsHelper.spawnAvailable(source.room)) {
             SpawnsHelper.requestSpawn(this.ID, source.room, Hauler.defineBodyParts(source.room), {role: 'hauler'}, 'hauler');
         }

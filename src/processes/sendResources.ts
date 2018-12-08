@@ -14,7 +14,7 @@ export class SendResources extends Process
   run()
   {
     // if(this.meta.resource === 'H') {
-    //   this.state = 'killed';
+       // this.state = 'killed';
     // }
     if(typeof this.meta.done === 'undefined') {
       this.meta.done = false;

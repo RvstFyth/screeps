@@ -9,8 +9,8 @@ export class Transport extends Process
   {
     // Default 1 transporter. It will fill all extensions, spawns and towers.
     // During attacks 2 transporters. Only spawn when defenders are already spawned!!
-
-    if(!Game.rooms[this.meta.room]) {
+    const room = Game.rooms[this.meta.room];
+    if(!room || !room.controller || !room.controller.my) {
       this.state = 'killed';
       return;
     }

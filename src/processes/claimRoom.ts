@@ -8,9 +8,10 @@ export class ClaimRoom extends Process
 
   run()
   {
-    //this.meta.target = "W49S41";
-    // this.state = 'killed';
     if(this.shouldRun()) {
+      if(this.meta.target === 'W54S29') {
+        this.state = 'killed';
+      }
       // The room from where the creeps are spawned
       const room = Game.rooms[this.meta.room];
       this.handleClaimer(room);
@@ -44,7 +45,14 @@ export class ClaimRoom extends Process
         creep.heal(creep);
       }
       else {
-        const hostiles = creep.room.hostiles;
+        let hostiles;
+        if(this.meta.target === 'W54S29') {
+            hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
+        }
+        else {
+          hostiles = creep.room.hostiles;
+        }
+
         if(hostiles.length) {
           const target = creep.pos.findClosestByRange(hostiles);
           if(creep.rangedAttack(target) === ERR_NOT_IN_RANGE) {
@@ -60,6 +68,20 @@ export class ClaimRoom extends Process
             const target = creep.pos.findClosestByRange(damaged);
             if(creep.heal(target) === ERR_NOT_IN_RANGE) {
               creep.moveTo(target);
+            }
+          }
+          else {
+            // const spawns = SpawnsHelper.getAvailableSpawns(creep.room);
+            if(creep.ticksToLive && creep.ticksToLive < 500 && creep.room.energyAvailable === creep.room.energyCapacityAvailable) {
+              if(SpawnsHelper.spawnAvailable(room)) {
+                const target = creep.pos.findClosestByRange(SpawnsHelper.getAvailableSpawns(creep.room));
+                if(creep.pos.isNearTo(target)) {
+                  target.renewCreep(creep);
+                }
+                else {
+                  creep.moveTo(target);
+                }
+              }
             }
           }
         }
@@ -122,7 +144,15 @@ export class ClaimRoom extends Process
 
           const source = creep.pos.findClosestByRange(Game.rooms[this.meta.target].sources);
 
-          if(!creep.pos.inRangeTo(source, 2)) {
+          if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 20000) {
+            if(creep.pos.isNearTo(creep.room.storage)) {
+              creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
+            }
+            else {
+              creep.moveTo(creep.room.storage);
+            }
+          }
+          else if(!creep.pos.inRangeTo(source, 2)) {
             creep.moveTo(source);
           }
           else {

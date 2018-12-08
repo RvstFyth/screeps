@@ -12,3 +12,24 @@ test()
 test()
 test()
 Game.shard.name
+test()
+gcl()
+resourceStats()
+JSON.parse(JSON.stringify([1,2,3])).pop
+/help
+cpu()
+cpu()
+cpu()
+gcl()
+cpu()
+cpu()
+Game.shard.name
+/help
+/help help
+/help
+/shard2
+/reconnect
+Game.shard.name
+/reconnect
+Game.shard.name
+Game.shard.name
