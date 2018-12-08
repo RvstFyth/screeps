@@ -66,10 +66,30 @@ export class Mineral extends Process
         }
       }
 
+      if(!this.meta.miningSpots) {
+        try {
+          const x = mineral.pos.x;
+          const y = mineral.pos.y;
+          let cnt = 0;
+          const tiles = room.lookForAtArea(LOOK_TERRAIN,y -1, x - 1, y + 1, x + 1, true);
+          for(let i = 0, iEnd = tiles.length; i < iEnd; i++) {
+            if(tiles[i].x === x && tiles[i].y === y) continue;
+            if(tiles[i].terrain !== 'wall') {
+              cnt++;
+            }
+          }
+          this.meta.miningSpots = cnt;
+        }
+        catch(e) {}
+      }
+      // else {
+      //   mineral.say(`${this.meta.miningSpots} spots`);
+      // }
+
       if(mineral.mineralAmount > 0) {
         try {
           if(!storageAmount || storageAmount < 200000) {
-            this.handleMiner();
+            this.handleMiners();
           }
           else {
             // Start selling resources!!
@@ -151,18 +171,42 @@ export class Mineral extends Process
     }
   }
 
-  handleMiner()
+  handleMiners()
   {
-    if(!this.meta.miner || !Game.creeps[this.meta.miner]) {
-      if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
-        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], MineralMiner.defineBodyParts(Game.rooms[this.meta.room]), {role: 'mineralMiner'}, 'miner');
+    const room = Game.rooms[this.meta.room];
+    let numMiners = 1;
+
+    if(this.meta.miningSpots && room.storage) {
+      numMiners += Math.floor(room.storage.store[RESOURCE_ENERGY] / 50000);
+      if(numMiners > this.meta.miningSpots) {
+        numMiners = this.meta.miningSpots;
       }
     }
-    else if(Game.creeps[this.meta.miner].spawning) {
 
+    if(!this.meta.miners) {
+      this.meta.miners = [];
     }
-    else if(Game.creeps[this.meta.miner]) {
-      MineralMiner.run(Game.creeps[this.meta.miner]);
+
+    let spawningCreeps = 0;
+
+    for(let i = 0, iEnd = this.meta.miners.length; i < iEnd; i++) {
+      if(!Game.creeps[this.meta.miners[i]]) {
+        this.meta.miners[i] = null;
+      }
+      else if(Game.creeps[this.meta.miners[i]] && Game.creeps[this.meta.miners[i]].spawning) {
+        spawningCreeps++;
+      }
+      else if(Game.creeps[this.meta.miners[i]]) {
+        MineralMiner.run(Game.creeps[this.meta.miners[i]]);
+      }
+    }
+
+    this.meta.miners = this.meta.miners.filter((n: any) => n); // Remove NULL values
+
+    if(spawningCreeps === 0 && this.meta.miners.length < numMiners) {
+      if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
+        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], MineralMiner.defineBodyParts(Game.rooms[this.meta.room]), {role: 'mineralMiner'}, 'miners[]');
+      }
     }
   }
 }
