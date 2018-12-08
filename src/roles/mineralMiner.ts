@@ -19,9 +19,6 @@ export class MineralMiner
 
     if(creep.ticksToLive && creep.ticksToLive <= 51) {
       creep.memory.harvesting = false;
-      if(_.sum(creep.carry) === 0) {
-        creep.suicide();
-      }
     }
     if(_.sum(creep.carry) === 0) {
       creep.memory.harvesting = true;
@@ -31,7 +28,12 @@ export class MineralMiner
     }
 
     // TODO: Implement container mining
-    if(creep.memory.harvesting) {
+    if(creep.ticksToLive && creep.ticksToLive <= 51) {
+      if(_.sum(creep.carry) === 0) {
+        creep.suicide();
+      }
+    }
+    else if(creep.memory.harvesting) {
       if(mineral) {
         if(!creep.pos.isNearTo(mineral)) {
           creep.moveTo(mineral);
