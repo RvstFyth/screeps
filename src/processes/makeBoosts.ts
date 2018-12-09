@@ -12,7 +12,6 @@ export class MakeBoosts extends Process
       // this.state = 'killed';
       // this.meta.labs = [];
       const room = Game.rooms[this.meta.room];
-      // console.log("Making "+this.meta.boost);
       if(!this.meta.ingredients || !this.meta.ingredients.length) {
         this.meta.ingredients = global.BOOST_COMPONENTS[this.meta.boost];
         this.meta.currentIngredient = 0;
@@ -32,21 +31,21 @@ export class MakeBoosts extends Process
       if(this.meta.labs) {
 
         const labs: StructureLab[] = this.getLabs();
-        if(labs[1].mineralAmount === labs[1].mineralCapacity && labs[2].mineralAmount === labs[2].mineralCapacity) {
+        if(labs[0].mineralAmount === labs[0].mineralCapacity && labs[1].mineralAmount === labs[1].mineralCapacity) {
           this.meta.shouldBoost = true;
         }
-        const filledLabs = room.labs.filter((l: StructureLab) => l.mineralAmount > 0);
-        if(this.meta.shouldBoost && !labs[0].cooldown && labs[1].mineralAmount > 0 && labs[2].mineralAmount > 0) {
-          labs[0].runReaction(labs[1], labs[2]);
-          const labsIDs = labs.map((l: StructureLab) => l.id);
-          const extraLabs = room.labs.filter((l: StructureLab) => labsIDs.indexOf(l.id) < 0);
+
+        const labsIDs = labs.map((l: StructureLab) => l.id);
+        const extraLabs = room.labs.filter((l: StructureLab) => labsIDs.indexOf(l.id) < 0);
+
+        if(this.meta.shouldBoost && !extraLabs[0].cooldown && labs[0].mineralAmount > 0 && labs[1].mineralAmount > 0) {
           if(extraLabs.length) {
             for(let i = 0, iEnd = extraLabs.length; i < iEnd; i++) {
-              extraLabs[i].runReaction(labs[1], labs[2]);
+              extraLabs[i].runReaction(labs[0], labs[1]);
             }
           }
         }
-        else if(this.meta.shouldBoost && (labs[1].mineralAmount === 0 || labs[2].mineralAmount === 0)) {
+        else if(this.meta.shouldBoost && (labs[0].mineralAmount === 0 || labs[1].mineralAmount === 0)) {
           this.meta.shouldBoost = false;
           if(Game.creeps[this.meta.transporter]) {
             Game.creeps[this.meta.transporter].suicide();
@@ -64,7 +63,7 @@ export class MakeBoosts extends Process
                 }
               }
               else {
-                this.handleTransporter(room, labs);
+                this.handleTransporter(room, labs, extraLabs);
               }
             }
             else {
@@ -91,14 +90,14 @@ export class MakeBoosts extends Process
           }
         }
         else {
-          this.handleTransporter(room, labs);
+          this.handleTransporter(room, labs, extraLabs);
         }
       }
   }
 
-  handleTransporter(room: Room, labs: StructureLab[])
+  handleTransporter(room: Room, labs: StructureLab[], extraLabs: StructureLab[])
   {
-    if(!Game.creeps[this.meta.transporter] && (!this.meta.shouldBoost || (this.meta.shouldBoost && labs[0].mineralAmount > 450))) {
+    if(!Game.creeps[this.meta.transporter] && (!this.meta.shouldBoost || (this.meta.shouldBoost && extraLabs[0].mineralAmount > 450))) {
       if(SpawnsHelper.spawnAvailable(room)) {
         this.meta.transporter = SpawnsHelper.spawnCreep(room,
           [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE],
@@ -116,16 +115,15 @@ export class MakeBoosts extends Process
         if(_.sum(creep.carry) === 0) {
         // suicide with less then 50 ticks, as we dont want him to die during the transport!
           if(creep.ticksToLive && creep.ticksToLive < 50) creep.suicide();
-          const withdrawMin = labs[1].mineralAmount === 0 || labs[2].mineralAmount === 0 ? 0 : creep.carryCapacity;
-          if(!creep.pos.isNearTo(labs[0])) {
-              creep.moveTo(labs[0]);
+          const withdrawMin = labs[0].mineralAmount === 0 || labs[1].mineralAmount === 0 ? 0 : creep.carryCapacity;
+          if(!creep.pos.isNearTo(extraLabs[0])) {
+              creep.moveTo(extraLabs[0]);
           }
-          if(labs[0].mineralAmount >= withdrawMin || (labs[0].mineralAmount > 0 && (labs[1].mineralAmount === 0 || labs[2].mineralAmount === 0))) {
-            creep.withdraw(labs[0], this.meta.boost);
+          if(extraLabs[0].mineralAmount >= withdrawMin || (extraLabs[0].mineralAmount > 0 && (labs[0].mineralAmount === 0 || labs[1].mineralAmount === 0))) {
+            creep.withdraw(extraLabs[0], this.meta.boost);
           }
           else {
             const labsIDs = labs.map((l: StructureLab) => l.id);
-            const extraLabs = room.labs.filter((l: StructureLab) => labsIDs.indexOf(l.id) < 0 && l.mineralAmount >= withdrawMin);
             if(extraLabs.length) {
               if(!creep.pos.isNearTo(extraLabs[0])) {
                 creep.moveTo(extraLabs[0]);
@@ -153,13 +151,13 @@ export class MakeBoosts extends Process
           let mineral: ResourceConstant|null;
           let amount;
 
-          if(!labs[1].mineralAmount || labs[1].mineralAmount < this.meta.amount) {
+          if(!labs[0].mineralAmount || labs[0].mineralAmount < this.meta.amount) {
             mineral = this.meta.ingredients[0];
-            amount = this.meta.amount - labs[1].mineralAmount > creep.carryCapacity ? creep.carryCapacity : this.meta.amount - labs[1].mineralAmount;
+            amount = this.meta.amount - labs[0].mineralAmount > creep.carryCapacity ? creep.carryCapacity : this.meta.amount - labs[0].mineralAmount;
           }
-          else if(!labs[2].mineralAmount || labs[2].mineralAmount < this.meta.amount) {
+          else if(!labs[1].mineralAmount || labs[1].mineralAmount < this.meta.amount) {
             mineral = this.meta.ingredients[1];
-            amount = this.meta.amount - labs[2].mineralAmount > creep.carryCapacity ? creep.carryCapacity : this.meta.amount - labs[2].mineralAmount;
+            amount = this.meta.amount - labs[1].mineralAmount > creep.carryCapacity ? creep.carryCapacity : this.meta.amount - labs[1].mineralAmount;
           }
           else {
             mineral = null;
@@ -195,11 +193,11 @@ export class MakeBoosts extends Process
         else { // Creep carries resources
           let lab,
               mineral;
-          if(labs[1].mineralAmount < this.meta.amount) {
+          if(labs[0].mineralAmount < this.meta.amount) {
             lab = 1;
             mineral = this.meta.ingredients[0];
           }
-          else if(labs[2].mineralAmount < this.meta.amount) {
+          else if(labs[1].mineralAmount < this.meta.amount) {
             lab = 2;
             mineral = this.meta.ingredients[1];
           }
@@ -218,6 +216,10 @@ export class MakeBoosts extends Process
 
   getLabs()
   {
+    if(this.meta.labs.length === 3) {
+      const labIDs = [this.meta.labs[1], this.meta.labs[2]];
+      this.meta.labs = labIDs;
+    }
     return this.meta.labs.map((id: string) => Game.getObjectById(id));
   }
 
@@ -244,26 +246,8 @@ export class MakeBoosts extends Process
     labs[0].room.visual.circle(labRanges[0].lab.pos, {stroke: 'red'});
     labs[1].room.visual.circle(labRanges[1].lab.pos, {stroke: 'red'});
 
-    this.meta.labs.push(labRanges[2].lab.id);
     this.meta.labs.push(labRanges[0].lab.id);
     this.meta.labs.push(labRanges[1].lab.id);
   }
 
-  // Old defineLabs method
-  getLabTargets(room: Room)
-  {
-    this.meta.labs = [];
-    for(let n in room.labs) {
-      if(room.labs[n].mineralAmount === 0) {
-        // Find 2 empty labs for ingredients within range
-        const labsInRange = room.labs[n].pos.findInRange(room.labs.filter((l: StructureLab) => l.id !== room.labs[n].id && l.mineralAmount === 0), 2);
-        if(labsInRange.length > 1) {
-          this.meta.labs.push(room.labs[n].id);
-          this.meta.labs.push(labsInRange[0].id);
-          this.meta.labs.push(labsInRange[1].id);
-          break;
-        }
-      }
-    }
-  }
 }
