@@ -11,7 +11,8 @@ export class Hauler
     }
     const source: Source|null = Game.getObjectById(sourceID);
     if(creep.memory.harvesting) {
-      let c: StructureContainer|null = null;
+      const containers = source ? source.pos.findInRange(creep.room.containers, 2) : null;
+      let c: StructureContainer|null = containers ? containers[0] : null;
       if(creep.room.storage) {
         // if(creep.pos.inRangeTo(creep.room.storage, 2)) {
         //   const cc: any = creep.pos.findInRange(FIND_STRUCTURES, 3, {filter: (s: StructureContainer) => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > creep.carryCapacity});
@@ -22,19 +23,28 @@ export class Hauler
       }
       if(c) {
         if(creep.withdraw(c, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-          creep.moveTo(c);
+          creep.moveTo(c, {
+            maxRooms: 1,
+            range: 1
+          });
         }
       }
       else if(source) {
         if(!creep.pos.inRangeTo(source, 2)) {
-          creep.moveTo(source);
+          creep.moveTo(source, {
+            maxRooms: 1,
+            range: 1
+          });
         }
         else {
           const resources = creep.room.find(FIND_DROPPED_RESOURCES);
           const inRange = source.pos.findInRange(resources, 1);
           if(inRange.length) {
             if(!creep.pos.isNearTo(inRange[0])) {
-              creep.moveTo(inRange[0]);
+              creep.moveTo(inRange[0], {
+                maxRooms: 1,
+                range: 1
+              });
             }
             else {
               creep.pickup(inRange[0]);
@@ -44,7 +54,10 @@ export class Hauler
             const containers = source.pos.findInRange(creep.room.containers, 2).filter((c: StructureContainer) => c.store[RESOURCE_ENERGY] > creep.carryCapacity);
             if(containers.length) {
               if(creep.withdraw(containers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(containers[0]);
+                creep.moveTo(containers[0], {
+                  maxRooms: 1,
+                  range: 1
+                });
               }
             }
           }

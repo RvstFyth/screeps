@@ -176,7 +176,7 @@ export class Mineral extends Process
     const room = Game.rooms[this.meta.room];
     let numMiners = 1;
 
-    if(this.meta.miningSpots && room.storage) {
+    if(this.meta.miningSpots && room.storage && room.spawns.length > 1) {
       numMiners += Math.floor(room.storage.store[RESOURCE_ENERGY] / 50000);
       if(numMiners > this.meta.miningSpots) {
         numMiners = this.meta.miningSpots;

@@ -29,6 +29,7 @@ export class MineralMiner
 
     // TODO: Implement container mining
     if(creep.ticksToLive && creep.ticksToLive <= 51) {
+      creep.memory.harvesting = false;
       if(_.sum(creep.carry) === 0) {
         creep.suicide();
       }
@@ -41,6 +42,14 @@ export class MineralMiner
         else {
           if(creep.room.extractor && !creep.room.extractor.cooldown) {
             creep.harvest(mineral);
+          }
+          else {
+            const thombstones = creep.pos.findInRange(FIND_TOMBSTONES, 1,{
+              filter: (t: Tombstone) => t.store[mineral.mineralType]
+            });
+            if(thombstones.length) {
+              creep.withdraw(thombstones[0], mineral.mineralType);
+            }
           }
         }
       }

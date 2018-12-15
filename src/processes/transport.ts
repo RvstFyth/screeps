@@ -27,6 +27,20 @@ export class Transport extends Process
 
       }
       else if(Game.creeps[this.meta.creeps[i]]) {
+        // if(this.meta.room === 'W56S33') {
+        //   const creep = Game.creeps[this.meta.creeps[i]];
+        //   const cpuUsed = Game.cpu.getUsed();
+        //   for(let i = 0, iEnd = 100; i < iEnd; i++) {
+        //     const a = creep.memory;
+        //   }
+        //   console.log(`memory.creeps took ${(Game.cpu.getUsed() - cpuUsed)}`);
+
+        //   const cpuUsedB = Game.cpu.getUsed();
+        //   for(let i = 0, iEnd = 100; i < iEnd; i++) {
+        //     const a = Memory.creeps[creep.name];
+        //   }
+        //   console.log(`Memory.creeps[creepname] took ${(Game.cpu.getUsed() - cpuUsedB)}`);
+        // }
         Transporter.run(Game.creeps[this.meta.creeps[i]]);
       }
     }

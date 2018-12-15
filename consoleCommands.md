@@ -6,7 +6,7 @@ rollup -c --environment DEST:main
 ## Boosts
 OS.kernel.addProcess('makeBoosts', {room: 'W56S33', boost: RESOURCE_GHODIUM, amount: 3000}, 0);
 OS.kernel.addProcess('makeBoosts', {room: 'W15S2', boost: RESOURCE_UTRIUM_HYDRIDE,transporter:'88_19283181', shouldBoost: true, labs:['5b532f554df916370860b91d','5b53327c4df916370860ba62','5b5336334df916370860bbc1']}, 0);
-global.OS.kernel.addProcess('emptyLabs', {room: 'W51S31', creep: '496_11257143'}, 0)
+global.OS.kernel.addProcess('emptyLabs', {room: 'W59S28'}, 0)
 OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_GHODIUM_ACID]}, 0);
 OS.kernel.addProcess('autoMakeBoosts', {room: 'W56S33'}, 0);
 

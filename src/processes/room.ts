@@ -32,6 +32,12 @@ export class Room extends Process
     //if(room.controller && room.controller.level > 3) StructuresHelper.planRoom(room);
     // console.log(`Running room ${room.name}`);
     let rcl = room.controller && room.controller.level ? room.controller.level : 0;
+    if(Game.shard.name.toLowerCase() === 'shard3') {
+      this.meta.support = false;
+    }
+    if(typeof this.meta.support !== 'undefined' && this.meta.support && rcl < 5) {
+      return;
+    }
 
     if(rcl && rcl <= 8 && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('room_bootstrap', 'room', room.name)) {
       // Bootstrap room. dedicated creeps starts from RCL4

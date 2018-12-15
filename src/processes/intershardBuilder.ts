@@ -26,13 +26,14 @@ export class IntershardBuilder extends Process
         const creep = Game.creeps[this.meta.creep];
 
         if(room && flag) {
-            if((!this.meta.creep || !creep) && this.meta.last + 300 < Game.time) {
+            if((!this.meta.creep || !creep) && this.meta.last + 1150 < Game.time) {
                 if(SpawnsHelper.spawnAvailable(room)) {
-                    const name = SpawnsHelper.spawnCreep(room, [
-                        WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE
-                    ], {role: 'isBuilder'}, 'IB_'+this.meta.target);
+                    const name = SpawnsHelper.spawnCreep(room,
+                        [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY]
+                    , {role: 'isBuilder'}, 'IB_'+this.meta.target);
                     if(name) {
                         this.meta.creep = name;
+                        //this.meta.last = Game.time;
                     }
                 }
             }
@@ -61,7 +62,7 @@ export class IntershardBuilder extends Process
             if(!creep.pos.isEqualTo(flag)) {
                 creep.moveTo(flag);
             }
-            else {
+            if(creep.pos.inRangeTo(flag, 1)) {
                 this.meta.last = Game.time;
             }
         }

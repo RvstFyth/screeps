@@ -30,6 +30,11 @@ interface Room
   allies: Creep[]
 }
 
+interface StructureLab
+{
+  memory: {state: number}
+}
+
 interface RoomObject
 {
   say(value: string) : any

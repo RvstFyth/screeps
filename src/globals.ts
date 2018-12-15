@@ -1,3 +1,10 @@
+global.LAB_STATE = {
+    IDLE: 0,
+    SUPPLY: 1,
+    REACTING: 2,
+    BOOSTING: 3
+};
+
 global.BOOST_COMPONENTS = {
         //Base
         [RESOURCE_GHODIUM]: [RESOURCE_ZYNTHIUM_KEANITE, RESOURCE_UTRIUM_LEMERGITE],
@@ -40,7 +47,7 @@ global.BOOST_COMPONENTS = {
 };
 
 global.populateLOANlist = function(LOANuser = "LeagueOfAutomatedNations", LOANsegment = 99) {
-    if ((typeof RawMemory.setActiveForeignSegment == "function") && !!~['shard0','shard1','shard2'].indexOf(Game.shard.name)) { // To skip running in sim or private servers which prevents errors
+    if ((typeof RawMemory.setActiveForeignSegment == "function") && !!~['shard0','shard1','shard2','shard3'].indexOf(Game.shard.name)) { // To skip running in sim or private servers which prevents errors
         if ((typeof Memory.lastLOANtime == "undefined") || (typeof global.LOANlist == "undefined")) {
             Memory.lastLOANtime = Game.time - 1001;
             global.LOANlist = [];

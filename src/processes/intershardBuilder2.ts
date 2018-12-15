@@ -37,6 +37,12 @@ export class IntershardBuilder2 extends Process
                 else {
                   const constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
                   const ramparts = creep.room.ramparts.filter((r: StructureRampart) => r.hits < 7000);
+                  const damaged = creep.room.find(FIND_STRUCTURES, {
+                    filter: (s: Structure) => s.hits < s.hitsMax && s.structureType !== STRUCTURE_WALL && s.structureType !== STRUCTURE_RAMPART &&
+                        !s.pos.findInRange(FIND_MY_CREEPS, 2, {
+                          filter: (c: Creep) => c.name.substr(0, 2) === 'IB'
+                        }).length
+                  });
                     if(creep.room.controller && (creep.room.controller.level < 2 || creep.room.controller.ticksToDowngrade < 1000)) {
                       if(creep.room.controller && creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE)  {
                           creep.moveTo(creep.room.controller);
@@ -54,8 +60,36 @@ export class IntershardBuilder2 extends Process
                             creep.moveTo(target);
                         }
                     }
+                    else if(damaged.length) {
+                      const target = creep.pos.findClosestByRange(damaged);
+                      if(creep.repair(target) === ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                      }
+                    }
                     else {
-                        if(creep.room.controller && creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE)  {
+                        let target;
+                        const spawnToFill = creep.room.spawns.filter((s: StructureSpawn) => s.energy < s.energyCapacity);
+                        if(spawnToFill.length) {
+                            target = creep.pos.findClosestByRange(spawnToFill);
+                        }
+                        else {
+                          const extensionsToFill = creep.room.extensions.filter((s: StructureExtension) => s.energy < s.energyCapacity);
+                          if(extensionsToFill.length) {
+                            target = creep.pos.findClosestByRange(extensionsToFill);
+                          }
+                          else {
+                            const towersToFill = creep.room.towers.filter((s: StructureTower) => s.energy < s.energyCapacity);
+                            if(towersToFill.length) {
+                              target = creep.pos.findClosestByRange(towersToFill);
+                            }
+                          }
+                        }
+                        if(target) {
+                          if(creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                            creep.moveTo(target);
+                          }
+                        }
+                        else if(creep.room.controller && creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE)  {
                             creep.moveTo(creep.room.controller);
                         }
                     }
@@ -69,10 +103,16 @@ export class IntershardBuilder2 extends Process
 
     private harvest(creep: Creep)
     {
-        const source = creep.pos.findClosestByRange(Game.rooms[this.meta.target].sources);
+        const source = creep.pos.findClosestByRange(Game.rooms[this.meta.target].find(FIND_SOURCES_ACTIVE));
 
           if(!creep.pos.isNearTo(source)) {
             creep.moveTo(source);
+            const tombstones = creep.pos.findInRange(FIND_TOMBSTONES, 1, {
+              filter: (t: Tombstone) => t.store[RESOURCE_ENERGY] > 0 && creep.pos.inRangeTo(t,1)
+            });
+            if(tombstones.length) {
+              creep.withdraw(tombstones[0], RESOURCE_ENERGY);
+            }
           }
           else {
             const droppedResources = source.pos.findInRange(FIND_DROPPED_RESOURCES, 2, {
@@ -98,7 +138,7 @@ export class IntershardBuilder2 extends Process
                 const miners = source.pos.findInRange(FIND_MY_CREEPS, 2, {
                   filter: (c: Creep) => c.memory.role === 'miner' && c.getActiveBodyparts(WORK) > 2
                 });
-                const tombstones = creep.pos.findInRange(FIND_TOMBSTONES, 3, {
+                const tombstones = creep.pos.findInRange(FIND_TOMBSTONES, 1, {
                   filter: (t: Tombstone) => t.store[RESOURCE_ENERGY] > 0
                 });
                 if(tombstones.length) {

@@ -33,3 +33,21 @@ Game.shard.name
 /reconnect
 Game.shard.name
 Game.shard.name
+cpu()
+Math.floor(23000 / 50000)
+cpu()
+cpu()
+Game.shard.name
+global.OS.kernel.addProcess('intershardBuilder', {room: 'W51S31', target: 'W59S39', flag: '123'}, 0)
+global.OS.kernel.addProcess('intershardBuilder', {room: 'W51S31', target: 'W59S39', flag: '123'}, 0)
+global.OS.kernel.addProcess('intershardBuilder', {room: 'W51S31', target: 'W59S39', flag: '123'}, 0)
+global.OS.kernel.getProcessForMetaKeyValueCLI('intershardBuilder', 'room','W51S31').length
+global.OS.kernel.getProcessForMetaKeyValueCLI('target','W59S39').length
+global.OS.kernel.getProcessForMetaKeyValueCLI('target','W59S39').length
+Memory.errors = []
+cpu()
+cpu()
+cpu()
+Game.shard.name
+cpu()
+roomStats()

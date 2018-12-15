@@ -9,7 +9,9 @@ export class MakeBoosts extends Process
       if(!this.meta.amount) {
         this.meta.amount = 1000;
       }
-      // this.state = 'killed';
+      if(this.meta.room === 'W59S28') {
+        return;
+      }
       // this.meta.labs = [];
       const room = Game.rooms[this.meta.room];
       if(!this.meta.ingredients || !this.meta.ingredients.length) {
@@ -31,6 +33,10 @@ export class MakeBoosts extends Process
       if(this.meta.labs) {
 
         const labs: StructureLab[] = this.getLabs();
+
+        labs[0].memory.state = global.LAB_STATE.SUPPLY;
+        labs[1].memory.state = global.LAB_STATE.SUPPLY;
+
         if(labs[0].mineralAmount === labs[0].mineralCapacity && labs[1].mineralAmount === labs[1].mineralCapacity) {
           this.meta.shouldBoost = true;
         }
@@ -41,7 +47,9 @@ export class MakeBoosts extends Process
         if(this.meta.shouldBoost && !extraLabs[0].cooldown && labs[0].mineralAmount > 0 && labs[1].mineralAmount > 0) {
           if(extraLabs.length) {
             for(let i = 0, iEnd = extraLabs.length; i < iEnd; i++) {
-              extraLabs[i].runReaction(labs[0], labs[1]);
+              if(!extraLabs[i].memory.state || !extraLabs[i].memory.state !== global.LAB_STATE.BOOSTING) {
+                extraLabs[i].runReaction(labs[0], labs[1]);
+              }
             }
           }
         }
@@ -115,22 +123,19 @@ export class MakeBoosts extends Process
         if(_.sum(creep.carry) === 0) {
         // suicide with less then 50 ticks, as we dont want him to die during the transport!
           if(creep.ticksToLive && creep.ticksToLive < 50) creep.suicide();
-          const withdrawMin = labs[0].mineralAmount === 0 || labs[1].mineralAmount === 0 ? 0 : creep.carryCapacity;
-          if(!creep.pos.isNearTo(extraLabs[0])) {
-              creep.moveTo(extraLabs[0]);
-          }
-          if(extraLabs[0].mineralAmount >= withdrawMin || (extraLabs[0].mineralAmount > 0 && (labs[0].mineralAmount === 0 || labs[1].mineralAmount === 0))) {
-            creep.withdraw(extraLabs[0], this.meta.boost);
+          const withdrawMin = labs[1].mineralAmount === 0 ? 0 : (creep.carryCapacity / 2);
+          const la = extraLabs.filter((l: StructureLab) => l.mineralAmount > withdrawMin);
+          if(la.length) {
+            if(!creep.pos.isNearTo(la[0])) {
+              creep.moveTo(la[0]);
+            }
+            else {
+                creep.withdraw(la[0], this.meta.boost);
+            }
           }
           else {
-            const labsIDs = labs.map((l: StructureLab) => l.id);
-            if(extraLabs.length) {
-              if(!creep.pos.isNearTo(extraLabs[0])) {
-                creep.moveTo(extraLabs[0]);
-              }
-              else {
-                  creep.withdraw(extraLabs[0], this.meta.boost);
-              }
+            if(!creep.pos.isNearTo(labs[0])) {
+              creep.moveTo(labs[0]);
             }
           }
         }
@@ -191,17 +196,22 @@ export class MakeBoosts extends Process
           }
         }
         else { // Creep carries resources
-          let lab,
+          let lab = -1,
               mineral;
           if(labs[0].mineralAmount < this.meta.amount) {
-            lab = 1;
+            lab = 0;
             mineral = this.meta.ingredients[0];
           }
           else if(labs[1].mineralAmount < this.meta.amount) {
-            lab = 2;
+            lab = 1;
             mineral = this.meta.ingredients[1];
           }
-          if(lab && mineral) {
+          // if(creep.name === '2365_11689053') {
+          // console.log(JSON.stringify(lab));
+          // console.log(mineral);
+          // }
+
+          if(lab > -1 && mineral) {
             if(!creep.pos.isNearTo(labs[lab])) {
               creep.moveTo(labs[lab]);
             }
