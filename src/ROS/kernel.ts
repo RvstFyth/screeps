@@ -35,6 +35,8 @@ import {AutoMakeBoosts} from '../processes/autoMakeBoosts'
 import {SourceKeeperAttacker} from '../processes/sourceKeeperAttacker'
 import {AlliResourceRequests} from '../processes/alliResourceRequests'
 import {Chemist} from '../processes/chemist';
+import {SmallDrainer} from '../processes/smallDrainer';
+import {Resources} from '../processes/resources';
 
 class ProcessTable
 {
@@ -81,7 +83,9 @@ const Processes = <{[type: string]: any}> {
   'autoMakeBoosts': AutoMakeBoosts,
   'sourceKeeperAttacker': SourceKeeperAttacker,
   'alliResourceRequests': AlliResourceRequests,
-  'chemist': Chemist
+  'chemist': Chemist,
+  'smallDrainer': SmallDrainer,
+  'resources': Resources
 }
 
 export class Kernel

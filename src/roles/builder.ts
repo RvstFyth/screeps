@@ -28,7 +28,7 @@ export class Builder
       let constructionSites: ConstructionSite[] = creep.room.find(FIND_CONSTRUCTION_SITES).filter((c: ConstructionSite) => c.structureType !== STRUCTURE_RAMPART && c.structureType !== STRUCTURE_WALL);
       if(constructionSites && constructionSites.length) {
         let target = creep.pos.findClosestByRange(constructionSites);
-        if(creep.build(target) === ERR_NOT_IN_RANGE) {
+        if(target && creep.build(target) === ERR_NOT_IN_RANGE) {
           creep.moveTo(target);
         }
       }

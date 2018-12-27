@@ -31,6 +31,10 @@ export class Source extends Process
         Miner.run(Game.creeps[this.meta.miner], this.meta.sourceID, link);
       }
 
+      const container = source.pos.findInRange(source.room.container, 1, {
+          filter: (c: StructureContainer) => _.sum(c.store) > 0
+        });
+
       // hauler
       if(!link && source.room.storage && source.room.storage.my && (!this.meta.hauler || !Game.creeps[this.meta.hauler])) {
         if(SpawnsHelper.spawnAvailable(source.room)) {
@@ -41,7 +45,7 @@ export class Source extends Process
 
       }
       else if(Game.creeps[this.meta.hauler]) {
-        if(source.room.controller.level === 8 && link) {
+        if(source.room.controller.level === 8 && link && !container.length) {
           Game.creeps[this.meta.hauler].suicide();
         }
         else {

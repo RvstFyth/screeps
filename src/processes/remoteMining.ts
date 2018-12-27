@@ -46,6 +46,9 @@ export class RemoteMining extends Process
       this.suspendedTill = 0;
     }
 
+    if(room.name === 'W59S39') {
+      this.state = 'killed';
+    }
     // if(!this.meta.roads) {
     //   if(source) {
     //     this.initRoom(source, room);

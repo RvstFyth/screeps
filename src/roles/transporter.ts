@@ -82,10 +82,10 @@ export class Transporter
           // TODO: renewCreep on a available spawn SpawnsHelper.getAvailableSpawns(room)
           if(creep.ticksToLive && creep.ticksToLive < 500 &&  SpawnsHelper.spawnAvailable(creep.room)) {
             const target = creep.pos.findClosestByRange(SpawnsHelper.getAvailableSpawns(creep.room));
-            if(creep.pos.isNearTo(target)) {
+            if(target && creep.pos.isNearTo(target)) {
               target.renewCreep(creep);
             }
-            else {
+            else if(target) {
               creep.moveTo(target);
             }
           }
@@ -119,17 +119,26 @@ export class Transporter
     const extensions = creep.room.extensions.filter((s: StructureExtension) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
     const spawns = creep.room.spawns.filter((s: StructureSpawn) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
     if(extensions.length || spawns.length) {
-      creep.memory.targetID = creep.pos.findClosestByRange([...extensions, ...spawns]).id;
+      const target = creep.pos.findClosestByRange([...extensions, ...spawns]);
+      if(target) {
+        creep.memory.targetID = target.id;
+      }
     }
     else {
       const towers = creep.room.towers.filter((s: StructureTower) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
       if(towers.length) {
-        creep.memory.targetID = creep.pos.findClosestByRange(towers).id;
+        const target = creep.pos.findClosestByRange(towers);
+        if(target) {
+          creep.memory.targetID = target.id;
+        }
       }
       else {
         const labs = creep.room.labs.filter((l: StructureLab) => l.energy < l.energyCapacity);
         if(labs.length) {
-          creep.memory.targetID = creep.pos.findClosestByRange(labs).id;
+          const target = creep.pos.findClosestByRange(labs);
+          if(target) {
+            creep.memory.targetID = target.id;
+          }
         }
         else {
           if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000 && creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 50000) {

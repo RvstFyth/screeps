@@ -41,12 +41,12 @@ export class RemoteMiner
             }
             else if(creep.room.constructionSites.length) {
               const target = creep.pos.findClosestByRange(creep.room.constructionSites);
-              if(!creep.pos.inRangeTo(target, 2)) {
+              if(target && !creep.pos.inRangeTo(target, 2)) {
                 creep.moveTo(target, {
                   maxRooms: 1
                 });
               }
-              else {
+              else if(target) {
                 creep.build(target);
               }
             }
@@ -56,10 +56,10 @@ export class RemoteMiner
               });
               if(needRepair.length) {
                 const target = creep.pos.findClosestByRange(needRepair);
-                if(!creep.pos.inRangeTo(target, 2)) {
+                if(target && !creep.pos.inRangeTo(target, 2)) {
                   creep.moveTo(target);
                 }
-                else {
+                else if(target) {
                   creep.repair(target);
                 }
               }

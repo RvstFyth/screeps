@@ -11,9 +11,6 @@ export class HaulResources extends Process
 
   run()
   {
-    // if(this.meta.room === 'W54S29') {
-    //   this.state = 'killed';
-    // }
     const room = Game.rooms[this.meta.room];
     if(room) {
       if(!this.meta.transfered) {
@@ -59,6 +56,11 @@ export class HaulResources extends Process
             creep.moveTo(creep.room.terminal);
           }
           else {
+            // if(!creep.room.terminal.store[this.meta.resource as ResourceConstant]) {
+            //   creep.suicide();
+            //   this.state = 'killed';
+            //   console.log(123)
+            // }
             creep.withdraw(creep.room.terminal, this.meta.resource)
           }
         }

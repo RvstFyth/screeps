@@ -42,8 +42,11 @@ export class EmptyLabs extends Process
 
   getResources(creep: Creep, labs: StructureLab[])
   {
-    if(!creep.memory.target) {
-      creep.memory.target = creep.pos.findClosestByRange(labs).id;
+    if(!creep.memory.target && labs.length) {
+      const target = creep.pos.findClosestByRange(labs);
+      if(target) {
+        creep.memory.target = target.id;
+      }
     }
     const target: StructureLab|null = Game.getObjectById(creep.memory.target);
     if(target) {

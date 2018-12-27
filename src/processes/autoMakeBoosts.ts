@@ -38,22 +38,50 @@ export class AutoMakeBoosts extends Process
         }
     }
 
-    private findBuyOrder(room: Room, resource: ResourceConstant)
+    private buyResources(room: Room, resource: ResourceConstant) :number
     {
+        //return false;
+        if(Game.market.credits < 5150000) return 0;
+        // Amount to buy is locked at 3k for the moment.
+        let amountBought = 0, orders = Game.market.getAllOrders({type: ORDER_SELL, resourceType: resource});
+        if(orders.length && room.terminal) {
+            orders = orders.filter((o: Order) => o.price < 0.1);
+            if(orders.length) {
+                orders.sort((a,b) => a.price - b.price);
+                let totalCosts = 0, totalTransferCosts = 0;
+                for(let i = 0, iEnd = 10; i < iEnd; i++) {
+                    if(!orders[i] || amountBought >= 3000) break;
+                    const remaining = 3000 - amountBought;
+                    const amount = orders[i].remainingAmount > remaining ? remaining : orders[i].remainingAmount;
+                    const txCosts = Game.market.calcTransactionCost(amount, room.name, orders[i].roomName || '');
+                    if(room.terminal.store[RESOURCE_ENERGY] >= txCosts) {
+                        if(Game.market.deal(orders[i].id, amount, room.name) === OK) {
+                            amountBought += amount;
+                            totalTransferCosts += txCosts || 0;
+                            totalCosts += amount * orders[0].price;
+                        }
+                    }
+                }
+                if(amountBought > 0) {
+                    console.log(`Bought ${amountBought} ${resource} for room ${room.name}. Costs ${totalCosts}C and ${totalTransferCosts} energy`);
+                }
+            }
+        }
 
+        return amountBought;
     }
 
     private requestResources(room: Room, resource: ResourceConstant) : boolean
     {
-        return true;
+        return false;
 
         // for(let i in Game.rooms) {
         //     const r = Game.rooms[i];
         //     if(r.controller && r.controller.my && r.terminal && r.storage) {
-        //         const terminalAmount = r.terminal.store[resource];
-        //         const storageAmount = r.storage.store[resource];
-        //         if(terminalAmount && storageAmount && terminalAmount + storageAmount > 8000) {
-        //             if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', r.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', room.name)) {
+        //         const terminalAmount = r.terminal.store[resource] || 0;
+        //         const storageAmount = r.storage.store[resource] || 0;
+        //         if(terminalAmount + storageAmount > 8000) {
+        //             if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', r.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', r.name)) {
         //                 global.OS.kernel.addProcess('sendResources', {room: r.name, target: room.name, resource: resource, amount: 3000}, this.ID);
         //             }
         //         }
@@ -65,8 +93,12 @@ export class AutoMakeBoosts extends Process
 
     private handle(room: Room)
     {
+        // if(room.name === 'W51S37') console.log(1);
         if(room.storage && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('emptyLabs', 'room', room.name)) {
             const reaction = this.defineReaction(room);
+            if(room.name === 'W56S33') {
+                // console.log(reaction)
+            }
             if(reaction) {
                 global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: reaction, amount: 3000}, 0);
             }
@@ -84,14 +116,10 @@ export class AutoMakeBoosts extends Process
                 });
             }
 
-            let filteredMinerals = minerals.filter((m) => m.amount < 3000);
-            if(!filteredMinerals.length) {
-                filteredMinerals = minerals.filter((m) => m.amount < 6000);
-            }
-            if(!filteredMinerals.length) {
-                filteredMinerals = minerals.filter((m) => m.amount < 12000);
-            }
-            if(filteredMinerals.length) {
+            let filteredMinerals, targetMineral, amount = 3000, lastAmount = 0;
+        whileLoop:
+            while(true) {
+                filteredMinerals = minerals.filter((m) => m.amount >= lastAmount &&  m.amount < amount);
                 for(let i in filteredMinerals) {
                     const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[filteredMinerals[i].resource];
                     let fAmount = room.storage.store[ingredients[0]] || 0;
@@ -101,12 +129,34 @@ export class AutoMakeBoosts extends Process
                         sAmount += room.terminal.store[ingredients[1]] || 0;
                     }
                     if(fAmount >= 3000 && sAmount >= 3000) {
-                        return filteredMinerals[i].resource;
+                        targetMineral = filteredMinerals[i].resource;
+                        break;
+                    }
+                    else {
+                        try {
+                            if(this.requestResources(room, (fAmount < 3000 ? ingredients[0] : ingredients[1]))) {
+
+                            }
+                            else {
+                                const ingredient = (fAmount < 3000 ? ingredients[0] : ingredients[1]);
+                                if(ingredient.length === 1 && room.terminal && !room.terminal.cooldown) {
+                                    const amountBought = this.buyResources(room, ingredient);
+                                    if(amountBought > 0) break whileLoop;
+                                }
+                            }
+                        }
+                        catch(e) {
+                            console.log(`${e.message}`);
+                        }
                     }
                 }
+
+                lastAmount = amount;
+                amount += 3000;
+                if(amount >= 12000) break;
             }
-            else {
-                return _.min(minerals, (m) => m.amount).resource;
+            if(targetMineral) {
+                return targetMineral;
             }
         }
 

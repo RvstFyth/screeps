@@ -11,6 +11,7 @@ export class LootRoom extends Process
     run ()
     {
         // this.state = 'killed';
+        this.meta.target = 'W55S33'
         if(typeof this.meta.doneLooting === 'undefined') {
             this.meta.doneLooting = false;
             this.meta.shouldKill = false;
@@ -73,7 +74,7 @@ export class LootRoom extends Process
                                 costMatrix.set(x,y,60);
                               }
                             }
-                            costMatrix.set(sX,sY,255);
+                            costMatrix.set(sX,sY,150);
                           }
                         }
 
@@ -101,7 +102,7 @@ export class LootRoom extends Process
         if(creep.room.name !== this.meta.room) {
             creep.moveTo(new RoomPosition(25,25,this.meta.room), {
               reusePath: 17,
-              range: 20,
+              range: 10,
               costCallback: function(roomName: string, costMatrix: CostMatrix) {
                 const sourceKeepersLiar = creep.room.find(FIND_STRUCTURES, {
                   filter: (s: Structure) => s.structureType === STRUCTURE_KEEPER_LAIR
@@ -144,7 +145,9 @@ export class LootRoom extends Process
     {
         if(creep.room.terminal && _.sum(creep.room.terminal.store) > 0) {
             // creep.transfer(creep.room.storage, _.findKey(creep.carry) as ResourceConstant);
-            if(creep.withdraw(creep.room.terminal, _.findKey(creep.room.terminal.store) as ResourceConstant) === ERR_NOT_IN_RANGE) {
+            const resource = Object.keys(creep.room.terminal.store).filter(r => r !== RESOURCE_ENERGY)[0] || RESOURCE_ENERGY;
+
+            if(creep.withdraw(creep.room.terminal, resource as ResourceConstant) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.terminal);
             }
         }
@@ -157,9 +160,11 @@ export class LootRoom extends Process
             const labs = creep.room.labs.filter((l: StructureLab) => l.mineralAmount > 0 || l.energy > 0);
             const tmp = false;
             if(tmp) { //labs.length) {
-                const target = creep.pos.findClosestByRange(labs);
-                if(creep.withdraw(target, target.mineralType as ResourceConstant) === ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
+                const target: StructureLab|null = creep.pos.findClosestByRange(labs);
+                if(target) {
+                    if(creep.withdraw(target, target.mineralType as ResourceConstant) === ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                    }
                 }
             }
             else {
@@ -168,8 +173,8 @@ export class LootRoom extends Process
                         (s.structureType === STRUCTURE_TOWER || s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION) && s.energy > 0
                 });
                 if(targets.length) {
-                    const target = creep.pos.findClosestByRange(targets);
-                    if(creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                    const target: AnyStructure|null = creep.pos.findClosestByRange(targets);
+                    if(target && creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(target);
                     }
                 }
@@ -187,7 +192,7 @@ export class LootRoom extends Process
                         const containers = creep.room.containers.filter((c: StructureContainer) => _.sum(c.store) > 0);
                         if(containers.length) {
                             const target = creep.pos.findClosestByRange(containers);
-                            if(creep.withdraw(target, _.findKey(target.store) as ResourceConstant) === ERR_NOT_IN_RANGE) {
+                            if(target && creep.withdraw(target, _.findKey(target.store) as ResourceConstant) === ERR_NOT_IN_RANGE) {
                                 creep.moveTo(target);
                             }
                         }

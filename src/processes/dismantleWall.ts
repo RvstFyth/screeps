@@ -350,8 +350,10 @@ export class DismantleWall extends Process
                     filter: (s: Structure) => s.structureType === STRUCTURE_RAMPART && s.hits < 5000
                 });
                 if(ramparts.length) {
-                    const target = healer.pos.findClosestByRange(ramparts);
-                    healer.rangedAttack(target);
+                    const target: Structure|null = healer.pos.findClosestByRange(ramparts);
+                    if(target) {
+                        healer.rangedAttack(target);
+                    }
                 }
                 else {
                     if(wall && healer.pos.inRangeTo(wall,3)) {
@@ -377,10 +379,10 @@ export class DismantleWall extends Process
                     const allies = healer.pos.findInRange(healer.room.allies, 3).filter((c: Creep) => c.hits < c.hitsMax);
                     if(allies.length) {
                         const target = healer.pos.findClosestByRange(allies);
-                        if(healer.pos.isNearTo(target)) {
+                        if(target && healer.pos.isNearTo(target)) {
                             healer.heal(target);
                         }
-                        else {
+                        else if(target) {
                             healer.rangedHeal(target);
                         }
                     }

@@ -42,13 +42,19 @@ export class Links extends Process
         }
         else if(Game.creeps[this.meta.creep]) {
             const creep: Creep = Game.creeps[this.meta.creep];
-            if(creep.carry[RESOURCE_ENERGY] === 0)    {
+            if(_.sum(creep.carry) === 0)    {
                 if(!creep.pos.isNearTo(upgradersLink)) {
                     creep.moveTo(upgradersLink);
                 }
                 else {
                     if(upgradersLink.energy > 0) {
                         creep.withdraw(upgradersLink, RESOURCE_ENERGY);
+                    }
+                    else {
+                        const droppedResources = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
+                        if(droppedResources.length) {
+                            creep.pickup(droppedResources[0]);
+                        }
                     }
                 }
             }
@@ -58,7 +64,7 @@ export class Links extends Process
                         creep.moveTo(creep.room.storage);
                     }
                     else {
-                        creep.transfer(creep.room.storage, RESOURCE_ENERGY);
+                        creep.transfer(creep.room.storage, _.findKey(creep.carry) as ResourceConstant);
                     }
                 }
             }

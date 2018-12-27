@@ -45,28 +45,22 @@ export class ClaimRoom extends Process
         creep.heal(creep);
       }
       else {
-        let hostiles;
-        if(this.meta.target === 'W54S29') {
-            hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
-        }
-        else {
-          hostiles = creep.room.hostiles;
-        }
+        let hostiles: Creep[] = creep.room.hostiles;
 
         if(hostiles.length) {
-          const target = creep.pos.findClosestByRange(hostiles);
-          if(creep.rangedAttack(target) === ERR_NOT_IN_RANGE) {
+          const target: Creep| null = creep.pos.findClosestByRange(hostiles);
+          if(target && creep.rangedAttack(target) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target);
           }
           creep.heal(creep);
         }
         else {
-          const damaged = creep.room.find(FIND_MY_CREEPS, {
+          const damaged: Creep[] = creep.room.find(FIND_MY_CREEPS, {
             filter: (c: Creep) => c.hits < c.hitsMax
           });
           if(damaged && damaged.length) {
             const target = creep.pos.findClosestByRange(damaged);
-            if(creep.heal(target) === ERR_NOT_IN_RANGE) {
+            if(target && creep.heal(target) === ERR_NOT_IN_RANGE) {
               creep.moveTo(target);
             }
           }
@@ -74,11 +68,11 @@ export class ClaimRoom extends Process
             // const spawns = SpawnsHelper.getAvailableSpawns(creep.room);
             if(creep.ticksToLive && creep.ticksToLive < 500 && creep.room.energyAvailable === creep.room.energyCapacityAvailable) {
               if(SpawnsHelper.spawnAvailable(room)) {
-                const target = creep.pos.findClosestByRange(SpawnsHelper.getAvailableSpawns(creep.room));
-                if(creep.pos.isNearTo(target)) {
+                const target: StructureSpawn|null = creep.pos.findClosestByRange(SpawnsHelper.getAvailableSpawns(creep.room));
+                if(target && creep.pos.isNearTo(target)) {
                   target.renewCreep(creep);
                 }
-                else {
+                else if(target) {
                   creep.moveTo(target);
                 }
               }
@@ -142,7 +136,7 @@ export class ClaimRoom extends Process
 
         if(creep.memory.harvesting) {
 
-          const source = creep.pos.findClosestByRange(Game.rooms[this.meta.target].sources);
+          const source: Source|null = creep.pos.findClosestByRange(Game.rooms[this.meta.target].sources);
 
           if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 20000) {
             if(creep.pos.isNearTo(creep.room.storage)) {
@@ -152,10 +146,10 @@ export class ClaimRoom extends Process
               creep.moveTo(creep.room.storage);
             }
           }
-          else if(!creep.pos.inRangeTo(source, 2)) {
+          else if(source && !creep.pos.inRangeTo(source, 2)) {
             creep.moveTo(source);
           }
-          else {
+          else if(source) {
             const droppedResources = source.pos.findInRange(FIND_DROPPED_RESOURCES, 2, {
               filter: (s: Resource) => s.resourceType === RESOURCE_ENERGY && s.amount > creep.carryCapacity
             })
@@ -176,13 +170,13 @@ export class ClaimRoom extends Process
                 }
               }
               else {
-                const hostileStructures = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+                const hostileStructures: Structure[] = creep.room.find(FIND_HOSTILE_STRUCTURES, {
                   filter: (s: OwnedStructure) => (s.hasOwnProperty('store') && (s as any).store[RESOURCE_ENERGY] > 0) ||
                     s.hasOwnProperty('energy') && (s as any).energy > 0
                 });
                 if(hostileStructures.length) {
-                  const target = creep.pos.findClosestByRange(hostileStructures);
-                  if(creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                  const target: Structure|null = creep.pos.findClosestByRange(hostileStructures);
+                  if(target && creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                   }
                 }
@@ -273,11 +267,11 @@ export class ClaimRoom extends Process
               global.OS.kernel.addProcess('room', {name: this.meta.target}, 0);
             }
             if(Game.rooms[this.meta.target].constructionSites.length) {
-                const target = creep.pos.findClosestByRange(Game.rooms[this.meta.target].constructionSites);
-                if(!creep.pos.inRangeTo(target, 2)) {
+                const target: ConstructionSite|null = creep.pos.findClosestByRange(Game.rooms[this.meta.target].constructionSites);
+                if(target && !creep.pos.inRangeTo(target, 2)) {
                   creep.moveTo(target);
                 }
-                else {
+                else if(target) {
                   creep.build(target);
                 }
             }

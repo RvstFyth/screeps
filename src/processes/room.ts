@@ -19,12 +19,13 @@ export class Room extends Process
     }
 
     if(room.ramparts.length) {
-      if(this.meta.publicRamparts && !room.hostiles.length && !room.ramparts[0].isPublic) {
+      if(this.meta.publicRamparts && !room.hostiles.length && !room.ramparts[0].isPublic && Game.cpu.bucket >= 10000 && (!this.meta.rampartTimestamp || this.meta.rampartTimestamp + 100 < Game.time)) {
         _.forEach(room.ramparts, r => r.setPublic(true));
       }
       else if(this.meta.publicRamparts && room.hostiles.length && room.ramparts[0].isPublic) {
         let cpu = Game.cpu.getUsed();
         _.forEach(room.ramparts, r => r.setPublic(false));
+        this.meta.rampartTimestamp = Game.time;
         console.log(`<span style="color:orange">Hostile detected in ${room.name}, closing ramparts took ${Game.cpu.getUsed() - cpu} CPU`);
       }
     }
@@ -82,7 +83,7 @@ export class Room extends Process
     }
 
     if(!this.meta.lastStructureCheck || this.meta.lastStructureCheck < Game.time - 50) {
-      console.log('Triggering checkStructures');
+      // console.log('Triggering checkStructures');
       this.checkStructures(room);
       this.meta.lastStructureCheck = Game.time;
     }
@@ -90,6 +91,12 @@ export class Room extends Process
     if(room.controller && room.controller.level >= 6 && room.storage && room.terminal && room.labs.length > 2) {
       if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('autoMakeBoosts', 'room', room.name)) {
         global.OS.kernel.addProcess('autoMakeBoosts', {room: room.name}, this.ID);
+      }
+    }
+
+    if(room.storage && room.terminal) {
+      if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('resources', 'room', room.name)) {
+        global.OS.kernel.addProcess('resources', {room: room.name}, this.ID);
       }
     }
 

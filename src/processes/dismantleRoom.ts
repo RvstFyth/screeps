@@ -82,7 +82,10 @@ export class DismantleRoom extends Process
                         filter: (s: Structure) => s.structureType !== STRUCTURE_CONTAINER && s.structureType !== STRUCTURE_CONTROLLER
                     });
                     if(structures.length) {
-                        creep.memory.target = creep.pos.findClosestByRange(structures).id;
+                        const target = creep.pos.findClosestByRange(structures);
+                        if(target) {
+                            creep.memory.target = target.id;
+                        }
                     }
                     else {
                         creep.memory.harvesting = false;

@@ -50,19 +50,19 @@ export class IntershardBuilder2 extends Process
                     }
                     else if(ramparts.length) {
                       const target = creep.pos.findClosestByRange(ramparts);
-                        if(creep.repair(target) === ERR_NOT_IN_RANGE) {
+                        if(target && creep.repair(target) === ERR_NOT_IN_RANGE) {
                             creep.moveTo(target);
                         }
                     }
                     else if(constructionSites.length) {
                         const target = creep.pos.findClosestByRange(constructionSites);
-                        if(creep.build(target) === ERR_NOT_IN_RANGE) {
+                        if(target && creep.build(target) === ERR_NOT_IN_RANGE) {
                             creep.moveTo(target);
                         }
                     }
                     else if(damaged.length) {
                       const target = creep.pos.findClosestByRange(damaged);
-                      if(creep.repair(target) === ERR_NOT_IN_RANGE) {
+                      if(target && creep.repair(target) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(target);
                       }
                     }
@@ -105,7 +105,7 @@ export class IntershardBuilder2 extends Process
     {
         const source = creep.pos.findClosestByRange(Game.rooms[this.meta.target].find(FIND_SOURCES_ACTIVE));
 
-          if(!creep.pos.isNearTo(source)) {
+          if(source && !creep.pos.isNearTo(source)) {
             creep.moveTo(source);
             const tombstones = creep.pos.findInRange(FIND_TOMBSTONES, 1, {
               filter: (t: Tombstone) => t.store[RESOURCE_ENERGY] > 0 && creep.pos.inRangeTo(t,1)
@@ -114,7 +114,7 @@ export class IntershardBuilder2 extends Process
               creep.withdraw(tombstones[0], RESOURCE_ENERGY);
             }
           }
-          else {
+          else if(source) {
             const droppedResources = source.pos.findInRange(FIND_DROPPED_RESOURCES, 2, {
               filter: (s: Resource) => s.resourceType === RESOURCE_ENERGY && s.amount > creep.carryCapacity
             })

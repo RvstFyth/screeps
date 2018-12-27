@@ -56,17 +56,19 @@ export class SourceKeeperAttacker extends Process
                     if(hostilesInRange && hostilesInRange.length > 1) {
                         creep.rangedMassAttack();
                     }
-                    else if(creep.pos.inRangeTo(target, 3)) {
+                    else if(target && creep.pos.inRangeTo(target, 3)) {
                         creep.rangedAttack(target);
                     }
                     // Attack or heal
-                    if(creep.pos.isNearTo(target)) {
+                    if(target && creep.pos.isNearTo(target)) {
                         creep.attack(target);
                     }
                     else {
                         creep.heal(creep);
-                        if(creep.hits === creep.hitsMax || creep.pos.inRangeTo(target, 3)) {
-                            creep.moveTo(target);
+                        if(target) {
+                            if(creep.hits === creep.hitsMax || creep.pos.inRangeTo(target, 3)) {
+                                creep.moveTo(target);
+                            }
                         }
                     }
                 }

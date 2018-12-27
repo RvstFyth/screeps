@@ -13,9 +13,13 @@ export class SendResources extends Process
 
   run()
   {
-    // if(this.meta.resource === 'H') {
-       // this.state = 'killed';
-    // }
+    if(this.meta.room === 'W56S33') {
+      // console.log(this.meta.target);
+      //  this.state = 'killed';
+      //  if(Game.creeps[this.meta.transporter]) {
+      //    Game.creeps[this.meta.transporter].suicide();
+      //  }
+    }
     if(typeof this.meta.done === 'undefined') {
       this.meta.done = false;
     }
@@ -39,9 +43,9 @@ export class SendResources extends Process
           this.transport(room);
         }
         else {
-          this.meta.done = true;
           if(room.terminal.send(this.meta.resource, this.meta.amount, this.meta.target) === OK) {
             global.OS.kernel.addProcess('haulResources', {room: this.meta.target, resource: this.meta.resource, amount: this.meta.amount}, 0)
+            this.meta.done = true;
           }
         }
       }

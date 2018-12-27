@@ -5,7 +5,8 @@ import 'prototypes/Room';
 import 'prototypes/Creep';
 import 'prototypes/RoomObject';
 import 'prototypes/StructureLab';
-import 'globals'
+import 'prototypes/RoomVisual';
+import 'globals';
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 
@@ -43,9 +44,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
   global.populateLOANlist();
   OS.run();
   const cpuUsed = Game.cpu.getUsed() - cpu;
-  //if(Game.time % 5 === 0) {
-    console.log(`Tick: ${Game.time} | CPU: ${cpuUsed.toFixed(2)} | ${Object.keys(Game.rooms).length} rooms in vision | ${Memory.ROS.processes.length} processes in mem`);
-  //}
+  if(Game.time % 20 === 0) {
+    // console.log(`${Game.shard.name} | Tick: ${Game.time} | CPU: ${cpuUsed.toFixed(2)} | ${Object.keys(Game.rooms).length} rooms in vision | ${Memory.ROS.processes.length} processes in mem`);
+  }
   // Automatically delete memory of missing creeps
 
   if(Memory.cpu.cnt === 100) {

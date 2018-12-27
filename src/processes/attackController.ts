@@ -7,6 +7,8 @@ export class AttackController extends Process
 
     public run()
     {
+        // this.state = 'killed';
+        this.meta.target = 'W57S35'
         try {
             this.run2();
         }
@@ -25,9 +27,14 @@ export class AttackController extends Process
         if(room) {
             if(!creep && (this.meta.last === 0 || this.meta.last + 600 < Game.time)) {
                 if(SpawnsHelper.spawnAvailable(room)) {
-                    SpawnsHelper.requestSpawn(this.ID, room, [
-                        CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE
-                    ], {role: 'controllerAttacker'}, 'creep');
+                    let bodyParts;
+                    if(room.controller && room.controller.level < 8) {
+                        bodyParts = [CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                    }
+                    else {
+                        bodyParts = [CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,CLAIM,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+                    }
+                    SpawnsHelper.requestSpawn(this.ID, room, bodyParts, {role: 'controllerAttacker'}, 'creep');
                 }
             }
             else if(creep && creep.spawning) {

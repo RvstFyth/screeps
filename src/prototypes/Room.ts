@@ -11,6 +11,16 @@ Object.defineProperty(Room.prototype, 'sources', {
   }
 });
 
+Object.defineProperty(Room.prototype, 'mineral', {
+  get: function()
+  {
+    if(!this._mineral) {
+      this._mineral = this.find(FIND_MINERALS)[0];
+    }
+    return this._mineral;
+  }
+});
+
 Object.defineProperty(Room.prototype, 'labs', {
   get: function()
   {
@@ -158,7 +168,7 @@ Object.defineProperty(Room.prototype, 'hostiles', {
   {
     if(!this._hostiles) {
       this._hostiles = this.find(FIND_HOSTILE_CREEPS, {
-        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) === -1
+        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) === -1 || c.owner.username === 'Zenga' || c.owner.username === 'BarryOSeven'
       });
     }
 
@@ -171,7 +181,7 @@ Object.defineProperty(Room.prototype, 'allies', {
   {
     if(!this._allies) {
       this._allies = this.find(FIND_HOSTILE_CREEPS, {
-        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) > -1
+        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) > -1 && c.owner.username !== 'Zenga'
       });
     }
 

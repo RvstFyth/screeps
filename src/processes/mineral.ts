@@ -31,28 +31,28 @@ export class Mineral extends Process
       }
     }
     else {
-      try {
-        if(room.storage && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', this.meta.room)) {
-          for(let n in room.storage.store) {
-            if(n == RESOURCE_ENERGY) {
-              continue;
-            }
-            const storageAmount = room.storage ? (room.storage.store as any)[n] : null;
-            if(storageAmount && storageAmount > 20000) { // over 30k send to other rooms that can use them
-              //if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', this.meta.room)) {
-                if(this.sendResourcesToOtherRooms(n as MineralConstant)) {
-                  break;
-                }
-                else {
-                  continue;
-                }
-            }
-          }
-        }
-      }
-      catch(e) {
-        console.log("resource management failed");
-      }
+      // try {
+      //   if(room.storage && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', this.meta.room)) {
+      //     for(let n in room.storage.store) {
+      //       if(n == RESOURCE_ENERGY) {
+      //         continue;
+      //       }
+      //       const storageAmount = room.storage ? (room.storage.store as any)[n] : null;
+      //       if(storageAmount && storageAmount > 20000) { // over 30k send to other rooms that can use them
+      //         //if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', this.meta.room)) {
+      //           if(this.sendResourcesToOtherRooms(n as MineralConstant)) {
+      //             break;
+      //           }
+      //           else {
+      //             continue;
+      //           }
+      //       }
+      //     }
+      //   }
+      // }
+      // catch(e) {
+      //   console.log("resource management failed");
+      // }
 
       const storageAmount = room.storage ? room.storage.store[mineral.mineralType] : null;
       const sellTreshould = 300000; // replace with a constant
@@ -88,12 +88,13 @@ export class Mineral extends Process
 
       if(mineral.mineralAmount > 0) {
         try {
-          if(!storageAmount || storageAmount < 200000) {
-            this.handleMiners();
-          }
-          else {
+          //if(!storageAmount || storageAmount < 200000) {
+            const canSpawn = !storageAmount || storageAmount < 200000;
+            this.handleMiners(canSpawn);
+          //}
+          //else {
             // Start selling resources!!
-          }
+          //}
         }
         catch(e) {
           console.log("HandleMiner crashed: "+e.message);
@@ -110,7 +111,6 @@ export class Mineral extends Process
 
   sendResourcesToOtherRooms(mineral: MineralConstant)
   {
-    // Check if target rooms has no pending sendResources processes and this room has no sendResources process
     let room;
     let success = false;
     for(let n in Game.rooms) {
@@ -118,12 +118,9 @@ export class Mineral extends Process
       if(room.controller && room.controller.my) {
         if(room.terminal && room.storage) {
           const r = mineral;
-          let rAmount = room.storage.store[r];
-          const tAmount = room.terminal.store[r];
-          if(!rAmount && tAmount) rAmount = tAmount;
-          else if(rAmount && tAmount) rAmount += tAmount;
+          const amountInRoom = (room.storage.store[r] || 0) + (room.terminal.store[r] || 0);
 
-          if(!rAmount || rAmount < 5000) {
+          if(amountInRoom < 5000) {
             if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', room.name)) {
               success = true;
               global.OS.kernel.addProcess('sendResources', {room: this.meta.room, target: room.name, resource: mineral, amount: 5000}, 0);
@@ -171,7 +168,7 @@ export class Mineral extends Process
     }
   }
 
-  handleMiners()
+  handleMiners(canSpawn: boolean)
   {
     const room = Game.rooms[this.meta.room];
     let numMiners = 1;
@@ -203,7 +200,7 @@ export class Mineral extends Process
 
     this.meta.miners = this.meta.miners.filter((n: any) => n); // Remove NULL values
 
-    if(spawningCreeps === 0 && this.meta.miners.length < numMiners) {
+    if(canSpawn && spawningCreeps === 0 && this.meta.miners.length < numMiners) {
       if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
         SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], MineralMiner.defineBodyParts(Game.rooms[this.meta.room]), {role: 'mineralMiner'}, 'miners[]');
       }

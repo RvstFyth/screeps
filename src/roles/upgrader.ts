@@ -19,10 +19,10 @@ export class Upgrader
           const containers = creep.room.containers.filter((c: StructureContainer) => c.store[RESOURCE_ENERGY] > creep.carryCapacity);
           if(containers.length) {
             const target = creep.pos.findClosestByRange(containers);
-            if(!creep.pos.isNearTo(target)) {
+            if(target && !creep.pos.isNearTo(target)) {
               creep.moveTo(target);
             }
-            else {
+            else if(target) {
               creep.withdraw(target, RESOURCE_ENERGY);
             }
           }

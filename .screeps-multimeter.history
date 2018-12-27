@@ -51,3 +51,18 @@ cpu()
 Game.shard.name
 cpu()
 roomStats()
+cpu()
+JSON.stringify()
+JSON.stringify('')
+JSON.stringify('<')
+JSON.stringify('/ghj')
+cpu()
+JSON.stringify(Memory.scoutReports)
+Game.market.credits
+Game.shard.name
+JSON.stringify(Object.values(Game.rooms).filter((aRoom: Room) => aRoom.controller && aRoom.controller.my))
+if (Game.rooms.W50S20 && Game.rooms.W50S20.controller) console.log("yes")
+(!Game.rooms.W50S20) console.log("Cookies is right")
+if (!Game.rooms.W50S20) console.log("Cookies is right")
+gcl()
+JSON.stringify(Memory.rooms)

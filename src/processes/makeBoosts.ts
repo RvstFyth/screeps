@@ -31,11 +31,12 @@ export class MakeBoosts extends Process
       }
 
       if(this.meta.labs) {
+        room.visual.compound(this.meta.boost, 2, 2, 0.8);
 
         const labs: StructureLab[] = this.getLabs();
 
-        labs[0].memory.state = global.LAB_STATE.SUPPLY;
-        labs[1].memory.state = global.LAB_STATE.SUPPLY;
+        // labs[0].memory.state = global.LAB_STATE.SUPPLY;
+        // labs[1].memory.state = global.LAB_STATE.SUPPLY;
 
         if(labs[0].mineralAmount === labs[0].mineralCapacity && labs[1].mineralAmount === labs[1].mineralCapacity) {
           this.meta.shouldBoost = true;
@@ -45,6 +46,7 @@ export class MakeBoosts extends Process
         const extraLabs = room.labs.filter((l: StructureLab) => labsIDs.indexOf(l.id) < 0);
 
         if(this.meta.shouldBoost && !extraLabs[0].cooldown && labs[0].mineralAmount > 0 && labs[1].mineralAmount > 0) {
+
           if(extraLabs.length) {
             for(let i = 0, iEnd = extraLabs.length; i < iEnd; i++) {
               if(!extraLabs[i].memory.state || !extraLabs[i].memory.state !== global.LAB_STATE.BOOSTING) {
@@ -255,6 +257,9 @@ export class MakeBoosts extends Process
 
     labs[0].room.visual.circle(labRanges[0].lab.pos, {stroke: 'red'});
     labs[1].room.visual.circle(labRanges[1].lab.pos, {stroke: 'red'});
+
+    labRanges[0].lab.memory.state = global.LAB_STATE.SUPPLY;
+    labRanges[1].lab.memory.state = global.LAB_STATE.SUPPLY;
 
     this.meta.labs.push(labRanges[0].lab.id);
     this.meta.labs.push(labRanges[1].lab.id);

@@ -26,9 +26,11 @@ export class Rampart
         const constructionSites = creep.room.constructionSites.filter((c: ConstructionSite) => c.structureType === STRUCTURE_RAMPART);
         if(constructionSites.length) {
           const target = creep.pos.findClosestByRange(constructionSites);
-          creep.memory.target = target.id;
-          creep.memory.targetX = target.pos.x;
-          creep.memory.targetY = target.pos.y;
+          if(target) {
+            creep.memory.target = target.id;
+            creep.memory.targetX = target.pos.x;
+            creep.memory.targetY = target.pos.y;
+          }
         }
         else {
           // Find ramparts to repair

@@ -13,20 +13,29 @@ export class Worker
      const transporters = creep.room.find(FIND_MY_CREEPS, {filter: (c: Creep) => c.memory.role === 'transporter'});
 
      if(!transporters.length && spawns.length) {
-       targetID = creep.pos.findClosestByRange(spawns).id;
-       target = 'spawn';
+       const t = creep.pos.findClosestByRange(spawns);
+       if(t) {
+        targetID = t.id;
+        target = 'spawn';
+       }
      }
      else {
        const extensions = creep.room.extensions.filter((s: StructureExtension) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
        if(!transporters.length && extensions.length) {
-         targetID = creep.pos.findClosestByRange(extensions).id;
-         target = 'extension';
+         const t = creep.pos.findClosestByRange(extensions);
+         if(t) {
+           targetID = t.id;
+           target = 'extension';
+         }
        }
        else {
          const towers = creep.room.towers.filter((s: StructureTower) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
          if(!transporters.length && towers.length) {
-           targetID = creep.pos.findClosestByRange(towers).id;
-           target = 'tower';
+           const t = creep.pos.findClosestByRange(towers);
+           if(t) {
+            targetID = t.id;
+            target = 'tower';
+           }
          }
          else {
            if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] < 500000) {
@@ -46,8 +55,11 @@ export class Worker
                   filter: (s: ConstructionSite) => /**s.structureType !== STRUCTURE_WALL && */ s.structureType !== STRUCTURE_RAMPART
                });
                if(constructionSites.length) {
-                  targetID = creep.pos.findClosestByRange(constructionSites).id;
-                  target = 'build';
+                  const t = creep.pos.findClosestByRange(constructionSites);
+                  if(t) {
+                    targetID = t.id;
+                    target = 'build';
+                  }
                }
                else {
                  // Repair stuff
@@ -55,8 +67,11 @@ export class Worker
                     filter: (s: Structure) => s.hits < s.hitsMax && s.structureType !== STRUCTURE_WALL && s.structureType !== STRUCTURE_RAMPART && assignedTargets.indexOf(s.id) < 0
                  });
                  if(damaged.length) {
-                   targetID = creep.pos.findClosestByRange(damaged).id;
-                   target = 'repair';
+                   const t = creep.pos.findClosestByRange(damaged);
+                   if(t) {
+                    targetID = t.id;
+                    target = 'repair';
+                   }
                  }
                }
              }
@@ -67,8 +82,11 @@ export class Worker
               filter: (s: ConstructionSite) => /**s.structureType !== STRUCTURE_WALL && */ s.structureType !== STRUCTURE_RAMPART
               });
               if(constructionSites.length) {
-                  targetID = creep.pos.findClosestByRange(constructionSites).id;
-                  target = 'build';
+                const t = creep.pos.findClosestByRange(constructionSites);
+                  if(t) {
+                    targetID = t.id;
+                    target = 'build';
+                  }
               }
               else {
                 // Repair stuff
@@ -76,8 +94,11 @@ export class Worker
                     filter: (s: Structure) => s.hits < s.hitsMax && s.structureType !== STRUCTURE_WALL && s.structureType !== STRUCTURE_RAMPART && assignedTargets.indexOf(s.id) < 0
                 });
                 if(damaged.length) {
-                  targetID = creep.pos.findClosestByRange(damaged).id;
-                  target = 'repair';
+                  const t = creep.pos.findClosestByRange(damaged);
+                  if(t) {
+                    targetID = t.id;
+                    target = 'repair';
+                  }
                 }
               }
            }

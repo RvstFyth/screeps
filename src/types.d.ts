@@ -5,6 +5,14 @@ declare const require: (module: string) => any;
 // add your custom typings here
 declare var global: any;
 
+interface RoomVisual
+{
+  resource(type: ResourceConstant, x: number, y: number, size: number) : any,
+  fluid(type: string, x: number, y: number, size: number) : any,
+  mineral(type: string, x: number, y: number, size: number) : any,
+  compound(type: string, x: number, y: number, size: number) : any
+}
+
 interface StructureSpawn
 {
    isSpawning: boolean
@@ -28,11 +36,12 @@ interface Room
   observer: StructureObserver|undefined
   roads: StructureRoad[]
   allies: Creep[]
+  mineral: Mineral|undefined
 }
 
 interface StructureLab
 {
-  memory: {state: number}
+  memory: {state: number, boost: ResourceConstant}
 }
 
 interface RoomObject
@@ -44,6 +53,11 @@ interface Creep
 {
   moveToRoom(roomName: string): any;
   _suicide() : any
+}
+
+interface RoomPosition
+{
+  isExitTile() : boolean
 }
 
 interface CreepMemory {

@@ -87,10 +87,29 @@ export class Towers extends Process
     }
   }
 
+  private scanAlliHostileActions(room: Room)
+  {
+    if(room.allies.length) {
+      const log = room.getEventLog();
+      const attackEvents: any[] = _.filter(log, {event: EVENT_ATTACK});
+      if(attackEvents.length) {
+        for(let i = 0, iEnd = attackEvents.length; i < iEnd; i++) {
+          const creep: Creep|null = Game.getObjectById(attackEvents[i].objectId);
+          const target: Structure|Creep|null = Game.getObjectById(attackEvents[i].data.targetId);
+          if(creep && target) {
+            if(global.LOANlist.indexOf(creep.owner.username) > -1) {
+              // Kick from alli list.
+            }
+          }
+        }
+      }
+    }
+  }
+
   private handleHostiles(tower: StructureTower, targetIDs: string[]) : string[]
   {
     const healers = tower.room.hostiles.filter((c: Creep) => c.getActiveBodyparts(HEAL) > 0);
-    let target: Creep|undefined;
+    let target: Creep|null;
 
     if(healers.length) {
       const filteredTargets = healers.filter((c: Creep) => targetIDs.indexOf(c.id) < 0);
@@ -121,7 +140,7 @@ export class Towers extends Process
 
   private handleInvaders(tower: StructureTower, targetIDs: string[]) : string[]
   {
-    let target: Creep|undefined;
+    let target: Creep|null = null;
     if(tower.room.invaders.length === 1) {
       const invader = tower.room.invaders[0];
       //if(invader.pos.findInRange(tower.room.ramparts, 3).length) {
