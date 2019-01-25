@@ -27,20 +27,6 @@ export class Transport extends Process
 
       }
       else if(Game.creeps[this.meta.creeps[i]]) {
-        // if(this.meta.room === 'W56S33') {
-        //   const creep = Game.creeps[this.meta.creeps[i]];
-        //   const cpuUsed = Game.cpu.getUsed();
-        //   for(let i = 0, iEnd = 100; i < iEnd; i++) {
-        //     const a = creep.memory;
-        //   }
-        //   console.log(`memory.creeps took ${(Game.cpu.getUsed() - cpuUsed)}`);
-
-        //   const cpuUsedB = Game.cpu.getUsed();
-        //   for(let i = 0, iEnd = 100; i < iEnd; i++) {
-        //     const a = Memory.creeps[creep.name];
-        //   }
-        //   console.log(`Memory.creeps[creepname] took ${(Game.cpu.getUsed() - cpuUsedB)}`);
-        // }
         Transporter.run(Game.creeps[this.meta.creeps[i]]);
       }
     }
@@ -48,7 +34,8 @@ export class Transport extends Process
     this.meta.creeps = this.meta.creeps.filter((n: any) => n);
 
     if(this.meta.creeps.length < this.defineTotalTransporters())  {
-      if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
+      const room = Game.rooms[this.meta.room];
+      if(room && room.storage && room.storage.my && SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
         // let name = SpawnsHelper.spawnCreep(Game.rooms[this.meta.room], Transporter.defineBodyParts(Game.rooms[this.meta.room]), {role: 'transporter'}, this.ID.toString());
         // if(name) {
         //   this.meta.creeps.push(name);

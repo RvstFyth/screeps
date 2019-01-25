@@ -73,6 +73,9 @@ export class Spawns extends Process
     if(sorted['upgrader'] && sorted['upgrader'].length) {
       return sorted['upgrader'][0];
     }
+    if(sorted['worker'] && sorted['worker'].length) {
+      return sorted['worker'][0];
+    }
 
     return entries.shift();
   }

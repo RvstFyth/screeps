@@ -3,6 +3,11 @@ export class Miner
 
   static run(creep: Creep, sourceID: string, linkID: string)
   {
+    // if(creep.room.name === 'W51S32') {
+    //   const CPU = Game.cpu.getUsed();
+    //   creep.pos.findInRange(FIND_STRUCTURES, 1);
+    //   console.log(`${(Game.cpu.getUsed() - CPU).toFixed(3)} CPU`);
+    // }
     const source: Source|null = Game.getObjectById(sourceID);
     if(source) {
       let link:StructureLink|null = null;
@@ -69,20 +74,21 @@ export class Miner
   {
     let bodyParts;
 
-    if(/*room.energyCapacityAvailable < 500 && */room.energyAvailable <= 300) {
-        bodyParts = [WORK, MOVE]; // 150
-    }
-    else if(room.energyAvailable <= 450) {
+    // if(/*room.energyCapacityAvailable < 500 && */room.energyAvailable <= 300) {
+    //     bodyParts = [WORK, MOVE]; // 150
+    // }
+    // else
+    if(room.energyCapacityAvailable <= 450) {
         bodyParts = [WORK,WORK,MOVE,MOVE]; // 300
     }
-    else if(room.energyAvailable <= 700 ){
+    else if(room.energyCapacityAvailable <= 700 ){
         bodyParts = [WORK, WORK, WORK, WORK, MOVE, MOVE]; // 550
     }
     else if(room.energyAvailable <= 800){
         bodyParts = [MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,CARRY];
     }
     else {
-      bodyParts = [WORK,WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE]; // 750
+      bodyParts = [WORK,WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE]; // 750
     }
     return bodyParts;
   }

@@ -36,25 +36,52 @@ export class Source extends Process
         });
 
       // hauler
-      if(!link && source.room.storage && source.room.storage.my && (!this.meta.hauler || !Game.creeps[this.meta.hauler])) {
-        if(SpawnsHelper.spawnAvailable(source.room)) {
-            SpawnsHelper.requestSpawn(this.ID, source.room, Hauler.defineBodyParts(source.room), {role: 'hauler'}, 'hauler');
-        }
-      }
-      else if(Game.creeps[this.meta.hauler] && Game.creeps[this.meta.hauler].spawning) {
-
-      }
-      else if(Game.creeps[this.meta.hauler]) {
-        if(source.room.controller.level === 8 && link && !container.length) {
-          Game.creeps[this.meta.hauler].suicide();
-        }
-        else {
-          Hauler.run(Game.creeps[this.meta.hauler], this.meta.sourceID);
-        }
-      }
+      const canSpawn = !link && source.room.storage && source.room.storage.my && (!this.meta.hauler || !Game.creeps[this.meta.hauler]);
+      this.handleHaulers(canSpawn);
     }
     else {
       this.state = 'killed';
+    }
+  }
+
+  handleHaulers(canSpawn: boolean)
+  {
+    if(!this.meta.haulers) {
+      this.meta.haulers = [];
+      if(this.meta.hauler) { // Migration line
+        this.meta.haulers.push(this.meta.hauler);
+      }
+    }
+
+    for(let i in this.meta.haulers) {
+      const creep = Game.creeps[this.meta.haulers[i]];
+      if(!creep) {
+        this.meta.haulers[i] = null;
+      }
+      else if(creep && creep.spawning) {
+
+      }
+      else if(creep) {
+        Hauler.run(creep, this.meta.sourceID);
+      }
+    }
+    this.meta.haulers = this.meta.haulers.filter((n: any) => n); // Remove NULL values
+    if(canSpawn) {
+      let maxHaulers = 1;
+      const s:any = Game.getObjectById(this.meta.sourceID);
+      if(s) {
+        const containers: StructureContainer[] = s.pos.findInRange(s.room.containers, 1);
+        if(containers && containers.length) {
+          if(containers[0].store[RESOURCE_ENERGY] === containers[0].storeCapacity) {
+            maxHaulers = 2;
+          }
+        }
+      }
+      if(this.meta.haulers.length < maxHaulers) {
+        if(SpawnsHelper.spawnAvailable(s.room)) {
+          SpawnsHelper.requestSpawn(this.ID, s.room, Hauler.defineBodyParts(s.room), {role: 'hauler'}, 'haulers[]');
+        }
+      }
     }
   }
 }

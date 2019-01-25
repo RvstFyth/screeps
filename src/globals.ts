@@ -5,6 +5,8 @@ global.LAB_STATE = {
     BOOSTING: 3
 };
 
+global.UNIT_COST = (body: BodyPartConstant[]) => _.sum(body, (p: BodyPartConstant) => BODYPART_COST[p]);
+
 global.BOOST_COMPONENTS = {
         //Base
         [RESOURCE_GHODIUM]: [RESOURCE_ZYNTHIUM_KEANITE, RESOURCE_UTRIUM_LEMERGITE],
@@ -139,6 +141,20 @@ global.roomStats = function()
     }
 
     console.log(output);
+}
+
+global.defineTier = function(t: string)
+{
+    return t.length +1;
+}
+
+/**
+ * Clear the in-game console
+ * Usage: `clear()` in the console
+ */
+global.clear = function()
+{
+   console.log("<script>angular.element(document.getElementsByClassName('fa fa-trash ng-scope')[0].parentNode).scope().Console.clear()</script>")
 }
 
 global.gcl = function()

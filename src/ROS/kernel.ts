@@ -37,6 +37,9 @@ import {AlliResourceRequests} from '../processes/alliResourceRequests'
 import {Chemist} from '../processes/chemist';
 import {SmallDrainer} from '../processes/smallDrainer';
 import {Resources} from '../processes/resources';
+import {EmptyOwnedRoom} from '../processes/emptyOwnedRoom'
+import {WishHappyNewYear} from '../processes/wishHappyNewYear';
+import {Defence} from '../processes/defence';
 
 class ProcessTable
 {
@@ -85,7 +88,10 @@ const Processes = <{[type: string]: any}> {
   'alliResourceRequests': AlliResourceRequests,
   'chemist': Chemist,
   'smallDrainer': SmallDrainer,
-  'resources': Resources
+  'resources': Resources,
+  'emptyOwnedRoom': EmptyOwnedRoom,
+  'wishHappyNewYear': WishHappyNewYear,
+  'defence': Defence
 }
 
 export class Kernel
@@ -104,6 +110,22 @@ export class Kernel
     this.ProcessTable = new ProcessTable();
     //this.nextID = Memory.ROS.nextProcessID;
     this.loadProcesses();
+  }
+
+  stats()
+  {
+    const stringified = JSON.stringify(Memory);
+		let cpu = Game.cpu.getUsed();
+		JSON.parse(stringified);
+
+
+    console.log(`
+      ROS Kernel stats
+      ${Memory.ROS.processes.length} Processes total
+      ${(Game.cpu.getUsed() - cpu).toFixed(3)} CPU spent on parsing memory
+      Next processID: ${Memory.ROS.nextProcessID}
+      Current tick: ${Game.time}
+    `);
   }
 
   addProcess(name: string, meta: any, parentID: number)
@@ -208,6 +230,7 @@ export class Kernel
           this.ProcessTable.queue.push(pr);
       }
     }
+    Memory.stats['ROS.'+Game.shard.name+'.pCnt'] = this.ProcessTable.queue.length;
     Memory.ROS.processes = [];
   }
 

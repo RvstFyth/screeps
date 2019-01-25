@@ -51,8 +51,22 @@ interface RoomObject
 
 interface Creep
 {
-  moveToRoom(roomName: string): any;
+  moveToRoom(roomName: string, ignoreSK?: boolean, prioritizeHighways?:boolean): any;
   _suicide() : any
+  flee(targets: any, range:number) : any
+}
+
+interface Source
+{
+  spots: number
+  memory: any
+}
+
+interface StructureController
+{
+  spots: RoomPosition[]
+  memory: any
+  global: any
 }
 
 interface RoomPosition

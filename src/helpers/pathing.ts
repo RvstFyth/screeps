@@ -44,6 +44,7 @@ export class PathingHelper
 
     static stringToPath(path: string) : {x:number, y:number, d:number}[]
     {
+        if(!path) return [];
         let splitted: string[] = path.split('|');
         let output: any = {};
 

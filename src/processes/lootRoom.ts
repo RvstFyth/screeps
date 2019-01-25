@@ -4,14 +4,14 @@ import {SpawnsHelper} from '../helpers/spawns'
 // META:
 // room
 // target
-// global.OS.kernel.addProcess('lootRoom', {room: 'W59S21', target: "W59S22"}, 0)
+// global.OS.kernel.addProcess('lootRoom', {room: 'W4S3', target: "W4S2", creep: '38_30315275'}, 0)
 export class LootRoom extends Process
 {
 
     run ()
     {
         // this.state = 'killed';
-        this.meta.target = 'W55S33'
+        // this.meta.target = 'W55S33'
         if(typeof this.meta.doneLooting === 'undefined') {
             this.meta.doneLooting = false;
             this.meta.shouldKill = false;
@@ -37,8 +37,15 @@ export class LootRoom extends Process
             this.state = 'killed';
         }
         else if(!creep) {
+            let bodyParts;
+            if(room.controller && room.controller.level <= 5) {
+                bodyParts = [CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
+            }
+            else {
+                bodyParts = [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+            }
             if(SpawnsHelper.spawnAvailable(room)) {
-                SpawnsHelper.requestSpawn(this.ID, room, [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE],
+                SpawnsHelper.requestSpawn(this.ID, room, bodyParts,
                     {role: 'looter'}, 'creep'
                 );
             }
@@ -134,8 +141,15 @@ export class LootRoom extends Process
                 creep.moveTo(creep.room.storage);
             }
             else if(creep.room.storage) {
-                if(creep.transfer(creep.room.storage, _.findKey(creep.carry) as ResourceConstant) === ERR_NOT_IN_RANGE) {
+                const res = creep.transfer(creep.room.storage, _.findKey(creep.carry) as ResourceConstant);
+                if(res === ERR_NOT_IN_RANGE) {
                     creep.moveTo(creep.room.storage);
+                }
+                else if(res === OK) {
+                    if(_.sum(creep.room.storage.store) > 900000) {
+                        this.meta.shouldKill = true;
+                        this.meta.doneLooting = true;
+                    }
                 }
             }
         }

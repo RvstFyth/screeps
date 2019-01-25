@@ -8,7 +8,7 @@ export class AttackController extends Process
     public run()
     {
         // this.state = 'killed';
-        this.meta.target = 'W57S35'
+        // this.meta.target = 'W57S35'
         try {
             this.run2();
         }

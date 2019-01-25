@@ -34,7 +34,14 @@ export class Links extends Process
     {
         if(!this.meta.creep || !Game.creeps[this.meta.creep]) {
             if(SpawnsHelper.spawnAvailable(upgradersLink.room)) {
-                SpawnsHelper.requestSpawn(this.ID, upgradersLink.room, [CARRY,CARRY,MOVE,MOVE], {role: 'linkTransporter'}, 'creep');
+                let bodyParts;
+                if(upgradersLink.room.controller && upgradersLink.room.controller.level < 6) {
+                    bodyParts = [CARRY,CARRY,MOVE];
+                }
+                else {
+                    bodyParts = [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
+                }
+                SpawnsHelper.requestSpawn(this.ID, upgradersLink.room, bodyParts, {role: 'linkTransporter'}, 'creep');
             }
         }
         else if(Game.creeps[this.meta.creep].spawning) {

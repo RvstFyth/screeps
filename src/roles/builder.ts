@@ -10,9 +10,19 @@ export class Builder
       creep.memory.harvesting = false;
     }
     if(creep.memory.harvesting) {
-      if(typeof creep.room.storage === 'undefined') {
-        if(creep.harvest(creep.room.sources[0]) === ERR_NOT_IN_RANGE) {
-          creep.moveTo(creep.room.sources[0]);
+      if(typeof creep.room.storage === 'undefined' || (!creep.room.storage.my && !creep.room.storage.store[RESOURCE_ENERGY])) {
+        const containers = creep.room.containers.filter((c: StructureContainer) => c.store[RESOURCE_ENERGY] > creep.carryCapacity * 2);
+        if(containers && containers.length) {
+          const target = creep.pos.findClosestByRange(containers);
+          if(target && creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+          }
+        }
+        else {
+          const target = creep.pos.findClosestByRange(creep.room.sources);
+          if(target && creep.harvest(target) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+          }
         }
       }
       else {

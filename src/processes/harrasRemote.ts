@@ -11,12 +11,15 @@ export class HarrasRemote extends Process
     init()
     {
         this.meta.creeps = [];
+        if(Game.creeps['3995_3156665']) {
+            this.meta.creeps.push('3995_3156665');
+        }
         this.meta.initialized = true;
     }
 
     run()
     {
-        this.state = 'killed';
+        // this.state = 'killed';
         try {
             this.run2();
         }
@@ -116,7 +119,7 @@ export class HarrasRemote extends Process
                 }
             }
             else {
-                creep.moveToRoom(this.meta.target);
+                creep.moveToRoom(this.meta.target, false, true);
             }
         }
         else {
@@ -179,7 +182,7 @@ export class HarrasRemote extends Process
             }
             else {
                 //const structures: Structure[] = creep.room.containers;
-                const structures: Structure[] = [...creep.room.spawns, ...creep.room.towers]; //creep.room.find(FIND_STRUCTURES, {filter: (r: Structure) => r.structureType === STRUCTURE_ROAD /*|| r.structureType === STRUCTURE_CONTAINER*/});
+                const structures: Structure[] = [...creep.room.spawns, ...creep.room.towers, ...creep.room.extensions]; //creep.room.find(FIND_STRUCTURES, {filter: (r: Structure) => r.structureType === STRUCTURE_ROAD /*|| r.structureType === STRUCTURE_CONTAINER*/});
                 if(structures.length) {
                     const target = creep.pos.findClosestByRange(structures);
                     if(target) {
@@ -215,17 +218,30 @@ export class HarrasRemote extends Process
                                 this.harrasserAttack(creep, target);
                             }
                         }
+                        else if(creep.room.controller) {
+                            if(!creep.pos.isNearTo(creep.room.controller)) {
+                                creep.moveTo(creep.room.controller);
+                            }
+                            else {
+                                if(creep.room.controller.sign && creep.room.controller.sign.username !== 'GimmeCookies') {
+                                    creep.signController(creep.room.controller, "Cleared by #overlords");
+                                }
+                                else {
+                                    if(creep.room.constructionSites) {
+                                        const target = creep.pos.findClosestByRange(creep.room.constructionSites);
+                                        if(target) {
+                                            creep.moveTo(target);
+                                        }
+                                    }
+                                    else {
+                                        if(!creep.pos.isNearTo(creep.room.controller)) {
+                                            creep.moveTo(creep.room.controller);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                    // else if(creep.room.controller) {
-                    //     if(!creep.pos.isNearTo(creep.room.controller)) {
-                    //         creep.moveTo(creep.room.controller);
-                    //     }
-                    //     else {
-                    //         if(creep.room.controller.sign && creep.room.controller.sign.username !== 'GimmeCookies') {
-                    //             creep.signController(creep.room.controller, "#overlords");
-                    //         }
-                    //     }
-                    // }
                 }
             }
         }

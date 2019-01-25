@@ -27,10 +27,20 @@ export class Room_Bootstrap extends Process
   run()
   {
     const room = Game.rooms[this.meta.room];
-
+    //if(room.name === 'W56S33') console.log(1)
     if(!room || (room.controller && !room.controller.my)) {
       this.state = 'killed';
       return;
+    }
+    else if(room.name === 'W51S39' && room.controller) {
+      // const a = Game.cpu.getUsed();
+      const spots = room.controller.spots;
+      //console.log(`${(Game.cpu.getUsed() - a).toFixed(3)} CPU`);
+      for(let i in spots) {
+        room.visual.circle(spots[i].x, spots[i].y, {
+          stroke: 'blue'
+        })
+      }
     }
 
     if(!this.meta.targets) {
@@ -48,7 +58,6 @@ export class Room_Bootstrap extends Process
     }
 
     for(let s in this.meta.sources) {
-      let numWorkers = this.defineWorkersCount(room);
 
       if(!this.meta.sources[s].creeps) {
         this.meta.sources[s].creeps = [];
@@ -56,6 +65,7 @@ export class Room_Bootstrap extends Process
       const source = this.meta.sources[s];
       let link = '';
       const sourceObject: Source|null = Game.getObjectById(s);
+      let numWorkers = this.defineWorkersCount(room, sourceObject);
       if(sourceObject) {
         const links: StructureLink[] = sourceObject.pos.findInRange(room.links, 2);
         if(links.length) {
@@ -147,10 +157,13 @@ export class Room_Bootstrap extends Process
     }
   }
 
-  defineWorkersCount(room: Room)
+  defineWorkersCount(room: Room, source: Source|null)
   {
     if(!room.storage) {
-
+      if(source) {
+        const multiplyer = 1; //!room.constructionSites.length ? 2 : 1.5;
+        return Math.floor((source.spots > 1 ? source.spots : 2) * multiplyer);
+      }
       return 4;
     }
     if(typeof room.controller !== 'undefined'  && room.controller.level >= 3) {

@@ -14,7 +14,7 @@ export class ReserveRoom extends Process
     else {
       this.suspendedTill = 0;
     }
-
+    // this.state = 'killed';
     if(!this.suspendedTill && Game.rooms[this.meta.target] && Game.rooms[this.meta.target].hostiles) {
       const invaders: Creep[] = Game.rooms[this.meta.target].hostiles.filter((c: Creep) => c.owner.username.toLowerCase() === 'invader');
       if(invaders.length && invaders.length === Game.rooms[this.meta.target].hostiles.length) {

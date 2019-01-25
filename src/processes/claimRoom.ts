@@ -9,9 +9,10 @@ export class ClaimRoom extends Process
   run()
   {
     if(this.shouldRun()) {
-      if(this.meta.target === 'W54S29') {
-        this.state = 'killed';
-      }
+      // if(this.meta.target === 'W59S36') {
+      //   this.state = 'killed';
+      // }
+
       // The room from where the creeps are spawned
       const room = Game.rooms[this.meta.room];
       this.handleClaimer(room);
@@ -32,7 +33,14 @@ export class ClaimRoom extends Process
   {
     if(!Game.creeps[this.meta.defender]) {
       if(SpawnsHelper.spawnAvailable(room)) {
-        this.meta.defender = SpawnsHelper.spawnCreep(room, [RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'claimRoom_defender'}, this.ID.toString());
+        let bodyParts;
+        if(room.controller && room.controller.level < 4) {
+          bodyParts = [MOVE,MOVE,MOVE,MOVE,MOVE,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL];
+        }
+        else {
+          bodyParts = [RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+        }
+        this.meta.defender = SpawnsHelper.spawnCreep(room, bodyParts, {role: 'claimRoom_defender'}, this.ID.toString());
       }
     }
     else if(Game.creeps[this.meta.defender].spawning) {
@@ -41,16 +49,31 @@ export class ClaimRoom extends Process
     else if(Game.creeps[this.meta.defender]) {
       const creep = Game.creeps[this.meta.defender];
       if(creep.room.name !== this.meta.target) {
-        creep.moveToRoom(this.meta.target);
+        creep.moveToRoom(this.meta.target, true);
         creep.heal(creep);
       }
       else {
+        if(creep.room.allies.length && Game.time % 16 === 0) {
+          const closest = creep.pos.findClosestByRange(creep.room.allies);
+          if(closest && creep.pos.inRangeTo(closest, 5)) {
+            creep.say('Hi '+creep.room.allies[0].owner.username, true);
+          }
+        }
         let hostiles: Creep[] = creep.room.hostiles;
 
         if(hostiles.length) {
           const target: Creep| null = creep.pos.findClosestByRange(hostiles);
           if(target && creep.rangedAttack(target) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target);
+          }
+          if(target) {
+            if(creep.pos.inRangeTo(target, 3)) {
+              creep.rangedAttack(target);
+            }
+            creep.flee(hostiles, 4);
+            // else {
+            //   creep.moveTo(target);
+            // }
           }
           creep.heal(creep);
         }
@@ -77,6 +100,34 @@ export class ClaimRoom extends Process
                 }
               }
             }
+            else {
+              const hostileExtensions = creep.room.find(FIND_HOSTILE_STRUCTURES, {
+                filter: (s: Structure) => (s.structureType === STRUCTURE_EXTENSION || s.structureType === STRUCTURE_LINK)
+              });
+              if(hostileExtensions.length) {
+                // console.log(1)
+                const target = creep.pos.findClosestByRange(hostileExtensions);
+                if(target && creep.rangedAttack(target) === ERR_NOT_IN_RANGE) {
+                  creep.moveTo(target);
+                }
+              }
+              else {
+                if(creep.room.spawns.length) {
+                  if(!creep.pos.inRangeTo(creep.room.spawns[0], 4)) {
+                    creep.moveTo(creep.room.spawns[0], {
+                      maxRooms: 1,
+                      range: 4
+                    });
+                  }
+                }
+                else if(creep.room.controller && !creep.pos.inRangeTo(creep.room.controller, 3)) {
+                  creep.moveTo(creep.room.controller, {
+                    range: 3,
+                    maxRooms: 1
+                  });
+                }
+              }
+            }
           }
         }
       }
@@ -90,41 +141,13 @@ export class ClaimRoom extends Process
         this.meta.builder = SpawnsHelper.spawnCreep(room, [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'claimRoom_builder'}, this.ID.toString());
       }
     }
-    else if(Game.creeps[this.meta.builder].spawning) {
+    else if(Game.creeps[this.meta.builder] && Game.creeps[this.meta.builder].spawning) {
 
     }
     else if(Game.creeps[this.meta.builder]) {
       const creep = Game.creeps[this.meta.builder];
       if(creep.room.name !== this.meta.target) {
-        creep.moveTo(new RoomPosition(25,25,this.meta.target), {
-          reusePath: 17,
-          range: 20,
-          costCallback: function(roomName: string, costMatrix: CostMatrix) {
-            const sourceKeepersLiar = creep.room.find(FIND_STRUCTURES, {
-              filter: (s: Structure) => s.structureType === STRUCTURE_KEEPER_LAIR
-            });
-
-            if(sourceKeepersLiar.length) {
-              for(let i in sourceKeepersLiar) {
-                const sX = sourceKeepersLiar[i].pos.x;
-                const sY = sourceKeepersLiar[i].pos.y;
-                //costMatrix.set(sX,sY,255);
-                // Loop throug Y
-                for(let y = (sY - 5), yEnd = (sY + 5); y < yEnd; y++) {
-                  for(let x = (sX - 5), xEnd = (sX + 5); x < xEnd; x++) {
-                    costMatrix.set(x,y,60);
-                    // if(sX !== x && sY !== y) {
-                    //   costMatrix.set(x,y,60);
-                    // }
-                  }
-                }
-                costMatrix.set(sX,sY,255);
-              }
-            }
-
-            return costMatrix;
-          }
-        });
+        creep.moveToRoom(this.meta.target, true);
       }
       else {
         if(creep.carry[RESOURCE_ENERGY] === 0) {
@@ -138,7 +161,13 @@ export class ClaimRoom extends Process
 
           const source: Source|null = creep.pos.findClosestByRange(Game.rooms[this.meta.target].sources);
 
-          if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 20000) {
+          if(creep.room.terminal && !creep.room.terminal.my && creep.room.terminal.store[RESOURCE_ENERGY] > 0) {
+            if(creep.withdraw(creep.room.terminal, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+              creep.moveTo(creep.room.terminal);
+            }
+          }
+
+          else if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 20000) {
             if(creep.pos.isNearTo(creep.room.storage)) {
               creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
             }
@@ -304,10 +333,10 @@ export class ClaimRoom extends Process
           this.meta.claimer = SpawnsHelper.spawnCreep(room, [CLAIM,MOVE], {role: 'claimer'}, this.ID.toString());
         }
       }
-      else if(Game.creeps[this.meta.claimer].spawning) {
+      else if(Game.creeps[this.meta.claimer] && Game.creeps[this.meta.claimer].spawning) {
 
       }
-      else if(Game.flags[this.ID]) {
+      else if(Game.creeps[this.meta.claimer] && Game.flags[this.ID]) {
         const creep = Game.creeps[this.meta.claimer];
         if(!creep.pos.isNearTo(Game.flags[this.ID])) {
           creep.moveTo(Game.flags[this.ID]);
@@ -319,35 +348,7 @@ export class ClaimRoom extends Process
       else if(Game.creeps[this.meta.claimer]) {
         const creep = Game.creeps[this.meta.claimer];
         if(creep.room.name !== this.meta.target) {
-          creep.moveTo(new RoomPosition(25,25,this.meta.target), {
-            reusePath: 7,
-            range: 5,
-            costCallback: function(roomName: string, costMatrix: CostMatrix) {
-              const sourceKeepersLiar = creep.room.find(FIND_STRUCTURES, {
-                filter: (s: Structure) => s.structureType === STRUCTURE_KEEPER_LAIR
-              });
-
-              if(sourceKeepersLiar.length) {
-                for(let i in sourceKeepersLiar) {
-                  const sX = sourceKeepersLiar[i].pos.x;
-                  const sY = sourceKeepersLiar[i].pos.y;
-                  //costMatrix.set(sX,sY,255);
-                  // Loop throug Y
-                  for(let y = (sY - 5), yEnd = (sY + 5); y < yEnd; y++) {
-                    for(let x = (sX - 5), xEnd = (sX + 5); x < xEnd; x++) {
-                      costMatrix.set(x,y,60);
-                      // if(sX !== x && sY !== y) {
-                      //   costMatrix.set(x,y,60);
-                      // }
-                    }
-                  }
-                  costMatrix.set(sX,sY,255);
-                }
-              }
-
-              return costMatrix;
-            }
-          });
+          creep.moveToRoom(this.meta.target, true);
         }
         else {
           if(creep.room.controller) {
@@ -369,7 +370,7 @@ export class ClaimRoom extends Process
   shouldRun()
   {
     const targetRoom = Game.rooms[this.meta.target];
-    if(targetRoom && targetRoom.controller && targetRoom.controller.level > 6) {
+    if(targetRoom && targetRoom.controller && targetRoom.controller.level > 6 && targetRoom.spawns.length > 1) {
       return false;
     }
 

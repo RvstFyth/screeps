@@ -95,16 +95,21 @@ export class StockBoostsLab extends Process
 
     private defineTargetLab(room: Room)
     {
-        const availableLabs = room.labs.filter((l: StructureLab) => l.mineralAmount === 0 && this.meta.labsToIgnore.indexOf(l.id) < 0);
-        if(availableLabs.length) {
-            this.meta.lab = availableLabs[0].id;
+        const lab = room.labs.filter((l: StructureLab) => l.mineralType === this.meta.current);
+        if(lab && lab.length) {
+            this.meta.lab = lab[0];
+        }
+        else {
+            const availableLabs = room.labs.filter((l: StructureLab) => l.mineralAmount === 0 && this.meta.labsToIgnore.indexOf(l.id) < 0);
+            if(availableLabs.length) {
+                this.meta.lab = availableLabs[0].id;
+            }
         }
     }
 
     private defineResource(room: Room)
     {
         let result;
-        console.log(1)
         for(let i in this.meta.boosts) {
             console.log(this.meta.boosts[i]);
             const labs = room.labs.filter((l:StructureLab) => this.meta.labsToIgnore.indexOf(l.id) < 0 && l.mineralType == this.meta.boosts[i]);
@@ -120,7 +125,10 @@ export class StockBoostsLab extends Process
 
     private transport(creep: Creep)
     {
-        if(!this.meta.current || this.meta.current == '0') {
+        if(this.meta.boosts.length === 1) {
+            this.meta.current = this.meta.boosts[0];
+        }
+        else if(!this.meta.current || this.meta.current == '0') {
             this.defineResource(creep.room);
         }
         if(!this.meta.lab) {

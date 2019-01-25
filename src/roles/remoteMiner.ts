@@ -36,30 +36,23 @@ export class RemoteMiner
             const creeps: Creep[] = creep.room.find(FIND_MY_CREEPS, {
               filter: (c: Creep) => c.memory.role === 'remotehauler' && c.memory.harvesting === true
             });
+            const constructionSites = creep.pos.findInRange(creep.room.constructionSites, 2);
             if(creeps.length && creep.pos.isNearTo(creeps[0])) {
               creep.transfer(creeps[0], RESOURCE_ENERGY);
             }
-            else if(creep.room.constructionSites.length) {
-              const target = creep.pos.findClosestByRange(creep.room.constructionSites);
-              if(target && !creep.pos.inRangeTo(target, 2)) {
-                creep.moveTo(target, {
-                  maxRooms: 1
-                });
-              }
-              else if(target) {
+            else if(constructionSites && constructionSites.length) {
+              const target = creep.pos.findClosestByRange(constructionSites);
+              if(target) {
                 creep.build(target);
               }
             }
             else {
               const needRepair = creep.room.find(FIND_STRUCTURES, {
-                filter: (s: Structure) => s.hits < s.hitsMax && s.structureType !== STRUCTURE_WALL && s.structureType !== STRUCTURE_RAMPART
+                filter: (s: Structure) => s.hits < s.hitsMax && s.structureType !== STRUCTURE_WALL && s.structureType !== STRUCTURE_RAMPART && s.structureType !== STRUCTURE_ROAD && s.pos.inRangeTo(creep, 2)
               });
               if(needRepair.length) {
                 const target = creep.pos.findClosestByRange(needRepair);
-                if(target && !creep.pos.inRangeTo(target, 2)) {
-                  creep.moveTo(target);
-                }
-                else if(target) {
+                if(target) {
                   creep.repair(target);
                 }
               }

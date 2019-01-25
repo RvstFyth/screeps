@@ -10,11 +10,13 @@ export class Towers extends Process
       this.state = 'killed';
       return;
     }
+    // if(this.meta.room === 'W51S32') return;
     let healed = false;
     let numRepairs = 0;
     let targetIDs: string[] = [];
     for(let i in Game.rooms[this.meta.room].towers) {
       const room = Game.rooms[this.meta.room];
+      if(room.towers[i].energy < TOWER_ENERGY_COST) continue;
       if(room.hostiles.length) {
         if(room.hostiles.length === room.invaders.length) { // Means only invaders :)
           targetIDs = this.handleInvaders(room.towers[i], targetIDs);

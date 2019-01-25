@@ -13,13 +13,6 @@ export class SendResources extends Process
 
   run()
   {
-    if(this.meta.room === 'W56S33') {
-      // console.log(this.meta.target);
-      //  this.state = 'killed';
-      //  if(Game.creeps[this.meta.transporter]) {
-      //    Game.creeps[this.meta.transporter].suicide();
-      //  }
-    }
     if(typeof this.meta.done === 'undefined') {
       this.meta.done = false;
     }

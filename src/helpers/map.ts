@@ -17,6 +17,17 @@ export class MapHelper
     }
 
     /**
+     * Define if the room is a owned room.
+     * @param roomName
+     */
+    public static isOwnRoom(roomName: string)
+    {
+        if(!Game.rooms[roomName]) return false;
+        const room = Game.rooms[roomName];
+        return room.controller && room.controller.my;
+    }
+
+    /**
      * Parse the room name and define if it is a source keeper room.
      * We use the second and third element of the parsing result.
      * The first element is the complete roomName

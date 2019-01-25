@@ -1,8 +1,26 @@
-Creep.prototype.moveToRoom = function(roomName: string)
+import {MapHelper} from '../helpers/map';
+
+Creep.prototype.moveToRoom = function(roomName: string, ignoreSK?: boolean, prioritizeHighways? : boolean)
 {
-    this.moveTo(new RoomPosition(25,25,roomName), {
+    const res: any = Game.map.findRoute(this.room, roomName, {
+        routeCallback: function(roomName) {
+            if(!Game.map.isRoomAvailable(roomName)) return Infinity;
+            if(ignoreSK && MapHelper.isSourceKeeperRoom(roomName)) return Infinity;
+            if(prioritizeHighways) return MapHelper.isNeutralRoom(roomName) ? 1 : 2.5;
+            return 1;
+        }
+    });
+    let room;
+    if(res && res.length) {
+        room = res[0].room;
+    }
+    else {
+        room = roomName;
+    }
+    this.moveTo(new RoomPosition(25,25,room), {
         reusePath: 9,
         range: 15,
+        maxRooms: 1
     });
 }
 
@@ -32,3 +50,21 @@ if(!Creep.prototype._suicide) {
         }
     }
 }
+
+Creep.prototype.flee = function(targets: any, range = 7) : any
+{
+    if (!_.isArray(targets))
+        targets = [targets];
+
+    var goals = _.map(targets, function(target: any) {return {pos: target.pos, range: range}});
+    var opts = {flee: true, maxOps: 2000};
+
+    var path = PathFinder.search(this.pos, goals, opts);
+
+    if (path && !path.incomplete) {
+        this.move(this.pos.getDirectionTo(path.path[0]));
+        return OK;
+    }
+
+    return ERR_NO_PATH;
+};

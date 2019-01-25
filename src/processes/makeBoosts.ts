@@ -10,7 +10,7 @@ export class MakeBoosts extends Process
         this.meta.amount = 1000;
       }
       if(this.meta.room === 'W59S28') {
-        return;
+        //return;
       }
       // this.meta.labs = [];
       const room = Game.rooms[this.meta.room];

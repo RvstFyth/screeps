@@ -42,7 +42,7 @@ export class Transporter
         const target: any = Game.getObjectById(creep.memory.targetID);
         if(target) {
           if(creep.pos.isNearTo(target)) {
-            if(creep.transfer(target, RESOURCE_ENERGY) === OK) {
+            if(creep.transfer(target, RESOURCE_ENERGY) === OK && creep.carry[RESOURCE_ENERGY] > 0) {
               this.defineTarget(creep, creep.memory.targetID);
               if(creep.memory.targetID && _.sum(creep.carry) > 0) {
                 const t: AnyStructure|null = Game.getObjectById(creep.memory.targetID);

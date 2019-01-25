@@ -32,18 +32,7 @@ export class Resources extends Process
         const room = Game.rooms[this.meta.room];
         const mineral = room.find(FIND_MINERALS)[0];
 
-        if(room && room.controller && room.controller.my && mineral && room.storage && room.terminal) {
-
-            // if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', room.name)) {
-            //     const mAmount = (room.terminal.store[mineral.mineralType] || 0) + (room.storage.store[mineral.mineralType] || 0)
-            //     if(mAmount >= 20000) {
-            //         if(Memory.resourceRequests[mineral.mineralType] && Memory.resourceRequests[mineral.mineralType].length) {
-            //             const target = Memory.resourceRequests[mineral.mineralType].pop();
-            //             global.OS.kernel.addProcess('sendResources', {room: room.name, target: target, resource: mineral.mineralType, amount: 5000}, 0);
-            //         }
-            //     }
-            // }
-
+        if(room && room.controller && room.controller.my && mineral && room.storage && room.terminal && room.terminal.my && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('emptyOwnedRoom', 'room', room.name)) {
             for(let r of base) {
                 const bAmount = (room.terminal.store[r as ResourceConstant] || 0) + (room.storage.store[r as ResourceConstant] || 0);
                 if(bAmount < 4000) {
@@ -59,7 +48,16 @@ export class Resources extends Process
                     }
                     if(bAmount > 20000 && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', room.name) && Memory.resourceRequests[r] && Memory.resourceRequests[r].length) {
                         for(let n in Memory.resourceRequests[r]) {
-                            if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', Memory.resourceRequests[r][n])) {
+                            const targetR = Game.rooms[Memory.resourceRequests[r][n]];
+                            if(!targetR || !targetR.controller || !targetR.controller.my || !targetR.terminal || !targetR.terminal.my) {
+                                const index = Memory.resourceRequests[r].indexOf(n);
+                                if(index > -1) {
+                                    Memory.resourceRequests[r].splice(index, 1);
+                                }
+                                continue;
+                            }
+                            const freeSpaceInTerminal = targetR.terminal.storeCapacity - _.sum(targetR.terminal.store);
+                            if(freeSpaceInTerminal > 30000 && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', Memory.resourceRequests[r][n])) {
                                 global.OS.kernel.addProcess('sendResources', {room: room.name, target: Memory.resourceRequests[r][n], resource: r, amount: 6000}, 0);
                                 const index = Memory.resourceRequests[r].indexOf(n);
                                 if(index > -1) {

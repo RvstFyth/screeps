@@ -6,13 +6,17 @@ import 'prototypes/Creep';
 import 'prototypes/RoomObject';
 import 'prototypes/StructureLab';
 import 'prototypes/RoomVisual';
+import 'prototypes/Source';
+import 'prototypes/StructureController';
 import 'globals';
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 
+if(!Memory.stats){ Memory.stats = {} }
+
 PathingHelper.initialize();
 const OS = new ROS();
-
+global.cache = {}
 global.OS = OS;
 //catalyzed zynthium alkalide
 // sendResources(RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, "W56S33", "W59S21", 3000);
@@ -39,7 +43,17 @@ if(!Memory.cpu) {
   }
 }
 
+console.log(`Starting a new global on ${Game.shard.name}`);
+
+if(!Memory.scoutReports) {
+  Memory.scoutReports = {};
+}
+if(!Memory.attackedRemotes) {
+  Memory.attackedRemotes = {};
+}
+
 export const loop = ErrorMapper.wrapLoop(() => {
+  Memory.triggeredConstruction = false;
   let cpu = Game.cpu.getUsed();
   global.populateLOANlist();
   OS.run();
@@ -63,5 +77,24 @@ export const loop = ErrorMapper.wrapLoop(() => {
     if (!(name in Game.creeps)) {
       delete Memory.creeps[name];
     }
+  }
+
+  const lastGCL = Memory.stats['gcl.'+Game.shard.name+'.progress'];
+  Memory.stats['gcl.'+Game.shard.name+'.tick'] = Game.gcl.progress - lastGCL > 0 ? Game.gcl.progress - lastGCL : Game.gcl.progress;
+
+  Memory.stats['cpu.'+Game.shard.name+'.getUsed'] = Game.cpu.getUsed()
+  Memory.stats['cpu.'+Game.shard.name+'.limit'] = Game.cpu.limit
+  Memory.stats['cpu.'+Game.shard.name+'.bucket'] = Game.cpu.bucket
+  Memory.stats['gcl.'+Game.shard.name+'.progress'] = Game.gcl.progress
+  Memory.stats['gcl.'+Game.shard.name+'.progressTotal'] = Game.gcl.progressTotal
+  Memory.stats['gcl.'+Game.shard.name+'.level'] = Game.gcl.level
+  Memory.stats['creepCount'] = undefined;
+  Memory.stats['creepCnt.'+Game.shard.name] = Object.keys(Game.creeps).length;
+
+  try {
+    RawMemory.segments[99] = JSON.stringify(Memory.stats);
+  }
+  catch(e) {
+    console.log(`Failed to push stats to segment!`);
   }
 });

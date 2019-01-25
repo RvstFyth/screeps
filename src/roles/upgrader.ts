@@ -2,7 +2,6 @@ export class Upgrader
 {
   static run(creep: Creep)
   {
-    creep.say('U');
     if(creep.carry[RESOURCE_ENERGY] === 0) {
       creep.memory.harvesting = true;
     }
@@ -27,13 +26,16 @@ export class Upgrader
             }
           }
           else {
-            if(creep.harvest(creep.room.sources[0]) === ERR_NOT_IN_RANGE) {
-              creep.moveTo(creep.room.sources[0]);
+            const source = creep.pos.findClosestByRange(creep.room.sources);
+            if(source && creep.harvest(source) === ERR_NOT_IN_RANGE) {
+              creep.moveTo(source);
             }
           }
         }
     }
     else {
+      // creep.say('🔺');
+      creep.say(String.fromCodePoint(0x1F53A));
       if(typeof creep.room.controller !== 'undefined' && creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
         creep.moveTo(creep.room.controller);
       }

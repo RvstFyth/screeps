@@ -14,15 +14,23 @@ export class Hauler
       const containers = source ? source.pos.findInRange(creep.room.containers, 2) : null;
       let c: StructureContainer|null = containers ? containers[0] : null;
       if(creep.room.storage) {
-        // if(creep.pos.inRangeTo(creep.room.storage, 2)) {
-        //   const cc: any = creep.pos.findInRange(FIND_STRUCTURES, 3, {filter: (s: StructureContainer) => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > creep.carryCapacity});
-        //   if(cc) {
-        //     c = cc[0];
-        //   }
-        // }
+
       }
-      if(c) {
-        if(creep.withdraw(c, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+      if(source && c) {
+        const resources = creep.room.find(FIND_DROPPED_RESOURCES);
+        const inRange = source.pos.findInRange(resources, 1);
+        if(inRange.length) {
+          if(!creep.pos.isNearTo(inRange[0])) {
+            creep.moveTo(inRange[0], {
+              maxRooms: 1,
+              range: 1
+            });
+          }
+          else {
+            creep.pickup(inRange[0]);
+          }
+        }
+        else if(creep.withdraw(c, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
           creep.moveTo(c, {
             maxRooms: 1,
             range: 1

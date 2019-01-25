@@ -8,11 +8,30 @@ export class Worker
      creep.memory.targetID = null;
      creep.memory.target = '';
 
-     const assignedTargets = creep.room.find(FIND_MY_CREEPS, {filter: (c: Creep) => c.memory.role === 'worker'}).map((c: Creep) => c.memory.targetID);
-     const spawns = creep.room.spawns.filter((s: StructureSpawn) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
+     const assignedTargets = creep.room.find(FIND_MY_CREEPS, {filter: (c: Creep) => c.memory.role === 'worker' || c.memory.role === 'remoteWorker'}).map((c: Creep) => c.memory.targetID);
+     // const spawns = creep.room.spawns.filter((s: StructureSpawn) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
+     let spawns: StructureSpawn[] = [];
+     for(let s in creep.room.spawns) {
+       if(creep.room.spawns[s]. energy < creep.room.spawns[s].energyCapacity) {
+         const creepsAssigned = creep.room.find(FIND_MY_CREEPS, {filter: (c: Creep) => c.memory.targetID === creep.room.spawns[s].id});
+         if(creepsAssigned.length) {
+            const missing = creep.room.spawns[s].energyCapacity - creep.room.spawns[s].energy;
+            let assigned = 0;
+            for(let c in creepsAssigned) {
+              assigned += creepsAssigned[c].carry[RESOURCE_ENERGY];
+            }
+            if(missing > assigned) {
+              spawns.push(creep.room.spawns[s]);
+            }
+         }
+         else {
+           spawns.push(creep.room.spawns[s]);
+         }
+       }
+     }
      const transporters = creep.room.find(FIND_MY_CREEPS, {filter: (c: Creep) => c.memory.role === 'transporter'});
 
-     if(!transporters.length && spawns.length) {
+     if(!transporters.length && spawns.length && ((creep.room.storage && creep.room.storage.my) || !creep.room.storage)) {
        const t = creep.pos.findClosestByRange(spawns);
        if(t) {
         targetID = t.id;
@@ -38,7 +57,7 @@ export class Worker
            }
          }
          else {
-           if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] < 500000) {
+           if(typeof creep.room.storage !== 'undefined' && creep.room.storage.my && creep.room.storage.store[RESOURCE_ENERGY] < 500000) {
              const storageCreeps = creep.room.find(FIND_MY_CREEPS, {
                filter: (c: Creep) => c.memory.target === 'storage' || c.memory.role === 'hauler'
              });
@@ -116,6 +135,8 @@ export class Worker
       creep.memory.harvesting = true;
       creep.memory.targetID = null;
       creep.memory.target = '';
+      creep.memory.targetX = 0;
+      creep.memory.targetY = 0;
     }
     if(creep.carry[RESOURCE_ENERGY] === creep.carryCapacity) {
       creep.memory.harvesting = false;
@@ -168,7 +189,9 @@ export class Worker
           creep.moveTo(source);
         }
         else {
-          const resources = creep.room.find(FIND_DROPPED_RESOURCES);
+          const resources = creep.room.find(FIND_DROPPED_RESOURCES, {
+            filter: (r: Resource) => r.resourceType === RESOURCE_ENERGY
+          });
           const inRange = creep.pos.findInRange(resources, 4);
           if(inRange.length && inRange[0].amount > creep.carryCapacity) {
             if(creep.pickup(inRange[0]) === ERR_NOT_IN_RANGE) {
@@ -177,7 +200,8 @@ export class Worker
           }
           else {
             const containers = source.pos.findInRange(creep.room.containers, 2).filter((c: StructureContainer) => c.store[RESOURCE_ENERGY] > creep.carryCapacity);
-            if(containers.length) {
+            const isMining = creep.pos.isEqualTo(containers[0]);// && containers[0].store[RESOURCE_ENERGY] < containers[0].storeCapacity;
+            if(containers.length && !isMining) {
               if(creep.withdraw(containers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                 if(creep.withdraw(containers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                   creep.moveTo(containers[0]);
@@ -189,8 +213,17 @@ export class Worker
                 filter: (c: Creep) => c.memory.role === 'miner' && c.getActiveBodyparts(WORK) > 2
               });
               if(!miners.length) {
-                if(creep.harvest(source) === ERR_NOT_IN_RANGE) {
+                const res = creep.harvest(source);
+                if(res === ERR_NOT_IN_RANGE) {
                   creep.moveTo(source);
+                }
+                else if(res === OK) {
+                  const containers = source.pos.findInRange(creep.room.containers, 2);
+                  if(containers && containers.length) {
+                    if(creep.pos.isEqualTo(containers[0]) && containers[0].store[RESOURCE_ENERGY] < containers[0].storeCapacity) {
+                      creep.drop(RESOURCE_ENERGY);
+                    }
+                  }
                 }
               }
             }
@@ -208,9 +241,53 @@ export class Worker
           this.run(creep, sourceID, linkID);
         }
         if(typeof creep.room.controller !== 'undefined') {
-          if(creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-            creep.moveTo(creep.room.controller);
-          }
+          // if(creep.room.name === 'W51S39') {
+          //   if(creep.memory.targetX && creep.memory.targetY) {
+          //     if(creep.room.lookForAt(LOOK_CREEPS, creep.memory.targetX, creep.memory.targetY).length) {
+          //       creep.memory.targetX = 0;
+          //       creep.memory.targetY = 0;
+          //     }
+          //   }
+          //   if(!creep.memory.targetX || !creep.memory.targetY) {
+          //     let tile: RoomPosition|undefined;
+          //     let blockedTiles: string[] = [];
+          //     const workers = creep.room.find(FIND_MY_CREEPS, {
+          //       filter: (c: Creep) => c.memory.role === creep.memory.role
+          //     });
+          //     if(workers.length) {
+          //       for(let i in workers) {
+          //         if(workers[i].memory.targetX && workers[i].memory.targetY) {
+          //           blockedTiles.push(workers[i].memory.targetX+'|'+workers[i].memory.targetY);
+          //         }
+          //       }
+          //     }
+          //     let filteredSpots = creep.room.controller.spots.filter((p: RoomPosition) => !p.lookFor(LOOK_CREEPS).length && blockedTiles.indexOf(p.x+'|'+p.y) < 0);
+          //     if(filteredSpots.length) {
+          //       let spots = creep.room.controller.pos.findInRange(filteredSpots, 1);
+          //       if(!spots.length) {
+          //         spots = creep.room.controller.pos.findInRange(filteredSpots, 2);
+          //       }
+          //       if(!spots.length) {
+          //         spots = creep.room.controller.pos.findInRange(filteredSpots, 3);
+          //       }
+          //       if(spots && spots.length) {
+          //         tile = spots[0];
+          //         creep.memory.targetX = tile.x;
+          //         creep.memory.targetY = tile.y;
+          //       }
+          //     }
+          //     if(creep.memory.targetX && creep.memory.targetY && !creep.pos.isEqualTo(creep.memory.targetX, creep.memory.targetY)) {
+          //       creep.moveTo(creep.memory.targetX, creep.memory.targetY);
+          //     }
+          //   }
+          //   if(creep.pos.inRangeTo(creep.room.controller, 3))
+          //         creep.upgradeController(creep.room.controller);
+          // }
+          //else {
+            if(creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
+              creep.moveTo(creep.room.controller);
+            }
+          //}
         }
       }
       else {
@@ -273,16 +350,16 @@ export class Worker
         bodyParts = [WORK,CARRY,CARRY,MOVE,MOVE,MOVE]; // 350
     }
     else if(room.energyAvailable < 1000) {
-      bodyParts = [WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
+      bodyParts = [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
     }
     else if(room.energyAvailable < 1500) {
-        bodyParts = [WORK,CARRY,CARRY,CARRY,CARRY, CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+        bodyParts = [WORK,WORK,WORK,CARRY,CARRY, CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
     }
     else if(room.energyAvailable >= 1500) {
       bodyParts = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY, CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
     }
     else {
-        bodyParts = [WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
+        bodyParts = [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
     }
 
     return bodyParts;

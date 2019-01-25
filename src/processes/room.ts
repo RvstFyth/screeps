@@ -23,10 +23,21 @@ export class Room extends Process
         _.forEach(room.ramparts, r => r.setPublic(true));
       }
       else if(this.meta.publicRamparts && room.hostiles.length && room.ramparts[0].isPublic) {
-        let cpu = Game.cpu.getUsed();
         _.forEach(room.ramparts, r => r.setPublic(false));
         this.meta.rampartTimestamp = Game.time;
-        console.log(`<span style="color:orange">Hostile detected in ${room.name}, closing ramparts took ${Game.cpu.getUsed() - cpu} CPU`);
+      }
+    }
+    if(typeof this.meta.lastHostileCnt === 'undefined'|| (!room.hostiles.length && this.meta.lastHostileCnt !== 0)) {
+      if(!room.hostiles.length && this.meta.lastHostileCnt !== 0) {
+        console.log(`<span style="color:green">No more hostiles in ${room.name} </span>`);
+      }
+      this.meta.lastHostileCnt = 0;
+    }
+    if(room.hostiles.length) {
+      if(this.meta.lastHostileCnt === 0 || this.meta.lastHostileCnt !== room.hostiles.length) {
+        let extra = room.hostiles.length === room.invaders.length ? '( Invaders )' : room.hostiles[0].owner.username;
+        console.log(`<span style="color:orange">Hostile detected in ${room.name} ${extra} | ${room.hostiles.length} total`);
+        this.meta.lastHostileCnt = room.hostiles.length;
       }
     }
 
@@ -116,7 +127,7 @@ export class Room extends Process
 
           for(let n in Game.rooms) {
             const tr = Game.rooms[n];
-            if(tr.controller && tr.controller.my && tr.controller.level < 8 && tr.storage && tr.terminal && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', tr.name)) {
+            if(tr.controller && tr.controller.my && tr.controller.level < 8 && tr.storage && tr.terminal && tr.terminal.my && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', tr.name)) {
               rooms.push(tr);
             }
           }

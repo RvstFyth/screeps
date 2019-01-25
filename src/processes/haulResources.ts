@@ -12,6 +12,7 @@ export class HaulResources extends Process
   run()
   {
     const room = Game.rooms[this.meta.room];
+
     if(room) {
       if(!this.meta.transfered) {
         this.meta.transfered = 0;
@@ -24,7 +25,7 @@ export class HaulResources extends Process
       }
     }
     else {
-      this.state = 'killed';
+      this.killProcess();
     }
   }
 
@@ -33,7 +34,9 @@ export class HaulResources extends Process
     if(Game.creeps[this.meta.transporter]) {
       Game.creeps[this.meta.transporter].suicide();
     }
-    this.state = 'killed';
+    else {
+      this.state = 'killed';
+    }
   }
 
   handleTransporter()

@@ -4,6 +4,7 @@ import {RemoteMiner} from '../roles/remoteMiner'
 import {RemoteHauler} from '../roles/remoteHauler'
 import {StructuresHelper} from '../helpers/structures'
 import {PathingHelper} from '../helpers/pathing'
+import {Worker} from '../roles/worker';
 
 // META:
 // room
@@ -14,15 +15,33 @@ export class RemoteMining extends Process
 {
   initRoom(source: Source, mainRoom: Room)
   {
-    if(!this.meta.roads) {
-      if(mainRoom.storage) {
-        const path = source.room.findPath( source.pos, mainRoom.storage.pos, {
-          ignoreCreeps: true,
-          ignoreRoads: true,
-          ignoreDestructibleStructures: true
-        });
-        this.meta.roads = PathingHelper.pathToString(path);
-      }
+    if(mainRoom.storage) {
+      const path = source.room.findPath( source.pos, mainRoom.storage.pos, {
+        ignoreCreeps: true,
+        ignoreDestructibleStructures: true,
+        costCallback: function(roomName, costMatrix) {
+
+          const room = Game.rooms[roomName];
+          if(room && room.sources.length) {
+              for(let i in room.sources) {
+                const sx = room.sources[i].pos.x;
+                const sy = room.sources[i].pos.y;
+
+                for(let y = (sy - 1), yEnd = (sy + 2); y < yEnd; y++) {
+                  for(let x = (sx - 1), xEnd = (sx + 2); x < xEnd; x++) {
+                    costMatrix.set(x,y,180);
+                  }
+                }
+                for(let w in room.walls) {
+                  costMatrix.set(room.walls[w].pos.x, room.walls[w].pos.y, 255);
+                }
+              }
+          }
+
+          return true;
+        }
+      });
+      this.meta.roads = PathingHelper.pathToString(path);
     }
   }
 
@@ -30,8 +49,15 @@ export class RemoteMining extends Process
   {
     const path = PathingHelper.stringToPath(this.meta.roads);
     for(let i in path) {
-      room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
-      //room.visual.circle(path[i].x, path[i].y, {stroke: 'orange'});
+        const terrain = room.lookForAt(LOOK_TERRAIN, path[i].x, path[i].y);
+        if(terrain && terrain.length) {
+          if(terrain[0] !== 'wall') {
+            room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
+          }
+        }
+        // room.visual.circle(path[i].x, path[i].y, {
+        //   stroke: 'orange'
+        // })
     }
   }
 
@@ -40,29 +66,35 @@ export class RemoteMining extends Process
     const room = Game.rooms[this.meta.room];
     const source: Source|null = Game.getObjectById(this.meta.sourceID);
     if(this.suspendedTill && this.suspendedTill > 0 && Game.time < this.suspendedTill) {
-      return;
+      if(Memory.attackedRemotes[this.meta.target]) {
+        return;
+      }
     }
     else {
       this.suspendedTill = 0;
+      Memory.attackedRemotes[this.meta.target] = undefined;
     }
 
-    if(room.name === 'W59S39') {
-      this.state = 'killed';
+    if(!this.meta.roads) {
+      if(source) {
+        this.initRoom(source, room);
+      }
     }
-    // if(!this.meta.roads) {
-    //   if(source) {
-    //     this.initRoom(source, room);
-    //   }
+    // if(source && source.room.name === 'W59S23') {
+    //   this.checkRoads(source.room)
     // }
+    if(Memory.triggeredConstruction === false && (!this.meta.lastRoadCheck || (this.meta.lastRoadCheck + 500 < Game.time))) {
+      if(room.controller && room.controller.level >= 7 && room.storage && room.storage.my && source && Object.keys(Game.constructionSites).length === 0) {
+        // console.log(`Triggering checking roads for remote: ${source.room.name}`);
+        this.meta.lastRoadCheck = Game.time;
+        /* if(source.room.name === 'W59S23')*/ this.checkRoads(source.room)
+        Memory.triggeredConstruction = true;
+      }
+    }
 
-    // if(!this.meta.lastRoadCheck || (this.meta.lastRoadCheck + 150 < Game.time)) {
-    //   if(source && Object.keys(Game.constructionSites).length < 10) {
-    //     console.log(`Triggering checking roads for remote: ${source.room.name}`);
-    //     this.meta.lastRoadCheck = Game.time;
-    //     this.checkRoads(source.room)
-    //   }
+    // if(this.meta.sourceID === '5aa67e414e6a625357a61fe1' && this.meta.lCreeps && this.meta.lCreeps.indexOf('29_30313114') < -1) {
+    //   this.meta.lCreeps.push('29_30313114');
     // }
-
 
     if(room && room.controller && room.controller.my) {
       if((!this.suspendedTill || this.suspendedTill === 0) && Game.rooms[this.meta.target] && Game.rooms[this.meta.target].hostiles) {
@@ -70,7 +102,10 @@ export class RemoteMining extends Process
         if(invaders.length) {
           const maxInvader: Creep = _.max(invaders, i => i.ticksToLive);
           if(maxInvader.ticksToLive) {
-             this.suspendedTill = Game.time + maxInvader.ticksToLive
+             this.suspendedTill = Game.time + maxInvader.ticksToLive;
+             if(!Memory.attackedRemotes[this.meta.target]) {
+               Memory.attackedRemotes[this.meta.target] = invaders.length; // Number of invaders for now. TODO: make a treath score or something
+             }
           }
         }
       }
@@ -80,11 +115,31 @@ export class RemoteMining extends Process
         }
       }
       else {
-        if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('reserveRoom', 'target', this.meta.target)) {
-          global.OS.kernel.addProcess('reserveRoom', {room: this.meta.room,target: this.meta.target}, this.ID);
+        if(room.controller && room.controller.level >= 7 && room.storage && room.storage.my) {
+          if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('reserveRoom', 'target', this.meta.target)) {
+            global.OS.kernel.addProcess('reserveRoom', {room: this.meta.room,target: this.meta.target}, this.ID);
+          }
         }
-        this.handleCreeps();
-        this.checkContainers();
+        if(room.controller && room.controller.level >= 8 && room.storage && room.storage.my) {
+          if(this.meta.lCreeps && this.meta.lCreeps.length) {
+            _.forEach(this.meta.lCreeps, n => n.suicide());
+          }
+          // console.log(1);
+          this.handleCreeps();
+          this.checkContainers();
+        }
+        else {
+          try {
+            if(this.meta.haulers && this.meta.haulers.length) {
+              _.forEach(this.meta.haulers, n => Game.creeps[this.meta.haulers[n]].suicide());
+            }
+            if(this.meta.miner && Game.creeps[this.meta.miner]) {
+              Game.creeps[this.meta.miner].suicide();
+            }
+          }
+          catch(e) {}
+          this.handleCreepsLow(room);
+        }
       }
     }
     else {
@@ -96,9 +151,9 @@ export class RemoteMining extends Process
   {
     const source: Source|null = Game.getObjectById(this.meta.sourceID);
     if(source) {
-      if(source.room.name === 'W15S3') {
-        this.initRoom(source, Game.rooms[this.meta.room]);
-      }
+      // if(source.room.name === 'W15S3') {
+      //   this.initRoom(source, Game.rooms[this.meta.room]);
+      // }
       // if(!Memory.lastRemoteRoads || Memory.lastRemoteRoads === Game.time || Memory.lastRemoteRoads + 100  < Game.time) {
       //   StructuresHelper.remoteRoads(source, Game.rooms[this.meta.room]);
       //   Memory.lastRemoteRoads = Game.time;
@@ -129,27 +184,175 @@ export class RemoteMining extends Process
     }
   }
 
+  // Method for rcl < 5
+  handleCreepsLow(room: Room)
+  {
+    if(!this.meta.lCreeps) {
+      this.meta.lCreeps = [];
+    }
+    for(let i = 0, iEnd = this.meta.lCreeps.length; i < iEnd; i++) {
+      const creep = Game.creeps[this.meta.lCreeps[i]];
+      if(!creep) {
+        this.meta.lCreeps[i] = null;
+      }
+      else if(creep && creep.spawning) {
+
+      }
+      else if(creep) {
+        this.handleLow(creep);
+      }
+    }
+    this.meta.lCreeps = this.meta.lCreeps.filter((n: any) => n);
+    const maxCreeps = room.controller && room.controller.level < 2 ? 1 : (room.controller && room.controller.level > 7 ? 2 : 3);
+    let canSpawn = true;
+    // if(room.storage && room.storage.my && room.storage.store[RESOURCE_ENERGY] < 10000) {
+    //   canSpawn = false;
+    // }
+    if (canSpawn && this.meta.lCreeps.length < maxCreeps) {
+      if(SpawnsHelper.spawnAvailable(room)) {
+        let bodyParts;
+        if(!room.storage) {
+          bodyParts = [MOVE,MOVE,CARRY,WORK];
+        }
+        else if(room.storage && room.controller && room.controller.level < 6) {
+          bodyParts = [MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,WORK,WORK];
+        }
+        else if(room.storage && room.controller && room.controller.level < 7){
+          bodyParts = [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,WORK,WORK,WORK];
+        }
+        else {
+          bodyParts = [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK];
+        }
+        SpawnsHelper.requestSpawn(this.ID, room, bodyParts, {role: 'remoteWorker'}, 'lCreeps[]');
+      }
+    }
+  }
+
+  handleLow(creep: Creep)
+  {
+    if(_.sum(creep.carry) === 0) {
+      creep.memory.harvesting = true;
+      creep.memory.targetID = null;
+      creep.memory.target = '';
+    }
+    else if(_.sum(creep.carry) === creep.carryCapacity) {
+      creep.memory.harvesting = false;
+    }
+    if(creep.memory.harvesting) {
+      if(creep.room.name !== this.meta.target) {
+        creep.moveToRoom(this.meta.target);
+      }
+      else {
+        const source: Source|null = Game.getObjectById(this.meta.sourceID);
+        if(source) {
+          if(creep.pos.isNearTo(source)) {
+            creep.harvest(source);
+          }
+          else {
+            creep.moveTo(source, {maxRooms: 1});
+          }
+        }
+      }
+    }
+    else {
+      if(creep.room.name !== this.meta.room) {
+        creep.moveToRoom(this.meta.room);
+      }
+      else {
+        if(!creep.memory.target && creep.room.storage && creep.room.storage.my && creep.room.storage.store[RESOURCE_ENERGY] < 50000) {
+          creep.memory.target = 'storage';
+        }
+        // else if(creep.room.constructionSites.length) {
+        //   const target = creep.pos.findClosestByRange(creep.room.constructionSites);
+        //   if(target && creep.build(target) === ERR_NOT_IN_RANGE) {
+        //     creep.moveTo(target, {maxRooms:1});
+        //   }
+        // }
+        else if(!creep.memory.target && creep.room.storage && creep.room.storage.my && (creep.room.storage.store[RESOURCE_ENERGY] < 100000 || Math.floor(Math.random() * 4))) {
+          creep.memory.target = 'storage';
+        }
+        else if(!creep.memory.target || creep.memory.target !== 'storage') {
+          Worker.run(creep, this.meta.sourceID, '');
+        }
+        //else {
+          if(creep.memory.target === 'storage' && creep.room.storage) {
+            let target: StructureStorage|StructureLink|null = null;
+            const linksInRange = creep.pos.findInRange(creep.room.links.filter((l:StructureLink) => l.energy < l.energyCapacity), 6);
+            if(creep.room.storage && !creep.pos.inRangeTo(creep.room.storage, 3) && linksInRange && linksInRange.length) {
+                const closestLink = creep.pos.findClosestByRange(linksInRange);
+                if(closestLink) {
+                  const distanceToStorage = creep.pos.getRangeTo(creep.room.storage);
+                  const distanceToLink = creep.pos.getRangeTo(closestLink);
+                  if(distanceToStorage > distanceToLink) {
+                    target = closestLink;
+                  }
+                }
+            }
+            if(!target) {
+              target = creep.room.storage;
+            }
+            if(!creep.pos.isNearTo(target)) {
+              creep.moveTo(target, {maxRooms: 1});
+            }
+            else {
+              creep.transfer(target, RESOURCE_ENERGY);
+            }
+          }
+        //}
+      }
+    }
+  }
+
   handleCreeps()
   {
     this.handleMiner();
-    this.handleHauler();
+    this.handleHaulers();
   }
 
-  handleHauler()
+  handleHaulers()
   {
-    if(!this.meta.hauler || !Game.creeps[this.meta.hauler]) {
-      if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
-        // this.meta.hauler = SpawnsHelper.spawnCreep(Game.rooms[this.meta.room],
-        //   [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'remotehauler'}, this.ID.toString()
-        // )
-        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'remotehauler'}, 'hauler');
+    if(!this.meta.haulers) {
+      this.meta.haulers = [];
+      if(this.meta.hauler) {
+        this.meta.haulers.push(this.meta.hauler);
+        this.meta.hauler = null;
       }
     }
-    else if(Game.creeps[this.meta.hauler] && Game.creeps[this.meta.hauler].spawning) {
+    for(let i = 0, iEnd = this.meta.haulers.length; i < iEnd; i++) {
+      const creep = Game.creeps[this.meta.haulers[i]];
+      if(!creep) {
+        this.meta.haulers[i] = null;
+      }
+      else if(creep && creep.spawning) {
 
+      }
+      else if(creep) {
+        RemoteHauler.run(creep, this.meta.room, this.meta.target, this.meta.sourceID);
+      }
     }
-    else if(Game.creeps[this.meta.miner]) {
-      RemoteHauler.run(Game.creeps[this.meta.hauler], this.meta.room, this.meta.target, this.meta.sourceID);
+    this.meta.haulers = this.meta.haulers.filter((n: any) => n);
+    let maxHaulers = 1;
+    const source: Source|null = Game.getObjectById(this.meta.sourceID);
+    if(source) {
+      const containers = source.pos.findInRange(source.room.containers, 1);
+      if(containers && containers.length) {
+        if(containers[0].store[RESOURCE_ENERGY] === containers[0].storeCapacity) {
+          maxHaulers = 2;
+        }
+      }
+    }
+    if(this.meta.haulers.length < maxHaulers) {
+      if(this.meta.miner && SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
+        let bodyParts;
+        const room = Game.rooms[this.meta.room];
+        if(room.controller && room.controller.level <= 7) {
+          bodyParts = [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+        }
+        else {
+          bodyParts = [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE]
+        }
+        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], bodyParts, {role: 'remotehauler'}, 'haulers[]');
+      }
     }
   }
 
@@ -157,10 +360,15 @@ export class RemoteMining extends Process
   {
     if(!this.meta.miner || !Game.creeps[this.meta.miner]) {
       if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
-        // this.meta.miner = SpawnsHelper.spawnCreep(Game.rooms[this.meta.room],
-        //   [WORK,WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'remoteMiner'}, this.ID.toString()
-        // )
-        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], [WORK,WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'remoteMiner'}, 'miner');
+        const room = Game.rooms[this.meta.room];
+        let bodyParts;
+        if(room.controller && room.controller.level < 7) {
+          bodyParts = [WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE];
+        }
+        else {
+          bodyParts = [WORK,WORK,WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+        }
+        SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], bodyParts, {role: 'remoteMiner'}, 'miner');
       }
     }
     else if(Game.creeps[this.meta.miner] && Game.creeps[this.meta.miner].spawning) {

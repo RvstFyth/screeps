@@ -70,16 +70,13 @@ export class DismantleRoom extends Process
         }
         if(creep.memory.harvesting) {
             if(creep.room.name !== this.meta.target) {
-                creep.moveTo(new RoomPosition(25,25,this.meta.target), {
-                    reusePath: 5,
-                    range: 15
-                });
+                creep.moveToRoom(this.meta.target);
             }
             else {
                 // Dismantle stuff!
                 if(!creep.memory.target) {
                     const structures = creep.room.find(FIND_STRUCTURES, {
-                        filter: (s: Structure) => s.structureType !== STRUCTURE_CONTAINER && s.structureType !== STRUCTURE_CONTROLLER
+                        filter: (s: Structure) => s.structureType !== STRUCTURE_CONTAINER && s.structureType !== STRUCTURE_CONTROLLER && s.structureType !== STRUCTURE_EXTRACTOR
                     });
                     if(structures.length) {
                         const target = creep.pos.findClosestByRange(structures);
