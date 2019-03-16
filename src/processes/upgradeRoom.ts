@@ -73,8 +73,8 @@ export class UpgradeRoom extends Process
     if(room.controller && room.controller.level === 8 && room.storage && room.storage.store[RESOURCE_ENERGY] > 500000) {
       return 1;
     }
-    else if(room.controller && room.controller.level === 8) {
-      return 0;
+    else if(room.controller && room.controller.level === 8 && room.storage && room.storage.store[RESOURCE_ENERGY] > 30000) {
+      return 1;
     }
     else if(room.controller && room.controller.level === 7 && room.storage && room.storage.store[RESOURCE_ENERGY] < 150000) {
       return 1;

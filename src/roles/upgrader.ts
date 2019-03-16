@@ -44,6 +44,9 @@ export class Upgrader
 
   static defineBodyParts(room: Room)
   {
+    if(room.controller && room.controller.level === 8) { // 25m15w10c
+      return [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
+    }
     if(room.energyAvailable < 200) {
         return [];
     }

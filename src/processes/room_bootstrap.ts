@@ -170,8 +170,8 @@ export class Room_Bootstrap extends Process
       if(room.controller.level < 8 && room.storage && room.storage.store[RESOURCE_ENERGY] > 200000) {
         return 2;
       }
-      else if(room.storage || room.controller.level === 8) {
-        return 1;
+      else if(room.storage && room.controller.level === 8) {
+        return 0;
       }
       //return 3;
     }
