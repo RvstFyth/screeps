@@ -43,9 +43,23 @@ export class Builder
         }
       }
       else {
-        if(typeof creep.room.controller !== 'undefined') {
+        if(creep.room.controller && creep.room.controller.level < 8) {
           if(creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE){
             creep.moveTo(creep.room.controller);
+          }
+        }
+        else {
+          if(!creep.memory.target) {
+            const t = _.min(creep.room.ramparts, c => c.hits);
+            creep.memory.target = t.id;
+          }
+          if(creep.memory.target) {
+            const r: StructureRampart|null = Game.getObjectById(creep.memory.target);
+            if(r) {
+              if(creep.repair(r) === ERR_NOT_IN_RANGE) {
+                creep.moveTo(r);
+              }
+            }
           }
         }
       }
