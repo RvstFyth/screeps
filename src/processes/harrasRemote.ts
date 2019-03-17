@@ -57,7 +57,7 @@ export class HarrasRemote extends Process
             else if(Game.creeps[this.meta.creeps[i]]) {
                 this.handleHarrasser(Game.creeps[this.meta.creeps[i]]);
                 const remainingTTL = Game.creeps[this.meta.creeps[i]].ticksToLive;
-                if(remainingTTL && remainingTTL <= 500 && this.meta.creeps.length < 2) {
+                if(remainingTTL && remainingTTL <= 100 && this.meta.creeps.length < 2) {
                     if(SpawnsHelper.spawnAvailable(room)) {
                         const bodyParts: BodyPartConstant[] = [ // 3290 energy
                             //MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,HEAL,HEAL,HEAL];
@@ -112,7 +112,7 @@ export class HarrasRemote extends Process
             }
             if(this.meta.waypoint && !creep.memory.arrived) {
                 if(!creep.pos.isNearTo(Game.flags[this.ID])) {
-                    creep.moveTo(Game.flags[this.ID]);
+                    creep.moveTo(Game.flags[this.ID], {maxRooms:1});
                 }
                 else {
                     creep.memory.arrived = true;
@@ -167,7 +167,7 @@ export class HarrasRemote extends Process
                             // creep.moveTo(closest);
                             if(closest && creep.heal(closest) === ERR_NOT_IN_RANGE) {
                                 if(creep.rangedHeal(closest) === ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(closest)
+                                    creep.moveTo(closest, {maxRooms:1})
                                 }
                             }
                         }
@@ -200,14 +200,14 @@ export class HarrasRemote extends Process
                             // creep.moveTo(closest);
                             if(closest && creep.heal(closest) === ERR_NOT_IN_RANGE) {
                                 if(creep.rangedHeal(closest) === ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(closest)
+                                    creep.moveTo(closest, {maxRooms:1})
                                 }
                             }
                         }
                     }
                     if(allies.length) {
                         if(!creep.pos.isNearTo(allies[0])) {
-                            creep.moveTo(allies[0]);
+                            creep.moveTo(allies[0], {maxRooms:1});
                         }
                     }
                     else {
@@ -220,7 +220,7 @@ export class HarrasRemote extends Process
                         }
                         else if(creep.room.controller) {
                             if(!creep.pos.isNearTo(creep.room.controller)) {
-                                creep.moveTo(creep.room.controller);
+                                creep.moveTo(creep.room.controller, {maxRooms:1});
                             }
                             else {
                                 if(creep.room.controller.sign && creep.room.controller.sign.username !== 'GimmeCookies') {
@@ -230,12 +230,12 @@ export class HarrasRemote extends Process
                                     if(creep.room.constructionSites) {
                                         const target = creep.pos.findClosestByRange(creep.room.constructionSites);
                                         if(target) {
-                                            creep.moveTo(target);
+                                            creep.moveTo(target, {maxRooms:1});
                                         }
                                     }
                                     else {
                                         if(!creep.pos.isNearTo(creep.room.controller)) {
-                                            creep.moveTo(creep.room.controller);
+                                            creep.moveTo(creep.room.controller, {maxRooms:1});
                                         }
                                     }
                                 }
@@ -251,7 +251,7 @@ export class HarrasRemote extends Process
     {
         if(target.pos) {
             if(!creep.pos.isNearTo(target)) {
-                creep.moveTo(target);
+                creep.moveTo(target, {maxRooms:1});
                 if(creep.pos.inRangeTo(target.pos.x, target.pos.y, 3) && creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
                     creep.rangedAttack(target);
                 }
