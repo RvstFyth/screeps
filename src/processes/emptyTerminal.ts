@@ -3,7 +3,6 @@ import {SpawnsHelper} from '../helpers/spawns'
 
 // META
 // room
-// global.OS.kernel.addProcess('emptyTerminal', {room: 'W59S39'}, 0)
 export class EmptyTerminal extends Process
 {
 

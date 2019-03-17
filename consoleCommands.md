@@ -15,12 +15,12 @@ OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALY
 
 ## Market & resource management
 OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 14000}, 0);
-global.OS.kernel.addProcess('haulResources', {room: 'W59S39', resource: RESOURCE_ENERGY, amount: 200000}, 0);
-
+global.OS.kernel.addProcess('haulResources', {room: 'W54S31', resource: RESOURCE_ENERGY, amount: 200000}, 0);
+global.OS.kernel.addProcess('emptyTerminal', {room: 'W51S31'}, 0)
 // W58S23
 // SMokeman U room: W47S16
 // UPGRADE BOOSTS W51S37
-global.OS.kernel.addProcess('sendResources', {room: 'W56S33', target: 'W55S17', resource: RESOURCE_HYDROGEN, amount: 75000}, 0)
+global.OS.kernel.addProcess('sendResources', {room: 'W51S37', target: 'W51S31', resource: RESOURCE_ENERGY, amount: 150000}, 0)
 global.OS.kernel.addProcess('sendResources', {room: 'W51S31', target: 'W51S37', resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 10000}, 0)
 
 
@@ -38,7 +38,7 @@ OS.kernel.addProcess('remoteMining', {room: 'W4S3', target: 'W4S4', sourceID: '5
 global.OS.kernel.addProcess('attackController', {room: 'W59S39', target: 'W59S31'}, 0)
 
 
-global.OS.kernel.addProcess('lootRoom', {room: 'W56S33', target: "W59S36"}, 0)
+global.OS.kernel.addProcess('lootRoom', {room: 'W54S31', target: "W55S29"}, 0)
 
 OS.kernel.addProcess('claimRoom', {room: 'E2S2', target: 'E0S3'}, 0);
 
