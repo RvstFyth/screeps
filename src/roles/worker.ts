@@ -125,6 +125,14 @@ export class Worker
        }
      }
 
+     if(!target && !targetID) {
+       if(creep.room.ramparts.length) {
+        const t = _.min(creep.room.ramparts, c => c.hits);
+        target = 'repair';
+        targetID = t.id;
+       }
+     }
+
      creep.memory.target = target || 'controller';
      creep.memory.targetID = targetID || 'abc';
    }
