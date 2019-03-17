@@ -10,18 +10,18 @@ export class Links extends Process
         const room = Game.rooms[this.meta.room];
         if(room && room.controller && room.controller.my) {
             if(room.storage && room.links.length) {
-                const upgradersLink = room.storage.pos.findInRange(room.links, 3);
-                if(upgradersLink.length) {
-                    if(upgradersLink[0].energy < upgradersLink[0].energyCapacity) {
-                        const otherLinks = room.links.filter((l: StructureLink) => l.id !== upgradersLink[0].id && l.energy > 0 && !l.cooldown);
+                const StorageLink = room.storage.pos.findInRange(room.links, 3);
+                if(StorageLink.length) {
+                    if(StorageLink[0].energy < StorageLink[0].energyCapacity) {
+                        const otherLinks = room.links.filter((l: StructureLink) => l.id !== StorageLink[0].id && l.energy > 0 && !l.cooldown);
                         if(otherLinks.length) {
                             for(let i in otherLinks) {
-                                otherLinks[i].transferEnergy(upgradersLink[0]);
+                                otherLinks[i].transferEnergy(StorageLink[0]);
                             }
                         }
                     }
 
-                    this.handleCreep(upgradersLink[0]);
+                    this.handleCreep(StorageLink[0]);
                 }
             }
         }
