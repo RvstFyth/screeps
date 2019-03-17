@@ -159,6 +159,10 @@ export class Room_Bootstrap extends Process
 
   defineWorkersCount(room: Room, source: Source|null)
   {
+    if(room.storage && room.controller && room.controller.level === 8) {
+      return 0;
+    }
+
     if(!room.storage) {
       if(source) {
         const multiplyer = 1; //!room.constructionSites.length ? 2 : 1.5;
@@ -169,9 +173,6 @@ export class Room_Bootstrap extends Process
     if(typeof room.controller !== 'undefined'  && room.controller.level >= 3) {
       if(room.controller.level < 8 && room.storage && room.storage.store[RESOURCE_ENERGY] > 200000) {
         return 2;
-      }
-      else if(room.storage && room.controller.level === 8) {
-        return 0;
       }
       //return 3;
     }
