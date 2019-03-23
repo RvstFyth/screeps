@@ -9,4 +9,10 @@ export class BoostsHelper
 
         return null;
     }
+
+    // const boostTier = (r) => Math.ceil(r.length / 2);
+    static defineTier(resource: ResourceConstant)
+    {
+        return Math.ceil(resource.length / 2);
+    }
 }
