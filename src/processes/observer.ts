@@ -29,7 +29,9 @@ export class Observer extends Process
                     }
                     vert += n;
                     const room = hor + vert;
-                    this.meta.rooms.push(room);
+                    if (room !== this.meta.room) {
+                        this.meta.rooms.push(room);
+                    }
                 }
             }
         }
@@ -42,8 +44,7 @@ export class Observer extends Process
         // this.state = 'killed';
         try {
             this.run2();
-        }
-        catch(e) {
+        } catch (e) {
             console.log(`Bug in process observer`);
         }
     }
@@ -59,9 +60,12 @@ export class Observer extends Process
                 if(this.meta.observed) {
                     const oRoom = Game.rooms[this.meta.observed];
                     if(oRoom) {
-                        //console.log(`Observing room ${oRoom.name}`);
                         // Scan for powerbanks
-                        const powerbanks = oRoom.find(FIND_STRUCTURES, {filter: (s: Structure) => s.structureType === STRUCTURE_POWER_BANK});
+                        const powerbanks = oRoom.find(FIND_STRUCTURES, {
+                            filter: (s: StructurePowerBank) => s.structureType === STRUCTURE_POWER_BANK
+                                && s.ticksToDecay > 4300 && !s.pos.findInRange(FIND_HOSTILE_CREEPS, 4).length
+                        });
+
                         if(powerbanks.length) {
                             console.log(`Found powerBank in ${oRoom.name}`);
                         }
