@@ -7,6 +7,15 @@ global.LAB_STATE = {
 
 global.UNIT_COST = (body: BodyPartConstant[]) => _.sum(body, (p: BodyPartConstant) => BODYPART_COST[p]);
 
+global.killProcess = function(pID: number) {
+    // TODO: Proper solution
+    for(let i in Memory.ROS.processes) {
+        if(Memory.ROS.processes[i].ID === pID) {
+            Memory.ROS.processes[i] = undefined;
+        }
+    }
+};
+
 global.BOOST_COMPONENTS = {
         //Base
         [RESOURCE_GHODIUM]: [RESOURCE_ZYNTHIUM_KEANITE, RESOURCE_UTRIUM_LEMERGITE],
