@@ -8,15 +8,19 @@ export class PowerFarming extends Process
     /**
      * META:
      * room
-     * targetRoom
-     * powerAmount
+     * target
+     *
+     * OS.kernel.addProcess('powerFarming', {room: 'W51S37', target: W50S38}, 0);
+     *
+     * 1 attacker does 600 dmg a tick
+     * 1 healer heals 600 dmg a tick
      */
 
     public run()
     {
         const room = Game.rooms[this.meta.room];
         if(room) {
-
+            this.handleCreeps(room);
         }
         else {
             this.state = 'killed';
@@ -33,7 +37,7 @@ export class PowerFarming extends Process
         }
         else if(attacker && attacker.spawning) {}
         else if(attacker) {
-            PowerAttacker.run(attacker);
+            PowerAttacker.run(attacker, healer, this.meta.target);
         }
 
         if(!healer) {
@@ -41,7 +45,7 @@ export class PowerFarming extends Process
         }
         else if(healer && healer.spawning) {}
         else if(healer) {
-            PowerHealer.run(healer);
+            PowerHealer.run(healer, attacker, this.meta.target);
         }
     }
 }
