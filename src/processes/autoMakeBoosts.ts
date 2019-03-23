@@ -1,6 +1,5 @@
 import {Process} from '../ROS/process'
 import {SpawnsHelper} from '../helpers/spawns'
-import {BoostsHelper} from "../helpers/boosts";
 
 // META
 // room
@@ -153,10 +152,8 @@ export class AutoMakeBoosts extends Process
                 }
 
                 lastAmount = amount;
-                const tier = BoostsHelper.defineTier(targetMineral as ResourceConstant);
                 amount += 3000;
-                if(tier === 3 && amount >= 12000) break;
-                else if((tier === 1 || tier === 2) && amount >= 3000) break;
+                if(amount >= 12000) break;
             }
             if(targetMineral) {
                 return targetMineral;
