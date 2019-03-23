@@ -125,7 +125,7 @@ export class Transporter
       }
     }
     else {
-      const towers = creep.room.towers.filter((s: StructureTower) => s.energy < s.energyCapacity && assignedTargets.indexOf(s.id) < 0);
+      const towers = creep.room.towers.filter((s: StructureTower) => s.energy < (s.energyCapacity * 0.8) && assignedTargets.indexOf(s.id) < 0);
       if(towers.length) {
         const target = creep.pos.findClosestByRange(towers);
         if(target) {
@@ -143,6 +143,9 @@ export class Transporter
         else {
           if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000 && creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 50000) {
             creep.memory.targetID = creep.room.terminal.id;
+          }
+          else if(creep.room.nuker && creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 80000) {
+            creep.memory.targetID = creep.room.nuker.id;
           }
         }
       }

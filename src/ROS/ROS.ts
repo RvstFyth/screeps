@@ -10,6 +10,9 @@ class ROS
     if(!Memory.ROS) {
       Memory.ROS = {};
     }
+    if(!Memory.errors) {
+      Memory.errors = [];
+    }
     if(!Memory.ROS.processes) {
       Memory.ROS.processes = [];
     }

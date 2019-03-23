@@ -40,6 +40,9 @@ import {Resources} from '../processes/resources';
 import {EmptyOwnedRoom} from '../processes/emptyOwnedRoom'
 import {WishHappyNewYear} from '../processes/wishHappyNewYear';
 import {Defence} from '../processes/defence';
+import {PowerCreeps} from '../processes/powerCreeps';
+import {FillNuke} from '../processes/fillNuke';
+import {Observer} from '../processes/observer';
 
 class ProcessTable
 {
@@ -91,7 +94,10 @@ const Processes = <{[type: string]: any}> {
   'resources': Resources,
   'emptyOwnedRoom': EmptyOwnedRoom,
   'wishHappyNewYear': WishHappyNewYear,
-  'defence': Defence
+  'defence': Defence,
+  'powerCreeps': PowerCreeps,
+  'fillNuke': FillNuke,
+  'observer': Observer
 }
 
 export class Kernel

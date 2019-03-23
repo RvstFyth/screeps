@@ -70,6 +70,9 @@ export class Spawns extends Process
     if(sorted['hauler'] && sorted['hauler'].length) {
       return sorted['hauler'][0];
     }
+    if(room.controller && room.controller.level < 4 && sorted['worker'] && sorted['worker'].length) {
+      return sorted['worker'][0];
+    }
     if(sorted['upgrader'] && sorted['upgrader'].length) {
       return sorted['upgrader'][0];
     }

@@ -38,7 +38,12 @@ export class RepairRoom extends Process
       this.meta.creeps = this.meta.creeps.filter((n: any) => n); // Remove NULL values
 
       if(this.meta.creeps.length < this.defineRampartsCount(room)) {
-        if(room.storage && room.storage.store[RESOURCE_ENERGY] > 50000  && SpawnsHelper.spawnAvailable(room)) {
+        let lowestRampart;
+        if(room.ramparts.length) lowestRampart = _.min(room.ramparts, c => c.hits).hits;
+        let valid = true;
+        if(!constructionSites.length && lowestRampart && lowestRampart > 20000000) valid = false;
+        if(room.storage && room.storage.store[RESOURCE_ENERGY] > 300000) valid = true;
+        if(valid && room.storage && room.storage.store[RESOURCE_ENERGY] > 50000  && SpawnsHelper.spawnAvailable(room)) {
           SpawnsHelper.requestSpawn(this.ID, room, Rampart.defineBodyParts(room), {role: 'rampart'}, 'creeps[]');
         }
       }

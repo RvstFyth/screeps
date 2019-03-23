@@ -207,9 +207,12 @@ export class Worker
             }
           }
           else {
-            const containers = source.pos.findInRange(creep.room.containers, 2).filter((c: StructureContainer) => c.store[RESOURCE_ENERGY] > creep.carryCapacity);
-            const isMining = creep.pos.isEqualTo(containers[0]);// && containers[0].store[RESOURCE_ENERGY] < containers[0].storeCapacity;
-            if(containers.length && !isMining) {
+            let containers, isMining;
+            if(creep.room.containers.length) {
+              containers = source.pos.findInRange(creep.room.containers, 2).filter((c: StructureContainer) => c.store[RESOURCE_ENERGY] > creep.carryCapacity);
+              isMining = containers.length && (creep.pos.x === containers[0].pos.x && creep.pos.y === containers[0].pos.y);// && containers[0].store[RESOURCE_ENERGY] < containers[0].storeCapacity;
+            }
+            if(containers && containers.length && !isMining) {
               if(creep.withdraw(containers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                 if(creep.withdraw(containers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                   creep.moveTo(containers[0]);
@@ -228,7 +231,7 @@ export class Worker
                 else if(res === OK) {
                   const containers = source.pos.findInRange(creep.room.containers, 2);
                   if(containers && containers.length) {
-                    if(creep.pos.isEqualTo(containers[0]) && containers[0].store[RESOURCE_ENERGY] < containers[0].storeCapacity) {
+                    if((creep.pos.x === containers[0].pos.x && creep.pos.y === containers[0].pos.y) && containers[0].store[RESOURCE_ENERGY] < containers[0].storeCapacity) {
                       creep.drop(RESOURCE_ENERGY);
                     }
                   }
@@ -249,49 +252,6 @@ export class Worker
           this.run(creep, sourceID, linkID);
         }
         if(typeof creep.room.controller !== 'undefined') {
-          // if(creep.room.name === 'W51S39') {
-          //   if(creep.memory.targetX && creep.memory.targetY) {
-          //     if(creep.room.lookForAt(LOOK_CREEPS, creep.memory.targetX, creep.memory.targetY).length) {
-          //       creep.memory.targetX = 0;
-          //       creep.memory.targetY = 0;
-          //     }
-          //   }
-          //   if(!creep.memory.targetX || !creep.memory.targetY) {
-          //     let tile: RoomPosition|undefined;
-          //     let blockedTiles: string[] = [];
-          //     const workers = creep.room.find(FIND_MY_CREEPS, {
-          //       filter: (c: Creep) => c.memory.role === creep.memory.role
-          //     });
-          //     if(workers.length) {
-          //       for(let i in workers) {
-          //         if(workers[i].memory.targetX && workers[i].memory.targetY) {
-          //           blockedTiles.push(workers[i].memory.targetX+'|'+workers[i].memory.targetY);
-          //         }
-          //       }
-          //     }
-          //     let filteredSpots = creep.room.controller.spots.filter((p: RoomPosition) => !p.lookFor(LOOK_CREEPS).length && blockedTiles.indexOf(p.x+'|'+p.y) < 0);
-          //     if(filteredSpots.length) {
-          //       let spots = creep.room.controller.pos.findInRange(filteredSpots, 1);
-          //       if(!spots.length) {
-          //         spots = creep.room.controller.pos.findInRange(filteredSpots, 2);
-          //       }
-          //       if(!spots.length) {
-          //         spots = creep.room.controller.pos.findInRange(filteredSpots, 3);
-          //       }
-          //       if(spots && spots.length) {
-          //         tile = spots[0];
-          //         creep.memory.targetX = tile.x;
-          //         creep.memory.targetY = tile.y;
-          //       }
-          //     }
-          //     if(creep.memory.targetX && creep.memory.targetY && !creep.pos.isEqualTo(creep.memory.targetX, creep.memory.targetY)) {
-          //       creep.moveTo(creep.memory.targetX, creep.memory.targetY);
-          //     }
-          //   }
-          //   if(creep.pos.inRangeTo(creep.room.controller, 3))
-          //         creep.upgradeController(creep.room.controller);
-          // }
-          //else {
             if(creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
               creep.moveTo(creep.room.controller);
             }

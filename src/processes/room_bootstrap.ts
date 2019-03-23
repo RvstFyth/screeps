@@ -82,7 +82,7 @@ export class Room_Bootstrap extends Process
         }
       }
       //let dedicatedUpgrader = source.creeps.filter((c: any) => c.memory.upgrader).length;
-      this.handleUpgrader(room);
+
       for(let n in source.creeps) {
 
         if(!Game.creeps[source.creeps[n]]) {
@@ -108,6 +108,7 @@ export class Room_Bootstrap extends Process
           }
       }
     }
+    this.handleUpgrader(room);
     this.handleBuilder(room);
     //console.log(`Running bootstrap process for room ${this.meta.room}`);
   }
@@ -122,10 +123,7 @@ export class Room_Bootstrap extends Process
     else {
       if(!Game.creeps[this.meta.upgrader]) {
         if(SpawnsHelper.spawnAvailable(room)) {
-          let name = SpawnsHelper.spawnCreep(room, [WORK,CARRY,MOVE,MOVE], {role: 'upgrader'},this.ID.toString());
-          if(name !== '') {
-            this.meta.upgrader = name;
-          }
+          SpawnsHelper.requestSpawn(this.ID, room, [WORK,CARRY,MOVE,MOVE], {role: 'upgrader'},'upgrader');
         }
       }
       else if(Game.creeps[this.meta.upgrader].spawning) {

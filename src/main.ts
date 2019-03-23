@@ -91,6 +91,34 @@ export const loop = ErrorMapper.wrapLoop(() => {
   Memory.stats['creepCount'] = undefined;
   Memory.stats['creepCnt.'+Game.shard.name] = Object.keys(Game.creeps).length;
 
+  let energyTotal = 0;
+  for(let i in Game.rooms) {
+    const room = Game.rooms[i];
+    if(room.controller && room.controller.my) {
+      energyTotal += room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
+      //energyTotal += room.terminal ? room.terminal.store[RESOURCE_ENERGY] : 0;
+    }
+  }
+
+  Memory.stats['energy.'+Game.shard.name+'.total'] = energyTotal;
+
+  _.forEach(Object.keys(Game.rooms), function(roomName){
+    let room = Game.rooms[roomName]
+
+    if(room.controller && room.controller.my){
+      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.level'] = room.controller.level
+      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.progress'] = room.controller.progress
+      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.progressTotal'] = room.controller.progressTotal
+
+      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.spawn.energy'] = room.energyAvailable
+      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.spawn.energyTotal'] = room.energyCapacityAvailable
+
+      if(room.storage){
+        Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.storage.energy'] = room.storage.store.energy
+      }
+    }
+  })
+
   try {
     RawMemory.segments[99] = JSON.stringify(Memory.stats);
   }

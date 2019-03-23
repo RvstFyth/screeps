@@ -39,9 +39,36 @@ export class DismantleWall extends Process
         //     this.meta.targetWall = '5bf84d5f57542e5b73d6e3c4';
         // }
 
+
+        const requiredBoosts = [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID];
+        const healerBody = [
+            TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
+            MOVE,MOVE,
+            RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,
+            HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,
+            MOVE,MOVE,MOVE,MOVE,MOVE
+        ];
+        const dismantlerBody = [
+            TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
+            MOVE,MOVE,
+            WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,
+            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE
+        ];
+
+        const boostsAmounts = {
+            RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE: 600, // MOVE
+            RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 600, // TOUGH
+            RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE: 420, //HEAL
+            RESOURCE_CATALYZED_ZYNTHIUM_ACID: 900 // WORK / DISMANTLE
+        }
+
         const room = Game.rooms[this.meta.room];
         const healer = Game.creeps[this.meta.healer];
         const dismantler = Game.creeps[this.meta.dismantler];
+        if(!healer && !dismantler && this.ID === 3377) {
+            this.state = 'killed';
+            return;
+        }
         if(dismantler && !dismantler.spawning && Game.flags[dismantler.name]) {
             dismantler.moveTo(Game.flags[dismantler.name]);
         }
@@ -68,18 +95,20 @@ export class DismantleWall extends Process
                 //this.state = 'killed';
             }
             if(!this.meta.done && SpawnsHelper.spawnAvailable(room)) {
-                SpawnsHelper.requestSpawn(this.ID, room, [
-                    TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,MOVE,MOVE,MOVE,MOVE
-                ], {role: 'dismantleHealer'}, 'healer');
+                SpawnsHelper.requestSpawn(this.ID, room, healerBody, {role: 'dismantleHealer'}, 'healer');
             }
         }
         else if(healer && !dismantler) {
             this.meta.dBoosted = false;
             this.meta.dCurrent = 0;
             if(!this.meta.done && SpawnsHelper.spawnAvailable(room)) {
-                SpawnsHelper.requestSpawn(this.ID, room, [
-                    TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE,MOVE,MOVE
-                ],{role: 'boostedDismantler'}, 'dismantler');
+                // SpawnsHelper.requestSpawn(this.ID, room, [
+                //     TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
+                //     MOVE,MOVE,
+                //     WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,
+                //     MOVE,MOVE,MOVE,MOVE,MOVE
+                // ],{role: 'boostedDismantler'}, 'dismantler');
+                SpawnsHelper.requestSpawn(this.ID, room, dismantlerBody,{role: 'boostedDismantler'}, 'dismantler');
             }
         }
         else {

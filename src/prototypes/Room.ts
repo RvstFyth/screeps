@@ -167,6 +167,7 @@ Object.defineProperty(Room.prototype, 'hostiles', {
   get: function()
   {
     if(!this._hostiles) {
+      // const hostiles = this.find(FIND_HOSTILE_CREEPS).concat(this.find(FIND_HOSTILE_POWER_CREEPS))
       this._hostiles = this.find(FIND_HOSTILE_CREEPS, {
         filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) === -1 || c.owner.username === 'Zenga' || c.owner.username === 'BarryOSeven'
       });
@@ -219,5 +220,18 @@ Object.defineProperty(Room.prototype, 'recycleContainers', {
     }
 
     return this._recycleContainers;
+  }
+});
+
+
+Object.defineProperty(Room.prototype, 'nuker', {
+  get: function()
+  {
+    if(!this._nuker) {
+      this._nuker = this.find(FIND_STRUCTURES, {
+        filter: (s: Structure) => s.structureType === STRUCTURE_NUKER
+      })[0];
+    }
+    return this._nuker;
   }
 });

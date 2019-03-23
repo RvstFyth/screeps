@@ -49,7 +49,7 @@ export class ClaimRoom extends Process
     else if(Game.creeps[this.meta.defender]) {
       const creep = Game.creeps[this.meta.defender];
       if(creep.room.name !== this.meta.target) {
-        creep.moveToRoom(this.meta.target, true);
+        creep.moveToRoom(this.meta.target, true, true);
         creep.heal(creep);
       }
       else {
@@ -147,7 +147,7 @@ export class ClaimRoom extends Process
     else if(Game.creeps[this.meta.builder]) {
       const creep = Game.creeps[this.meta.builder];
       if(creep.room.name !== this.meta.target) {
-        creep.moveToRoom(this.meta.target, true);
+        creep.moveToRoom(this.meta.target, true, true);
       }
       else {
         if(creep.carry[RESOURCE_ENERGY] === 0) {
@@ -348,7 +348,7 @@ export class ClaimRoom extends Process
       else if(Game.creeps[this.meta.claimer]) {
         const creep = Game.creeps[this.meta.claimer];
         if(creep.room.name !== this.meta.target) {
-          creep.moveToRoom(this.meta.target, true);
+          creep.moveToRoom(this.meta.target, true, true);
         }
         else {
           if(creep.room.controller) {

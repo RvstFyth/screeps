@@ -103,6 +103,7 @@ export class StockBoostsLab extends Process
             const availableLabs = room.labs.filter((l: StructureLab) => l.mineralAmount === 0 && this.meta.labsToIgnore.indexOf(l.id) < 0);
             if(availableLabs.length) {
                 this.meta.lab = availableLabs[0].id;
+                availableLabs[0].memory.state = global.LAB_STATE.BOOSTING;
             }
         }
     }

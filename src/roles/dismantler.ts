@@ -18,4 +18,9 @@ export class Dismantler
             }
         }
     }
+
+    defineBodyParts(room: Room)
+    {
+
+    }
 }
