@@ -43,6 +43,7 @@ import {Defence} from '../processes/defence';
 import {PowerCreeps} from '../processes/powerCreeps';
 import {FillNuke} from '../processes/fillNuke';
 import {Observer} from '../processes/observer';
+import {PowerFarming} from "../processes/powerFarming";
 
 class ProcessTable
 {
@@ -97,8 +98,9 @@ const Processes = <{[type: string]: any}> {
   'defence': Defence,
   'powerCreeps': PowerCreeps,
   'fillNuke': FillNuke,
-  'observer': Observer
-}
+  'observer': Observer,
+  'powerFarming': PowerFarming
+};
 
 export class Kernel
 {
@@ -226,6 +228,7 @@ export class Kernel
     }
     else {
       for(let n = 0, nEnd = Memory.ROS.processes.length; n < nEnd; n++) {
+        if(Memory.ROS.processes[n]) {
           const pr = this.getClassForProcessName(Memory.ROS.processes[n].name);
           pr.name = Memory.ROS.processes[n].name;
           pr.meta = Memory.ROS.processes[n].meta;
@@ -234,6 +237,7 @@ export class Kernel
           pr.ID = Memory.ROS.processes[n].ID;
 
           this.ProcessTable.queue.push(pr);
+        }
       }
     }
     Memory.stats['ROS.'+Game.shard.name+'.pCnt'] = this.ProcessTable.queue.length;
