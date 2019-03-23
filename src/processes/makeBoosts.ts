@@ -45,9 +45,9 @@ export class MakeBoosts extends Process
         const labsIDs = labs.map((l: StructureLab) => l.id);
         const extraLabs = room.labs.filter((l: StructureLab) => labsIDs.indexOf(l.id) < 0);
 
-        if(this.meta.shouldBoost && !extraLabs[0].cooldown && labs[0].mineralAmount > 0 && labs[1].mineralAmount > 0) {
+        if(this.meta.shouldBoost && !extraLabs[0].cooldown && labs[0].mineralAmount > 4 && labs[1].mineralAmount > 4) {
 
-          if(extraLabs.length) {
+          if(extraLabs.length && labs[0].mineralAmount > 4 && labs[1].mineralAmount > 4) {
             for(let i = 0, iEnd = extraLabs.length; i < iEnd; i++) {
               if(!extraLabs[i].memory.state || !extraLabs[i].memory.state !== global.LAB_STATE.BOOSTING) {
                 extraLabs[i].runReaction(labs[0], labs[1]);
@@ -55,7 +55,7 @@ export class MakeBoosts extends Process
             }
           }
         }
-        else if(this.meta.shouldBoost && (labs[0].mineralAmount === 0 || labs[1].mineralAmount === 0)) {
+        else if(this.meta.shouldBoost && (labs[0].mineralAmount < 5 || labs[1].mineralAmount < 5)) {
           this.meta.shouldBoost = false;
           if(Game.creeps[this.meta.transporter]) {
             Game.creeps[this.meta.transporter].suicide();
