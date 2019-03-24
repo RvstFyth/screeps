@@ -74,7 +74,7 @@ export class Room_Bootstrap extends Process
         const droppedResources = sourceObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
           filter: (r: Resource) => r.resourceType === RESOURCE_ENERGY
         });
-        if(droppedResources.length) {
+        if(droppedResources.length && room.controller && room.controller.level < 8) {
           if(droppedResources[0].amount > 0) {
             numWorkers++;
           }
