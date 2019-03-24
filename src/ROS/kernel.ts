@@ -44,6 +44,7 @@ import {PowerCreeps} from '../processes/powerCreeps';
 import {FillNuke} from '../processes/fillNuke';
 import {Observer} from '../processes/observer';
 import {PowerFarming} from "../processes/powerFarming";
+import {ClaimController} from "../processes/claimController";
 
 class ProcessTable
 {
@@ -99,7 +100,8 @@ const Processes = <{[type: string]: any}> {
   'powerCreeps': PowerCreeps,
   'fillNuke': FillNuke,
   'observer': Observer,
-  'powerFarming': PowerFarming
+  'powerFarming': PowerFarming,
+  'claimController': ClaimController
 };
 
 export class Kernel
