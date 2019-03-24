@@ -1,5 +1,6 @@
 import {Process} from "../ROS/process";
 import {SpawnsHelper} from "../helpers/spawns";
+import {Claimer} from "../roles/claimer";
 
 export class ClaimController extends Process
 {
@@ -31,20 +32,7 @@ export class ClaimController extends Process
         }
         else if(creep && creep.spawning) {}
         else if(creep) {
-            if(creep.room.name !== this.meta.target) {
-                creep.moveToRoom(this.meta.target, true, true);
-            }
-            else {
-                if(creep.room.controller) {
-                    if(creep.pos.isNearTo(creep.room.controller)) {
-                        creep.say('#overlords');
-                        creep.claimController(creep.room.controller);
-                    }
-                    else {
-                        creep.moveTo(creep.room.controller, {maxRooms: 1});
-                    }
-                }
-            }
+            Claimer.run(creep, this.meta.target);
         }
     }
 }
