@@ -34,7 +34,7 @@ export class ClaimRoom extends Process
     if(!Game.creeps[this.meta.defender]) {
       if(SpawnsHelper.spawnAvailable(room)) {
         let bodyParts;
-        if(room.controller && room.controller.level < 4) {
+        if(room.controller && room.controller.level < 5) {
           bodyParts = [MOVE,MOVE,MOVE,MOVE,MOVE,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL];
         }
         else {
