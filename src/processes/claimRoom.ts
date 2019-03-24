@@ -83,8 +83,11 @@ export class ClaimRoom extends Process
           });
           if(damaged && damaged.length) {
             const target = creep.pos.findClosestByRange(damaged);
-            if(target && creep.heal(target) === ERR_NOT_IN_RANGE) {
-              creep.moveTo(target);
+            if(target && creep.pos.isNearTo(target)) {
+              creep.heal(target);
+            }
+            else if(target && creep.pos.inRangeTo(target, 3)) {
+              creep.rangedHeal(target);
             }
           }
           else {
