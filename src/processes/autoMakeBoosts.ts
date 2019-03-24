@@ -1,5 +1,6 @@
 import {Process} from '../ROS/process'
 import {SpawnsHelper} from '../helpers/spawns'
+import {BoostsHelper} from "../helpers/boosts";
 
 // META
 // room
@@ -110,50 +111,48 @@ export class AutoMakeBoosts extends Process
         if(room.storage) {
             let minerals: {resource: string, amount: number}[] = [];
             for(let x in global.BOOST_COMPONENTS) {
-                minerals.push({
-                    resource: x,
-                    amount: room.storage.store[x as ResourceConstant] || 0
-                });
+                const tier = BoostsHelper.defineTier(x as ResourceConstant);
+                const amount = room.storage.store[x as ResourceConstant] || 0;
+                const max = tier === 3 ? 12000 : 3000;
+                if(amount < max) {
+                    minerals.push({
+                        resource: x,
+                        amount: room.storage.store[x as ResourceConstant] || 0
+                    });
+                }
             }
 
-            let filteredMinerals, targetMineral, amount = 3000, lastAmount = 0;
-        whileLoop:
-            while(true) {
-                filteredMinerals = minerals.filter((m) => m.amount >= lastAmount &&  m.amount < amount);
-                for(let i in filteredMinerals) {
-                    const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[filteredMinerals[i].resource];
-                    let fAmount = room.storage.store[ingredients[0]] || 0;
-                    let sAmount = room.storage.store[ingredients[1]] || 0;
-                    if(room.terminal) {
-                        fAmount += room.terminal.store[ingredients[0]] || 0;
-                        sAmount += room.terminal.store[ingredients[1]] || 0;
-                    }
-                    if(fAmount >= 3000 && sAmount >= 3000) {
-                        targetMineral = filteredMinerals[i].resource;
-                        break;
-                    }
-                    else {
-                        try {
-                            if(this.requestResources(room, (fAmount < 3000 ? ingredients[0] : ingredients[1]))) {
+            let targetMineral;
 
-                            }
-                            else {
-                                const ingredient = (fAmount < 3000 ? ingredients[0] : ingredients[1]);
-                                if(ingredient.length === 1 && room.terminal && !room.terminal.cooldown) {
-                                    const amountBought = this.buyResources(room, ingredient);
-                                    if(amountBought > 0) break whileLoop;
-                                }
+            for(let i in minerals) {
+                const ingredients: ResourceConstant[] = global.BOOST_COMPONENTS[minerals[i].resource];
+                let fAmount = room.storage.store[ingredients[0]] || 0;
+                let sAmount = room.storage.store[ingredients[1]] || 0;
+                if(room.terminal) {
+                    fAmount += room.terminal.store[ingredients[0]] || 0;
+                    sAmount += room.terminal.store[ingredients[1]] || 0;
+                }
+                if(fAmount >= 3000 && sAmount >= 3000) {
+                    targetMineral = minerals[i].resource;
+                    break;
+                }
+                else {
+                    try {
+                        if(this.requestResources(room, (fAmount < 3000 ? ingredients[0] : ingredients[1]))) {
+
+                        }
+                        else {
+                            const ingredient = (fAmount < 3000 ? ingredients[0] : ingredients[1]);
+                            if(ingredient.length === 1 && room.terminal && !room.terminal.cooldown) {
+                                const amountBought = this.buyResources(room, ingredient);
+                                if(amountBought > 0) break;
                             }
                         }
-                        catch(e) {
-                            console.log(`${e.message}`);
-                        }
+                    }
+                    catch(e) {
+                        console.log(`${e.message}`);
                     }
                 }
-
-                lastAmount = amount;
-                amount += 3000;
-                if(amount >= 12000) break;
             }
             if(targetMineral) {
                 return targetMineral;
