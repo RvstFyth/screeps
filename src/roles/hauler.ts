@@ -76,6 +76,23 @@ export class Hauler
       if(creep.room.storage) {
         if(!creep.pos.isNearTo(creep.room.storage)) {
           creep.moveTo(creep.room.storage);
+          const extensions: StructureExtension[] = creep.pos.findInRange(creep.room.extensions, 1, {
+            filter: (e: StructureExtension) => e.energy < e.energyCapacity
+          });
+          if(extensions.length) {
+            const transporter = creep.room.find(FIND_MY_CREEPS, {
+              filter: (c: Creep) => c.memory.role === 'transporter'
+            });
+            if(transporter.length) {
+              const filtered = extensions.filter((e: StructureExtension) => e.id !== transporter[0].memory.targetID);
+              if(filtered.length) {
+                creep.transfer(filtered[0], RESOURCE_ENERGY);
+              }
+            }
+            else {
+              creep.transfer(extensions[0], RESOURCE_ENERGY);
+            }
+          }
         }
         else {
           if(creep.transfer(creep.room.storage, RESOURCE_ENERGY) === OK && source) {

@@ -155,13 +155,14 @@ export class Transporter
   static defineBodyParts(room: Room)
   {
     let bodyParts;
+    const creeps = room.find(FIND_MY_CREEPS).length;
 
-    if(room.controller && room.controller.level > 6 && room.energyCapacityAvailable > 1500) {
-      return [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY, CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+    if(!creeps && room.energyAvailable <= 300) {
+        bodyParts = [CARRY,CARRY, MOVE, MOVE];
     }
 
-    if(room.energyAvailable <= 300) {
-        bodyParts = [CARRY,CARRY, MOVE, MOVE];
+    else if(room.controller && room.controller.level > 6 && room.energyCapacityAvailable > 1500) {
+      return [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY, CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
     }
 
     else if(room.energyAvailable <= 400) {

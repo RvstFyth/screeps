@@ -16,7 +16,7 @@ OS.kernel.addProcess('stockBoostsLab', {room: 'W52S41', boosts: [RESOURCE_CATALY
 ## Market & resource management
 OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 14000}, 0);
 
-global.OS.kernel.addProcess('haulResources', {room: 'W51S31', resource: RESOURCE_ENERGY, amount: 220000}, 0);
+global.OS.kernel.addProcess('haulResources', {room: 'W51S31', resource: RESOURCE_ENERGY, amount: 200000}, 0);
 
 
 global.OS.kernel.addProcess('emptyTerminal', {room: 'W51S31'}, 0)
@@ -36,7 +36,8 @@ global.OS.kernel.addProcess('sendResources', {room: 'W56S33', target: 'W55S17', 
 _.forEach(Game.market.orders, (o) => !o.active ? Game.market.cancelOrder(o.id) : '');
 
 
-OS.kernel.addProcess('remoteMining', {room: 'W4S3', target: 'W4S2', sourceID: '5aa67d2c4e6a625357a61f5d'}, 0)
+OS.kernel.addProcess('remoteMining', {room: 'W52S41', target: 'W52S42', sourceID: '59f19fc682100e1594f358ea'}, 0)
+OS.kernel.addProcess('claimController', {room: 'W52S41', target: 'W52S42'}, 0)
 OS.kernel.addProcess('remoteMining', {room: 'W4S3', target: 'W4S4', sourceID: '5aa67eab4e6a625357a6205f', miner: '28_30303827', hauler: '28_30303973'}, 0)
 
 ## Offensive
@@ -45,7 +46,7 @@ global.OS.kernel.addProcess('attackController', {room: 'W52S41', target: 'W52S42
 global.OS.kernel.addProcess('observer', {room: 'W51S31'}, 0)
 global.OS.kernel.addProcess('lootRoom', {room: 'W54S31', target: "W55S29"}, 0)
 
-OS.kernel.addProcess('claimRoom', {room: 'W51S37', target: 'W46S41'}, 0);
+OS.kernel.addProcess('claimRoom', {room: 'W41S41', target: 'W39S46'}, 0);
 
 
 OS.kernel.addProcess('sourceKeeperAttacker', {room: 'W15S6', target: 'W15S5'}, 0)

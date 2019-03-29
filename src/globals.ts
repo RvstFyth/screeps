@@ -16,6 +16,13 @@ global.killProcess = function(pID: number) {
     }
 };
 
+global.RECIPES = {};
+for (const a in REACTIONS) {
+	for (const b in REACTIONS[a]) {
+		global.RECIPES[REACTIONS[a][b]] = [a, b];
+	}
+}
+
 global.BOOST_COMPONENTS = {
         //Base
         [RESOURCE_GHODIUM]: [RESOURCE_ZYNTHIUM_KEANITE, RESOURCE_UTRIUM_LEMERGITE],
@@ -114,6 +121,16 @@ global.populateLOANlist = function(LOANuser = "LeagueOfAutomatedNations", LOANse
         return false;
     }
 }
+
+/**
+ * This method relies on the fixed length of the resource string.
+ * This only works for tier 1 => 3 and will break with higher numbers
+ * T1 = 2  Math.ceil(2 / 2) = 1
+ * T2 = 4  Math.ceil(4 / 2) = 2
+ * T3 = 5  Math.ceil(5 / 2) = 3
+ * @param r ResourceConstant
+ */
+global.boostTier = (r: ResourceConstant) => Math.ceil(r.length / 2);
 
 global.resourceStats = function()
 {

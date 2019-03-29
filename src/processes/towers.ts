@@ -30,7 +30,13 @@ export class Towers extends Process
           filter: (c: Creep) => c.hits < c.hitsMax
         });
         const damagedRoads = room.roads.filter((r: StructureRoad) => r.hits < r.hitsMax && targetIDs.indexOf(r.id) < 0);
-        if(!healed && damagedCreeps.length) {
+        const damagedContainers = room.containers.filter((c: StructureContainer) => c.hits < c.hitsMax && targetIDs.indexOf(c.id) < 0);
+        if(room.controller && room.controller.level === 8 && !healed && damagedContainers.length) {
+          const target = _.min(damagedContainers, r => r.hits);
+          room.towers[i].repair(target);
+          targetIDs.push(target.id);
+        }
+        else if(!healed && damagedCreeps.length) {
           room.towers[i].heal(damagedCreeps[0]);
           healed = true;
         }

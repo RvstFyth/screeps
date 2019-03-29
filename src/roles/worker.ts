@@ -126,7 +126,7 @@ export class Worker
      }
 
      if(!target && !targetID) {
-       if(creep.room.ramparts.length) {
+       if(creep.room.ramparts.length && creep.room.controller && creep.room.controller.level === 8) {
         const t = _.min(creep.room.ramparts, c => c.hits);
         target = 'repair';
         targetID = t.id;
@@ -287,6 +287,23 @@ export class Worker
           else if(creep.memory.target === 'storage' && typeof creep.room.storage !== 'undefined') {
             if(creep.transfer(creep.room.storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
               creep.moveTo(creep.room.storage);
+              const extensions: StructureExtension[] = creep.pos.findInRange(creep.room.extensions, 1, {
+                filter: (e: StructureExtension) => e.energy < e.energyCapacity
+              });
+              if(extensions.length) {
+                const transporter = creep.room.find(FIND_MY_CREEPS, {
+                  filter: (c: Creep) => c.memory.role === 'transporter'
+                });
+                if(transporter.length) {
+                  const filtered = extensions.filter((e: StructureExtension) => e.id !== transporter[0].memory.targetID);
+                  if(filtered.length) {
+                    creep.transfer(filtered[0], RESOURCE_ENERGY);
+                  }
+                }
+                else {
+                  creep.transfer(extensions[0], RESOURCE_ENERGY);
+                }
+              }
             }
           }
           else {

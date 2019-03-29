@@ -140,7 +140,7 @@ export class ClaimRoom extends Process
   handleBuilder(room: Room)
   {
     if(!Game.creeps[this.meta.builder]) {
-      if(SpawnsHelper.spawnAvailable(room) && room.energyAvailable === room.energyCapacityAvailable) {
+      if(SpawnsHelper.spawnAvailable(room)) {
         this.meta.builder = SpawnsHelper.spawnCreep(room, [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'claimRoom_builder'}, this.ID.toString());
       }
     }
