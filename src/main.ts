@@ -45,6 +45,9 @@ if(!Memory.cpu) {
 
 console.log(`Starting a new global on ${Game.shard.name}`);
 
+if(!Memory.roomBlacklist) {
+  Memory.roomBlacklist = [];
+}
 if(!Memory.scoutReports) {
   Memory.scoutReports = {};
 }
