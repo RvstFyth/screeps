@@ -1,3 +1,9 @@
+interface FindRouteOptions {
+    ignoreSK: boolean|undefined,
+    prioritizeHighways: boolean|undefined
+
+}
+
 export class MapHelper
 {
 
@@ -5,7 +11,7 @@ export class MapHelper
      * Parse the room name, and define if it is a neutral room.
      * We use the second and third element of the parsing result.
      * The first element is the complete roomName
-     * @param string roomName
+     * @param roomName
      */
     public static isNeutralRoom(roomName: string) : boolean
     {
@@ -31,7 +37,7 @@ export class MapHelper
      * Parse the room name and define if it is a source keeper room.
      * We use the second and third element of the parsing result.
      * The first element is the complete roomName
-     * @param string roomName
+     * @param roomName
      */
     public static isSourceKeeperRoom(roomName: string) : boolean
     {
@@ -44,6 +50,19 @@ export class MapHelper
             }
         }
         return false;
+    }
+
+    public static findRoute(from: string, to: string, opts?: FindRouteOptions)
+    {
+        return Game.map.findRoute(from, to, {
+            routeCallback: function(roomName) {
+                if(!Game.map.isRoomAvailable(roomName)) return Infinity;
+                if(opts && opts.ignoreSK && MapHelper.isSourceKeeperRoom(roomName)) return Infinity;
+                if(Memory.roomBlacklist && Memory.roomBlacklist.indexOf(roomName) > -1) return Infinity;
+                if(opts && opts.prioritizeHighways) return MapHelper.isNeutralRoom(roomName) ? 1 : 2.5;
+                return 1;
+            }
+        });
     }
 }
 

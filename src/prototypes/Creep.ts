@@ -2,14 +2,11 @@ import {MapHelper} from '../helpers/map';
 
 Creep.prototype.moveToRoom = function(roomName: string, ignoreSK?: boolean, prioritizeHighways? : boolean)
 {
-    const res: any = Game.map.findRoute(this.room, roomName, {
-        routeCallback: function(roomName) {
-            if(!Game.map.isRoomAvailable(roomName)) return Infinity;
-            if(ignoreSK && MapHelper.isSourceKeeperRoom(roomName)) return Infinity;
-            if(prioritizeHighways) return MapHelper.isNeutralRoom(roomName) ? 1 : 2.5;
-            return 1;
-        }
+    const res: any = MapHelper.findRoute(this.room.name, roomName, {
+        ignoreSK: ignoreSK,
+        prioritizeHighways: prioritizeHighways
     });
+
     let room;
     if(res && res.length) {
         room = res[0].room;
