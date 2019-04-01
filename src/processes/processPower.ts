@@ -46,12 +46,18 @@ export class ProcessPower extends Process
                 }
             }
             else if((!this.meta.transporter || !creep) && !this.meta.shouldProcess) {
-                if(room.storage && room.storage.store[RESOURCE_POWER]) {
-                    const sAmount = room.storage.store[RESOURCE_POWER];
-                    if(sAmount && sAmount > 100) {
+                if(room.storage) {
+                    const sAmount = room.storage.store[RESOURCE_POWER] || 0;
+                    const energy = room.storage.store[RESOURCE_ENERGY];
+                    const terminalAmount = room.terminal && room.terminal.store[RESOURCE_POWER] ? room.terminal.store[RESOURCE_POWER] : 0;
+                    if(sAmount && sAmount > 100 && energy && energy > 200000) {
                         if(SpawnsHelper.spawnAvailable(room)) {
                             SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'processPowerHauler'}, 'transporter');
                         }
+                    }
+                    else if((!sAmount || sAmount < 100) && (!terminalAmount || terminalAmount < 200) && energy && energy > 200000) {
+                        // Check if we can request power from other rooms!
+                        this.requestPower(room);
                     }
                 }
             }
@@ -69,6 +75,25 @@ export class ProcessPower extends Process
         }
         else {
             this.state = 'killed';
+        }
+    }
+
+    requestPower(room: Room)
+    {
+        if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', room.name)) {
+            for(let n in Game.rooms) {
+                if(n === this.meta.room) {
+                    continue;
+                }
+                const tr: Room = Game.rooms[n];
+                if(tr.controller && tr.controller.my && tr.storage && tr.terminal && tr.terminal.my && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', tr.name)) {
+                    const totalPower = (tr.terminal.store[RESOURCE_POWER] || 0) + (tr.storage.store[RESOURCE_POWER] || 0);
+                    if(totalPower > 3000) {
+                        global.OS.kernel.addProcess('sendResources', {room: tr.name, target: room.name, resource: RESOURCE_POWER, amount: 1000}, 0);
+                        break;
+                    }
+                }
+            }
         }
     }
 

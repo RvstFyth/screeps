@@ -223,6 +223,18 @@ Object.defineProperty(Room.prototype, 'recycleContainers', {
   }
 });
 
+Object.defineProperty(Room.prototype, 'powerSpawn', {
+    get: function()
+    {
+        if(!this._powerSpawn) {
+            this._powerSpawn = this.find(FIND_STRUCTURES, {
+              filter: (s: Structure) => s.structureType === STRUCTURE_POWER_SPAWN
+            })[0];
+        }
+        return this._powerSpawn;
+    }
+});
+
 
 Object.defineProperty(Room.prototype, 'nuker', {
   get: function()

@@ -38,6 +38,7 @@ interface Room
   allies: Creep[]
   mineral: Mineral|undefined
   nuker: StructureNuker|undefined
+  powerSpawn: StructurePowerSpawn|undefined
 }
 
 interface StructureLab

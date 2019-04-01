@@ -120,6 +120,10 @@ export class Room extends Process
       }
     }
 
+    if(room.powerSpawn && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('processPower', 'room', room.name)) {
+      global.OS.kernel.addProcess('processPower', {room: room.name}, this.ID);
+    }
+
     if(room.storage && room.controller && room.controller.level === 8 && room.storage.store[RESOURCE_ENERGY] >= 150000) {
       try {
         if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'room', room.name)) {
