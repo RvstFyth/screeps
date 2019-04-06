@@ -1,3 +1,5 @@
+import {MapHelper} from "./map";
+
 export class ResourcesHelper
 {
     public static inTerminal(room: Room, r: ResourceConstant) : number
@@ -12,16 +14,29 @@ export class ResourcesHelper
 
     public static inRoom(room: Room, r: ResourceConstant) : number
     {
-        return Resources.inStorage(room, r) + Resources.inTerminal(room, r);
+        return ResourcesHelper.inStorage(room, r) + ResourcesHelper.inTerminal(room, r);
     }
 
     public static totalInTerminals(r: ResourceConstant) : number
     {
-        return 0;
+        let total = 0;
+        const rooms = MapHelper.ownedRooms();
+        for(let i in rooms) {
+            const room = rooms[i];
+            if(room.terminal) total += room.terminal.store[r] || 0;
+        }
+        return total;
     }
 
     public static totalInStorages(r: ResourceConstant) :number
     {
-        return 0;
+        let total = 0;
+        const rooms = MapHelper.ownedRooms();
+        for(let i in rooms) {
+            const room = rooms[i];
+            if(room.storage) total += room.storage.store[r] || 0
+        }
+
+        return total;
     }
 }

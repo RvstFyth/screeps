@@ -64,5 +64,15 @@ export class MapHelper
             }
         });
     }
+
+    public static ownedRooms() : Room[]
+    {
+        let rooms = [];
+        for(let i in Game.rooms) {
+            const room = Game.rooms[i];
+            if(room.controller && room.controller.my) rooms.push(room);
+        }
+        return rooms;
+    }
 }
 
