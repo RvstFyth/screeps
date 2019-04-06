@@ -19,16 +19,17 @@ export class Source extends Process
     }
 
     if(source && source.room && source.room.controller && source.room.controller.my) {
-      if(!this.meta.miner || !Game.creeps[this.meta.miner]) {
+      const miner = Game.creeps[this.meta.miner];
+      if(!this.meta.miner || !miner) {
         if(SpawnsHelper.spawnAvailable(source.room)) {
           SpawnsHelper.requestSpawn(this.ID, source.room, Miner.defineBodyParts(source.room), {role: 'miner'}, 'miner');
         }
       }
-      else if(Game.creeps[this.meta.miner] && Game.creeps[this.meta.miner].spawning) {
+      else if(miner && miner.spawning) {
 
       }
-      else if(Game.creeps[this.meta.miner]) {
-        Miner.run(Game.creeps[this.meta.miner], this.meta.sourceID, link);
+      else if(miner) {
+        Miner.run(miner, this.meta.sourceID, link);
       }
 
       const container = source.pos.findInRange(source.room.container, 1, {
