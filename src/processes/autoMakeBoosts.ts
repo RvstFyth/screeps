@@ -101,7 +101,7 @@ export class AutoMakeBoosts extends Process
             //     console.log(reaction)
             // }
             if(reaction) {
-                global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: reaction, amount: 3000}, 0);
+                global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: reaction, amount: 3000}, this.ID);
             }
         }
     }
