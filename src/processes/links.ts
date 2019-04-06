@@ -20,7 +20,18 @@ export class Links extends Process
                         }
                         if(otherLinks.length) {
                             for(let i in otherLinks) {
-                                otherLinks[i].transferEnergy(StorageLink[0]);
+                                let missingAmount = 0;
+                                if(upgradersLink && upgradersLink.energy < upgradersLink.energyCapacity) {
+                                    missingAmount = upgradersLink.energyCapacity - upgradersLink.energy;
+                                }
+                                if((this.meta.last && this.meta.last === 'storage') && missingAmount >= otherLinks[i].energy) {
+                                    otherLinks[i].transferEnergy(upgradersLink);
+                                    this.meta.last = 'upgrader';
+                                }
+                                else {
+                                    otherLinks[i].transferEnergy(StorageLink[0]);
+                                    this.meta.last = 'storage';
+                                }
                             }
                         }
                     }
