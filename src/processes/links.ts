@@ -11,9 +11,13 @@ export class Links extends Process
         if(room && room.controller && room.controller.my) {
             if(room.storage && room.links.length) {
                 const StorageLink = room.storage.pos.findInRange(room.links, 3);
+                const upgradersLink = room.controller.pos.findInRange(room.links, 3)[0];
                 if(StorageLink.length) {
                     if(StorageLink[0].energy < StorageLink[0].energyCapacity) {
-                        const otherLinks = room.links.filter((l: StructureLink) => l.id !== StorageLink[0].id && l.energy > 0 && !l.cooldown);
+                        let otherLinks = room.links.filter((l: StructureLink) => l.id !== StorageLink[0].id && l.energy > 0 && !l.cooldown);
+                        if(upgradersLink) {
+                            otherLinks = otherLinks.filter((l: StructureLink) => l.id !== upgradersLink.id);
+                        }
                         if(otherLinks.length) {
                             for(let i in otherLinks) {
                                 otherLinks[i].transferEnergy(StorageLink[0]);
