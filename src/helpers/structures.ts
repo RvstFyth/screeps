@@ -66,6 +66,29 @@ export class StructuresHelper
     return [];
   }
 
+  static rampartImportantStructures(room: Room)
+  {
+    let structures: Structure[] = [];
+    if(room.labs.length) structures.concat(room.labs);
+    if(room.towers.length)  structures.concat(room.towers);
+    if(room.spawns.length) structures.concat(room.spawns);
+    if(room.nuker) structures.push(room.nuker);
+    if(room.terminal) structures.push(room.terminal);
+    if(room.storage) structures.push(room.storage);
+    if(room.powerSpawn) structures.push(room.powerSpawn);
+
+    for(let i = 0, iEnd = structures.length; i < iEnd; i++) {
+      if(!StructuresHelper.isRamparted(structures[i])) {
+        structures[i].pos.createConstructionSite(STRUCTURE_RAMPART);
+      }
+    }
+  }
+
+  static isRamparted(struc: Structure)
+  {
+    return struc.pos.lookFor(LOOK_STRUCTURES).filter((s: Structure) => s.structureType === STRUCTURE_RAMPART).length > 0;
+  }
+
   static placeContainerNearSources(room: Room)
   {
     for(let i in room.sources) {
