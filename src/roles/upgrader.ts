@@ -9,7 +9,22 @@ export class Upgrader
       creep.memory.harvesting = false;
     }
     if(creep.memory.harvesting) {
-        if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] >= creep.carryCapacity) {
+        let upgradersLink: StructureLink|undefined;
+        if(creep.room.controller && creep.pos.inRangeTo(creep.room.controller, 3)) {
+          upgradersLink = creep.pos.findInRange(creep.room.links, 3, {
+            filter: (l: StructureLink) => l.energy > 0
+          })[0];
+        }
+        if(upgradersLink) {
+          const res = creep.withdraw(upgradersLink, RESOURCE_ENERGY);
+          if(res === ERR_NOT_IN_RANGE) {
+            creep.moveTo(upgradersLink);
+          }
+          else if(res === OK) {
+            creep.memory.harvesting = false;
+          }
+        }
+        else if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] >= creep.carryCapacity) {
           if(creep.withdraw(creep.room.storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.moveTo(creep.room.storage);
           }
