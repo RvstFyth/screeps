@@ -122,6 +122,13 @@ export const loop = ErrorMapper.wrapLoop(() => {
     }
   })
 
+  if(typeof Game.cpu.getHeapStatistics !== 'undefined') {
+    const heap = Game.cpu.getHeapStatistics();
+    if(heap) {
+      Memory.stats['heap.'+Game.shard.name+'.usage'] = (heap.total_heap_size + heap.externally_allocated_size) / heap.heap_size_limit;
+    }
+  }
+
   try {
     RawMemory.segments[99] = JSON.stringify(Memory.stats);
   }
