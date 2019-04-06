@@ -159,6 +159,19 @@ export class Room extends Process
         if(room.controller.level >= 3) {
           StructuresHelper.placeContainerNearSources(room);
         }
+        if(room.controller.level >= 6) {
+          try {
+            const tiles: RoomPosition[] = StructuresHelper.defineUpgraderSpots(room, 1);
+            for(let i in tiles) {
+              if(!tiles[i].lookFor(LOOK_STRUCTURES).filter((s: Structure) => s.structureType === STRUCTURE_RAMPART).length) {
+                tiles[i].createConstructionSite(STRUCTURE_RAMPART);
+              }
+            }
+          }
+          catch(e) {
+            console.log(`Bug while placing ramparts around the controller ${JSON.stringify(e)}`);
+          }
+        }
     }
   }
 }

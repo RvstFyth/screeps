@@ -3,7 +3,7 @@ export class StructuresHelper
 
   static planRoom(room: Room)
   {
-    const upgradersSpots = this.defineUpgraderSpots(room);
+    const upgradersSpots = this.defineUpgraderSpots(room, 3);
     const roadTiles = this.buildRoads(room, upgradersSpots);
 
   }
@@ -43,26 +43,27 @@ export class StructuresHelper
     }
   }
 
-  static defineUpgraderSpots(room: Room)
+  static defineUpgraderSpots(room: Room, range: number) : RoomPosition[]
   {
     if(typeof room.controller !== 'undefined') {
       let x = room.controller.pos.x,
           y = room.controller.pos.y,
           validTiles = [];
 
-      let targets = room.lookForAtArea(LOOK_TERRAIN, y-3, x-3, y+3, x+3, true).filter((t: any) => t.terrain !== 'wall');
+      let targets = room.lookForAtArea(LOOK_TERRAIN, y-range, x-range, y+range, x+range, true).filter((t: any) => t.terrain !== 'wall');
       for(let i in targets) {
-        if(room.controller.pos.getRangeTo(targets[i].x, targets[i].y) <= 3) {
+        if(room.controller.pos.getRangeTo(targets[i].x, targets[i].y) <= range) {
             if(!room.lookForAt(LOOK_STRUCTURES, targets[i].x, targets[i].y).filter((s: any) => s.structureType === STRUCTURE_WALL).length) {
               room.visual.circle(targets[i].x, targets[i].y, {stroke: 'blue'});
-              validTiles.push({x: targets[i].x, y: targets[i].y});
+              validTiles.push(new RoomPosition(targets[i].x, targets[i].y, room.name));
+              // {x: targets[i].x, y: targets[i].y}
             }
         }
       }
       return validTiles;
     }
 
-    return null;
+    return [];
   }
 
   static placeContainerNearSources(room: Room)
