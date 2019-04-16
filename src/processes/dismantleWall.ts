@@ -32,7 +32,7 @@ export class DismantleWall extends Process
         // this.meta.target = 'W54S39';
         // this.meta.targetWall = '5bf84cacb4a5532a2db37788';
         // this.meta.done = false;
-        this.state = 'killed';
+        //this.state = 'killed';
         //this.meta.healer = '486_11251055';
 
         //  if(this.ID == 506) {
@@ -119,14 +119,15 @@ export class DismantleWall extends Process
                 this.boost(dismantler, 'dBoosted');
             }
             if(this.meta.hBoosted && this.meta.dBoosted) {
+                if(Game.flags[this.ID + '_p']) {
+                    if(healer && (!dismantler || !this.meta.dBoosted)) {
+                        healer.moveTo(Game.flags[this.ID+'_p']);
+                    }
+                    if(dismantler && (!healer || !this.meta.hBoosted)) {
+                        dismantler.moveTo(Game.flags[this.ID+'_p']);
+                    }
+                }
                 if(Game.flags[this.ID]) {
-                    // if(dismantler.pos.isNearTo(healer)) {
-                    //     dismantler.moveTo(Game.flags[this.ID]);
-                    //     healer.moveTo(dismantler);
-                    // }
-                    // else {
-                    //     healer.moveTo(dismantler);
-                    // }
                     if(dismantler.pos.isNearTo(healer) && dismantler.fatigue === 0 && healer.fatigue === 0) {
                         dismantler.moveTo(Game.flags[this.ID]);
                     }
@@ -221,7 +222,7 @@ export class DismantleWall extends Process
         }
         else {
             if(Game.time % 5 === 0) {
-                dismantler.say('#overlords', true);
+                //dismantler.say('#overlords', true);
             }
 
             if(!this.meta.targetWall) {
@@ -261,15 +262,15 @@ export class DismantleWall extends Process
                     if(dismantler.room.spawns.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
                     }
-                    else if(dismantler.room.extensions.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
-                    }
-                    else if(dismantler.room.terminal) {
-                        target = dismantler.room.terminal;
-                    }
                     else if(dismantler.room.towers.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.towers);
                     }
+                    else if(dismantler.room.extensions.length) {
+                        target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
+                    }
+                    // else if(dismantler.room.terminal) {
+                    //     target = dismantler.room.terminal;
+                    // }
                     else if(dismantler.room.spawns.length) {
                         target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
                     }
@@ -329,26 +330,49 @@ export class DismantleWall extends Process
             healer.moveTo(dismantler);
         }
         else {
-            //const sayings: any = ['You','only','have','one','safemode','use','it','wise!','...','..'];
-            // const sayings = ['Sie', 'haben', 'nur', 'ein', 'safemode', 'brauch', 'es', 'vernuuunftig','!!!!!'];
-            // for(let i = 0; i < 9; i++) {
-            //     if(Game.time % i === 0) {
-            //         //const string = sayings[i] ? sayings[i] : '';
-            //         healer.say(sayings[Game.time % sayings.length], true);
-            //         break;
-            //     }
-            // }
             if(healer.pos.x === 0) {
-                healer.moveTo(1, dismantler.pos.y + 1);
+                const pos = new RoomPosition(1, dismantler.pos.y + 1, healer.room.name);
+                if(pos.isWalkable(false)) healer.moveTo(pos);
+                else {
+                    const pos = new RoomPosition(1, dismantler.pos.y - 1, healer.room.name);
+                    if(pos.isWalkable(false)) healer.moveTo(pos);
+                    else {
+                        // TODO
+                    }
+                }
             }
             else if(healer.pos.x === 49) {
-                healer.moveTo(48, dismantler.pos.y - 1);
+                const pos = new RoomPosition(48, dismantler.pos.y - 1, healer.room.name);
+                if(pos.isWalkable(false)) healer.moveTo(pos);
+                else {
+                    const pos = new RoomPosition(48, dismantler.pos.y + 1, healer.room.name);
+                    if(pos.isWalkable(false)) healer.moveTo(pos);
+                    else {
+
+                    }
+                }
             }
             else if(healer.pos.y === 0) {
-                healer.moveTo(dismantler.pos.x + 1, 1);
+                const pos = new RoomPosition(dismantler.pos.x + 1, 1, healer.room.name);
+                if(pos.isWalkable(false)) healer.moveTo(pos);
+                else {
+                    const pos = new RoomPosition(dismantler.pos.x - 1, 1, healer.room.name);
+                    if(pos.isWalkable(false)) healer.moveTo(pos);
+                    else {
+
+                    }
+                }
             }
             else if(healer.pos.y === 49) {
-                healer.moveTo(dismantler.pos.x, 48);
+                const pos = new RoomPosition(dismantler.pos.x + 1, 48, healer.room.name);
+                if(pos.isWalkable(false)) healer.moveTo(pos);
+                else {
+                    const pos = new RoomPosition(dismantler.pos.x - 1, 48, healer.room.name);
+                    if(pos.isWalkable(false)) healer.moveTo(pos);
+                    else {
+
+                    }
+                }
             }
             else {
                 healer.moveTo(dismantler);

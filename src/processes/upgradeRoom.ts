@@ -31,28 +31,38 @@ export class UpgradeRoom extends Process
             }
         }
         else if(Game.creeps[this.meta.creeps[n]]) {
+          const creep = Game.creeps[this.meta.creeps[n]];
           if(typeof Game.creeps[this.meta.creeps[n]].memory.initialized === 'undefined') {
             Game.creeps[this.meta.creeps[n]].memory.initialized = true;
           }
-          if(!Game.creeps[this.meta.creeps[n]].memory.initialized) {
+
+          if(!creep.memory.initialized) {
             // catalyzed ghodium acid
             const labs = room.labs.filter((l: StructureLab) => l.mineralType === RESOURCE_CATALYZED_GHODIUM_ACID && l.mineralAmount >= 30);
             if(labs.length) {
-              const result = labs[0].boostCreep(Game.creeps[this.meta.creeps[n]]);
+              const result = labs[0].boostCreep(creep);
               if(result === ERR_NOT_IN_RANGE) {
-                Game.creeps[this.meta.creeps[n]].moveTo(labs[0]);
+                creep.moveTo(labs[0]);
               }
               else if(result === OK) {
-                Game.creeps[this.meta.creeps[n]].memory.initialized = true;
+                creep.memory.initialized = true;
               }
             }
             else {
-              Game.creeps[this.meta.creeps[n]].memory.initialized = true;
+              let boostsInStock = false;
+              if(boostsInStock) {
+                const workParts = Game.creeps[this.meta.creeps[n]].getActiveBodyparts(WORK);
+                const mineralsNeeded = workParts * LAB_BOOST_MINERAL;
+              }
+              else {
+                Game.creeps[this.meta.creeps[n]].memory.initialized = true;
+              }
             }
           }
           else {
             Upgrader.run(Game.creeps[this.meta.creeps[n]]);
           }
+
         }
       }
       this.meta.creeps = this.meta.creeps.filter((n: any) => n); // Remove NULL values

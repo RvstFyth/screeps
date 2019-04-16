@@ -47,7 +47,7 @@ export class Room extends Process
     if(Game.shard.name.toLowerCase() === 'shard3') {
       this.meta.support = false;
     }
-    if(typeof this.meta.support !== 'undefined' && this.meta.support && rcl < 5) {
+    if(typeof this.meta.support !== 'undefined' && this.meta.support && rcl < 6) {
       return;
     }
 

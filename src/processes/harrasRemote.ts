@@ -19,7 +19,7 @@ export class HarrasRemote extends Process
 
     run()
     {
-         this.state = 'killed';
+         //this.state = 'killed';
         try {
             this.run2();
         }

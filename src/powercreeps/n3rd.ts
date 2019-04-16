@@ -80,12 +80,14 @@ export class N3RD
         // }
 
         const ops = powerCreep.carry['ops'];
+        let triggered = false;
         if(powerCreep.powers[PWR_OPERATE_LAB] && global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', powerCreep.room.name)) {
             const cd: number|undefined = powerCreep.powers[PWR_OPERATE_LAB].cooldown;
             if(cd !== undefined && cd <= 0 && ops  > 10) {
                 if(powerCreep.room.labs.length) {
                     const filtered = powerCreep.room.labs.filter(l => (!l.memory.boostedTS || l.memory.boostedTS + 1000 < Game.time) && l.memory.state !== global.LAB_STATE.SUPPLY && l.memory.state !== global.LAB_STATE.BOOSTING);
                     if(filtered.length) {
+                        triggered = true;
                         if(powerCreep.pos.inRangeTo(filtered[0], 3)) {
                             if(powerCreep.usePower(PWR_OPERATE_LAB, filtered[0]) === OK) {
                                 filtered[0].memory.boostedTS = Game.time;
@@ -95,6 +97,19 @@ export class N3RD
                             powerCreep.moveTo(filtered[0]);
                         }
                     }
+                }
+            }
+        }
+
+        if(!triggered && powerCreep.powers[PWR_OPERATE_EXTENSION]) {
+            const extensions = powerCreep.room.extensions.filter((e: StructureExtension) => e.energy < e.energyCapacity);
+            if(extensions.length > 5 && powerCreep.room.storage) {
+                triggered = true;
+                if(powerCreep.pos.inRangeTo(powerCreep.room.storage, 2)) {
+                    powerCreep.usePower(PWR_OPERATE_EXTENSION, powerCreep.room.storage);
+                }
+                else {
+                    powerCreep.moveTo(powerCreep.room.storage);
                 }
             }
         }

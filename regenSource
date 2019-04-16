@@ -1,0 +1,11 @@
+Well, I wouldn't call it "math", rather "simple extrapolation", which, to be fair, is based on math.
+Per level
+4000, 5000, 6000, 7000, 8000. So you get per tick: 13.3, 16.6, 20, 23.3,26.66
+So you need work: 7, 9, 10, 12, 14
+I like to even it up and round up: 8, 10, 12, 14, 16
+Note: It adds the effect every 15 ticks while the source has energy in it. So you're better off having 100.0% miner coverage and the minimum number of work parts.
+
+Actually, I'm wrong. It keeps inserting the effect every 15 ticks even if the source is empty... so you're better off with a slightly aggressive miner. The 8 to 16 path is the way to go.
+That way if it's delayed getting on station, or throws a few link transfers or whatever... you still scrape out every last drop.
+It's really no ops.
+Which is a head scratcher in that it's a high level power... You literally HAVE to have gotten the ops one to even use it.

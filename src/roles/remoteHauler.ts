@@ -15,10 +15,11 @@ export class RemoteHauler
 
     if(creep.memory.harvesting) {
       if(creep.room.name !== targetRoom) {
-        creep.moveTo(new RoomPosition(25,25,targetRoom), {
-          reusePath: 5,
-          range: 15
-        });
+        // creep.moveTo(new RoomPosition(25,25,targetRoom), {
+        //   reusePath: 5,
+        //   range: 15
+        // });
+        creep.moveToRoom(targetRoom, true, false);
       }
       else {
         if(source) {

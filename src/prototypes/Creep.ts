@@ -1,5 +1,10 @@
 import {MapHelper} from '../helpers/map';
 
+Creep.prototype.boost = function(boosts)
+{
+
+}
+
 Creep.prototype.moveToRoom = function(roomName: string, ignoreSK?: boolean, prioritizeHighways? : boolean)
 {
     const res: any = MapHelper.findRoute(this.room.name, roomName, {

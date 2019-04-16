@@ -4,10 +4,11 @@ export class RemoteMiner
   static run(creep: Creep, targetRoom: string, sourceID: string)
   {
     if(creep.room.name !== targetRoom) {
-      creep.moveTo(new RoomPosition(25,25,targetRoom), {
-        reusePath: 5,
-        range: 23
-      });
+      // creep.moveTo(new RoomPosition(25,25,targetRoom), {
+      //   reusePath: 5,
+      //   range: 23
+      // });
+      creep.moveToRoom(targetRoom, true, false);
     }
     else {
       const source: Source|null = Game.getObjectById(sourceID);

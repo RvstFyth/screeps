@@ -6,17 +6,19 @@ rollup -c --environment DEST:main
 ## Boosts
 OS.kernel.addProcess('makeBoosts', {room: 'W56S33', boost: RESOURCE_GHODIUM, amount: 3000}, 0);
 OS.kernel.addProcess('makeBoosts', {room: 'W15S2', boost: RESOURCE_UTRIUM_HYDRIDE,transporter:'88_19283181', shouldBoost: true, labs:['5b532f554df916370860b91d','5b53327c4df916370860ba62','5b5336334df916370860bbc1']}, 0);
-global.OS.kernel.addProcess('emptyLabs', {room: 'W52S41'}, 0)
+global.OS.kernel.addProcess('emptyLabs', {room: 'W51S31', boosted: true}, 0)
 OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALYZED_GHODIUM_ACID]}, 0);
 OS.kernel.addProcess('autoMakeBoosts', {room: 'W56S33'}, 0);
 OS.kernel.addProcess('defence', {room: 'W56S33'}, 0);
 
-OS.kernel.addProcess('stockBoostsLab', {room: 'W52S41', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID], transporter: '497_11258239'}, 0);
+OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID]}, 0);
+
+OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ACID]}, 0);
 
 ## Market & resource management
 OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 14000}, 0);
 
-global.OS.kernel.addProcess('haulResources', {room: 'W51S31', resource: RESOURCE_ENERGY, amount: 200000}, 0);
+global.OS.kernel.addProcess('haulResources', {room: 'W51S32', resource: RESOURCE_POWER, amount: 14000}, 0);
 
 
 global.OS.kernel.addProcess('emptyTerminal', {room: 'W51S31'}, 0)
@@ -36,23 +38,24 @@ global.OS.kernel.addProcess('sendResources', {room: 'W56S33', target: 'W55S17', 
 _.forEach(Game.market.orders, (o) => !o.active ? Game.market.cancelOrder(o.id) : '');
 
 
-OS.kernel.addProcess('remoteMining', {room: 'W52S41', target: 'W52S42', sourceID: '59f19fc682100e1594f358ea'}, 0)
+OS.kernel.addProcess('remoteMining', {room: 'W56S33', target: 'W57S34', sourceID: '59bbc3be2052a716c3ce6a6f'}, 0)
 OS.kernel.addProcess('claimController', {room: 'W52S41', target: 'W52S42'}, 0)
 OS.kernel.addProcess('remoteMining', {room: 'W4S3', target: 'W4S4', sourceID: '5aa67eab4e6a625357a6205f', miner: '28_30303827', hauler: '28_30303973'}, 0)
 
+
 ## Offensive
-global.OS.kernel.addProcess('attackController', {room: 'W52S41', target: 'W52S42'}, 0)
+global.OS.kernel.addProcess('attackController', {room: 'W51S31', target: 'W43S29'}, 0)
 
 global.OS.kernel.addProcess('observer', {room: 'W51S31'}, 0)
-global.OS.kernel.addProcess('lootRoom', {room: 'W54S31', target: "W55S29"}, 0)
+global.OS.kernel.addProcess('lootRoom', {room: 'W59S39', target: "W51S39"}, 0)
 
-OS.kernel.addProcess('claimRoom', {room: 'W41S41', target: 'W39S46'}, 0);
+OS.kernel.addProcess('claimRoom', {room: 'W51S31', target: 'W43S29'}, 0);
 
 
 OS.kernel.addProcess('sourceKeeperAttacker', {room: 'W15S6', target: 'W15S5'}, 0)
 
 
-OS.kernel.addProcess('harrasRemote', {room: 'W4S3', target: "W5S3"}, 0)
+OS.kernel.addProcess('harrasRemote', {room: 'W51S31', target: "W43S29"}, 0)
 
 OS.kernel.addProcess('smallDrainer', {room: 'W51S32', target: "W47S31", creep: '3721_13920286'}, 0)
 
@@ -60,12 +63,12 @@ OS.kernel.addProcess('smallDrainer', {room: 'W51S32', target: "W47S31", creep: '
 
 OS.kernel.addProcess('wishHappyNewYear', {room: 'W54S31', target: 'W51S29'}, 0);
 
-OS.kernel.addProcess('fillNuke', {room: 'W52S41'}, 0);
+OS.kernel.addProcess('fillNuke', {room: 'W56S33'}, 0);
 
 
 ## Helmut
+OS.kernel.addProcess('dismantleWall', {room: 'W51S31', target: 'W43S29', targetWall: '5af767110adaa1321daaf1e0'}, 0);
 OS.kernel.addProcess('dismantleWall', {room: 'W52S41', target: 'W52S42', targetWall: '5bb39860163ccb197c5dc7fa'}, 0);
-OS.kernel.addProcess('dismantleWall', {room: 'W51S31', target: 'W54S39', targetWall: '5bcbb0f04aed1f4c736d3420'}, 0);
 
 _.forEach(Game.rooms['W55S23'].find(FIND_STRUCTURES), c => c.destroy())
 _.forEach(Game.rooms['W55S23'].find(FIND_MY_CREEPS), c => c.suicide())

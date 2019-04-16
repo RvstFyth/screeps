@@ -74,5 +74,17 @@ export class MapHelper
         }
         return rooms;
     }
+
+    public static nukesInRange(target: string) : string[]
+    {
+        let result: string[] = [];
+        const rooms = MapHelper.ownedRooms();
+        for(let i in rooms) {
+            if(Game.map.getRoomLinearDistance(target, rooms[i].name) <= NUKE_RANGE) {
+                result.push(rooms[i].name);
+            }
+        }
+        return result;
+    }
 }
 

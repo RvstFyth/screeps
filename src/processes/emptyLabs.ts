@@ -3,6 +3,7 @@ import {SpawnsHelper} from '../helpers/spawns'
 
 // META:
 // room
+// boosting
 export class EmptyLabs extends Process
 {
 
@@ -20,7 +21,10 @@ export class EmptyLabs extends Process
     }
     else if(Game.creeps[this.meta.creep]) {
       const creep = Game.creeps[this.meta.creep];
-      const labs = creep.room.labs.filter((l: StructureLab) => l.mineralAmount > 0);
+      let labs = creep.room.labs.filter((l: StructureLab) => l.mineralAmount > 0);
+      if(!this.meta.boosting) {
+        labs = labs.filter((l: StructureLab) => l.memory.state !== global.global.LAB_STATE.BOOSTING);
+      }
       if(_.sum(creep.carry) === 0) {
         if(!labs.length) {
           creep.suicide();

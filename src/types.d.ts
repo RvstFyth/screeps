@@ -57,6 +57,7 @@ interface Creep
   moveToRoom(roomName: string, ignoreSK?: boolean, prioritizeHighways?:boolean): any;
   _suicide() : any
   flee(targets: any, range:number) : any
+  boost(boosts: object) : any|void
 }
 
 interface Source
@@ -76,6 +77,7 @@ interface StructureController
 interface RoomPosition
 {
   isExitTile() : boolean
+  isWalkable(ignoreCreeps:boolean) : boolean
 }
 
 interface CreepMemory {

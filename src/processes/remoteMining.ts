@@ -52,7 +52,7 @@ export class RemoteMining extends Process
         const terrain = room.lookForAt(LOOK_TERRAIN, path[i].x, path[i].y);
         if(terrain && terrain.length) {
           if(terrain[0] !== 'wall') {
-            room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
+            // room.createConstructionSite(path[i].x, path[i].y, STRUCTURE_ROAD);
           }
         }
         // room.visual.circle(path[i].x, path[i].y, {
