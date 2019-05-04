@@ -443,7 +443,7 @@ export class ClaimRoom extends Process
   shouldRun()
   {
     const targetRoom = Game.rooms[this.meta.target];
-    if(targetRoom && targetRoom.controller && targetRoom.storage && targetRoom.spawns.length > 1) {
+    if(targetRoom && targetRoom.controller && targetRoom.storage) {
       return false;
     }
 
