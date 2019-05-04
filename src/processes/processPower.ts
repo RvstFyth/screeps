@@ -122,11 +122,12 @@ export class ProcessPower extends Process
                 creep.memory.harvesting = false;
             }
             if(creep.memory.harvesting) {
-                if(spawn.power === 0 && !creep.carry[RESOURCE_POWER]) {
+                if(spawn.power < spawn.powerCapacity && !creep.carry[RESOURCE_POWER]) {
                     if(creep.room.storage && creep.room.storage.store[RESOURCE_POWER]) {
                         const sAmount = creep.room.storage.store[RESOURCE_POWER];
+                        const needed = spawn.powerCapacity - spawn.power;
                         if(sAmount && sAmount > 100) {
-                            if(creep.withdraw(creep.room.storage, RESOURCE_POWER, 100) === ERR_NOT_IN_RANGE) {
+                            if(creep.withdraw(creep.room.storage, RESOURCE_POWER, needed) === ERR_NOT_IN_RANGE) {
                                 creep.moveTo(creep.room.storage);
                             }
                         }
