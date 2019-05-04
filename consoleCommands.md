@@ -11,14 +11,14 @@ OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALY
 OS.kernel.addProcess('autoMakeBoosts', {room: 'W56S33'}, 0);
 OS.kernel.addProcess('defence', {room: 'W56S33'}, 0);
 
-OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID]}, 0);
+OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID,RESOURCE_CATALYZED_KEANIUM_ALKALIDE]}, 0);
 
-OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ACID]}, 0);
+OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_KEANIUM_ALKALIDE]}, 0);
 
 ## Market & resource management
 OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 14000}, 0);
 
-global.OS.kernel.addProcess('haulResources', {room: 'W51S32', resource: RESOURCE_POWER, amount: 14000}, 0);
+global.OS.kernel.addProcess('haulResources', {room: 'W51S31', resource: RESOURCE_POWER, amount: 15000}, 0);
 
 
 global.OS.kernel.addProcess('emptyTerminal', {room: 'W51S31'}, 0)
@@ -40,22 +40,27 @@ _.forEach(Game.market.orders, (o) => !o.active ? Game.market.cancelOrder(o.id) :
 
 OS.kernel.addProcess('remoteMining', {room: 'W56S33', target: 'W57S34', sourceID: '59bbc3be2052a716c3ce6a6f'}, 0)
 OS.kernel.addProcess('claimController', {room: 'W52S41', target: 'W52S42'}, 0)
-OS.kernel.addProcess('remoteMining', {room: 'W4S3', target: 'W4S4', sourceID: '5aa67eab4e6a625357a6205f', miner: '28_30303827', hauler: '28_30303973'}, 0)
+
+OS.kernel.addProcess('remoteMining', {room: 'W2N2', target: 'W2N1', sourceID: '491f0774ad7dec8'}, 0)
 
 
 ## Offensive
-global.OS.kernel.addProcess('attackController', {room: 'W51S31', target: 'W43S29'}, 0)
+global.OS.kernel.addProcess('attackController', {room: 'W51S31', target: 'W51S28'}, 0)
 
 global.OS.kernel.addProcess('observer', {room: 'W51S31'}, 0)
 global.OS.kernel.addProcess('lootRoom', {room: 'W59S39', target: "W51S39"}, 0)
 
-OS.kernel.addProcess('claimRoom', {room: 'W51S31', target: 'W43S29'}, 0);
+
+
+OS.kernel.addProcess('claimRoom', {room: 'W51S32', target: 'E0S1'}, 0);
+
+
 
 
 OS.kernel.addProcess('sourceKeeperAttacker', {room: 'W15S6', target: 'W15S5'}, 0)
 
 
-OS.kernel.addProcess('harrasRemote', {room: 'W51S31', target: "W43S29"}, 0)
+OS.kernel.addProcess('harrasRemote', {room: 'W54S31', target: "W54S31"}, 0)
 
 OS.kernel.addProcess('smallDrainer', {room: 'W51S32', target: "W47S31", creep: '3721_13920286'}, 0)
 
@@ -63,11 +68,11 @@ OS.kernel.addProcess('smallDrainer', {room: 'W51S32', target: "W47S31", creep: '
 
 OS.kernel.addProcess('wishHappyNewYear', {room: 'W54S31', target: 'W51S29'}, 0);
 
-OS.kernel.addProcess('fillNuke', {room: 'W56S33'}, 0);
+OS.kernel.addProcess('fillNuke', {room: 'W51S31'}, 0);
 
 
 ## Helmut
-OS.kernel.addProcess('dismantleWall', {room: 'W51S31', target: 'W43S29', targetWall: '5af767110adaa1321daaf1e0'}, 0);
+OS.kernel.addProcess('dismantleWall', {room: 'W54S31', target: 'W52S26', targetWall: '5c62724f570b88549f8949f8'}, 0);
 OS.kernel.addProcess('dismantleWall', {room: 'W52S41', target: 'W52S42', targetWall: '5bb39860163ccb197c5dc7fa'}, 0);
 
 _.forEach(Game.rooms['W55S23'].find(FIND_STRUCTURES), c => c.destroy())

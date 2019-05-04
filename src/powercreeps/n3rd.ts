@@ -81,7 +81,27 @@ export class N3RD
 
         const ops = powerCreep.carry['ops'];
         let triggered = false;
-        if(powerCreep.powers[PWR_OPERATE_LAB] && global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', powerCreep.room.name)) {
+
+        // Regen source
+        if(powerCreep.powers[PWR_REGEN_SOURCE]) {
+            const cd: number|undefined = powerCreep.powers[PWR_REGEN_SOURCE].cooldown;
+            if(cd !== undefined && cd <= 0) {
+                const sources: Source[] = powerCreep.room.sources.filter((s: Source) => (!s.memory.boostedTS || s.memory.boostedTS + 270 < Game.time));
+                if(sources.length) {
+                    triggered = true;
+                    if(powerCreep.pos.inRangeTo(sources[0],3)) {
+                        if(powerCreep.usePower(PWR_REGEN_SOURCE, sources[0]) === OK) {
+                            sources[0].memory.boostedTS = Game.time;
+                        }
+                    }
+                    else {
+                        powerCreep.moveTo(sources[0].pos);
+                    }
+                }
+            }
+        }
+
+        if(!triggered && powerCreep.powers[PWR_OPERATE_LAB] && global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', powerCreep.room.name)) {
             const cd: number|undefined = powerCreep.powers[PWR_OPERATE_LAB].cooldown;
             if(cd !== undefined && cd <= 0 && ops  > 10) {
                 if(powerCreep.room.labs.length) {

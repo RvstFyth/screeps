@@ -109,6 +109,7 @@ interface PowerCreep {
   carryCapacity: number;
   memory: {spawnID: string};
   powers: PowerCreepPowers;
+  shard: string;
 
   renew(target: StructurePowerSpawn | StructurePowerBank) : OK | ERR_NOT_OWNER | ERR_BUSY | ERR_INVALID_TARGET | ERR_NOT_IN_RANGE;
 
@@ -172,6 +173,7 @@ type PWR_FORTIFY = 17;
 type PWR_OPERATE_CONTROLLER = 18;
 type RESOURCE_OPS = "ops";
 type FIND_HOSTILE_POWER_CREEPS = 121;
+type FIND_MY_POWER_CREEPS = 120;
 
 declare const PWR_GENERATE_OPS: 1;
 declare const PWR_OPERATE_SPAWN: 2;
@@ -193,3 +195,4 @@ declare const PWR_FORTIFY: 17;
 declare const PWR_OPERATE_CONTROLLER: 18;
 declare const RESOURCE_OPS: "ops";
 declare const FIND_HOSTILE_POWER_CREEPS: 121;
+declare const FIND_MY_POWER_CREEPS: 120;

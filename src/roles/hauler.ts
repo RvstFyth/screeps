@@ -19,6 +19,10 @@ export class Hauler
       if(source && c) {
         const resources = creep.room.find(FIND_DROPPED_RESOURCES);
         const inRange = source.pos.findInRange(resources, 1);
+        const tombstones = creep.pos.findInRange(FIND_TOMBSTONES, 1);
+        if(tombstones.length && tombstones[0].store[RESOURCE_ENERGY] > 0) {
+          creep.withdraw(tombstones[0], RESOURCE_ENERGY);
+        }
         if(inRange.length) {
           if(!creep.pos.isNearTo(inRange[0])) {
             creep.moveTo(inRange[0], {

@@ -144,7 +144,7 @@ export class Transporter
           if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000 && creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 50000) {
             creep.memory.targetID = creep.room.terminal.id;
           }
-          else if(creep.room.nuker && creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 80000) {
+          else if(creep.room.nuker && creep.room.nuker.energy < creep.room.nuker.energyCapacity && creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 80000) {
             creep.memory.targetID = creep.room.nuker.id;
           }
         }

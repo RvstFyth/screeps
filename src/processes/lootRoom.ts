@@ -1,5 +1,6 @@
 import {Process} from '../ROS/process'
 import {SpawnsHelper} from '../helpers/spawns'
+import { MapHelper } from 'helpers/map';
 
 // META:
 // room
@@ -10,8 +11,20 @@ export class LootRoom extends Process
 
     run ()
     {
-        // this.state = 'killed';
-        // this.meta.target = 'W55S33'
+
+        /**
+         * When the creep is hauling resources back target is current roomIndex - 1
+         * When the creep is going to fetch resources target is currentRoomINdex + 1
+         *
+         * Deciding if a new trip is worth it can be based on this.meta.roomsToTravel.length multiplied by a number between 2.2 and 3.
+         * need to do some math on that.
+         */
+        if(!this.meta.roomsToTravel) {
+            let route = MapHelper.findRoute(this.meta.room, this.meta.target);
+            if(route !== -2 && route.length) {
+                this.meta.roomsToTravel = route.map((s) => s.room);
+            }
+        }
         if(typeof this.meta.doneLooting === 'undefined') {
             this.meta.doneLooting = false;
             this.meta.shouldKill = false;
@@ -62,32 +75,7 @@ export class LootRoom extends Process
             }
             if(creep.memory.harvesting) {
                 if(creep.room.name !== this.meta.target) {
-                    creep.moveTo(new RoomPosition(25,25,this.meta.target), {
-                      reusePath: 17,
-                      range: 20,
-                      costCallback: function(roomName: string, costMatrix: CostMatrix) {
-                        const sourceKeepersLiar = creep.room.find(FIND_STRUCTURES, {
-                          filter: (s: Structure) => s.structureType === STRUCTURE_KEEPER_LAIR
-                        });
-
-                        if(sourceKeepersLiar.length) {
-                          for(let i in sourceKeepersLiar) {
-                            const sX = sourceKeepersLiar[i].pos.x;
-                            const sY = sourceKeepersLiar[i].pos.y;
-                            //costMatrix.set(sX,sY,255);
-                            // Loop throug Y
-                            for(let y = (sY - 5), yEnd = (sY + 5); y < yEnd; y++) {
-                              for(let x = (sX - 5), xEnd = (sX + 5); x < xEnd; x++) {
-                                costMatrix.set(x,y,60);
-                              }
-                            }
-                            costMatrix.set(sX,sY,150);
-                          }
-                        }
-
-                        return costMatrix;
-                      }
-                    });
+                    creep.moveToRoom(this.meta.target, true, true);
                   }
                 else {
                     if(!this.meta.shouldKill) {

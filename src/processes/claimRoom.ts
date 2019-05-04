@@ -71,7 +71,7 @@ export class ClaimRoom extends Process
             if(creep.pos.inRangeTo(target, 3)) {
               creep.rangedAttack(target);
             }
-            creep.flee(hostiles, 4);
+            creep.flee(hostiles, 3);
             // else {
             //   creep.moveTo(target);
             // }
@@ -87,28 +87,32 @@ export class ClaimRoom extends Process
             if(target && creep.pos.isNearTo(target)) {
               creep.heal(target);
             }
-            else if(target && creep.pos.inRangeTo(target, 3)) {
+            if(target){
+              creep.moveTo(target);
+            }
+            if(target && creep.pos.inRangeTo(target, 3)) {
               creep.rangedHeal(target);
             }
+
           }
           else {
             // const spawns = SpawnsHelper.getAvailableSpawns(creep.room);
             if(creep.ticksToLive && creep.ticksToLive < 500 && creep.room.energyAvailable === creep.room.energyCapacityAvailable) {
-              if(SpawnsHelper.spawnAvailable(room)) {
-                const target: StructureSpawn|null = creep.pos.findClosestByRange(SpawnsHelper.getAvailableSpawns(creep.room));
-                let builders: Creep[] = [];
-                if(target) {
-                  builders = target.pos.findInRange(target.room.find(FIND_MY_CREEPS, {
-                    filter: (c:Creep) => c.memory.role === 'claimRoom_builder'
-                  }), 3);
-                }
-                if(!builders.length && target && creep.pos.isNearTo(target)) {
-                  target.renewCreep(creep);
-                }
-                else if(target) {
-                  creep.moveTo(target);
-                }
-              }
+              // if(SpawnsHelper.spawnAvailable(room)) {
+              //   const target: StructureSpawn|null = creep.pos.findClosestByRange(SpawnsHelper.getAvailableSpawns(creep.room));
+              //   let builders: Creep[] = [];
+              //   if(target) {
+              //     builders = target.pos.findInRange(target.room.find(FIND_MY_CREEPS, {
+              //       filter: (c:Creep) => c.memory.role === 'claimRoom_builder'
+              //     }), 3);
+              //   }
+              //   if(!builders.length && target && creep.pos.isNearTo(target)) {
+              //     target.renewCreep(creep);
+              //   }
+              //   else if(target) {
+              //     creep.moveTo(target);
+              //   }
+              // }
             }
             else {
               const hostileExtensions = creep.room.find(FIND_HOSTILE_STRUCTURES, {
@@ -178,6 +182,15 @@ export class ClaimRoom extends Process
         }
       }
       else {
+        // let carryLimit = creep.carryCapacity;
+        // if(creep.hits < creep.hitsMax) {
+        //   const bodyCount = creep.body.length;
+        //   const moveParts = creep.getActiveBodyparts(MOVE);
+        //   const workParts = creep.getActiveBodyparts(WORK);
+        //   if(moveParts < bodyCount / 2) {
+
+        //   }
+        // }
         if(creep.carry[RESOURCE_ENERGY] === 0) {
           creep.memory.harvesting = true;
           creep.memory.targetID = null;
@@ -202,14 +215,14 @@ export class ClaimRoom extends Process
             }
           }
 
-          else if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 20000) {
-            if(creep.pos.isNearTo(creep.room.storage)) {
-              creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
-            }
-            else {
-              creep.moveTo(creep.room.storage);
-            }
-          }
+          // else if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 20000) {
+          //   if(creep.pos.isNearTo(creep.room.storage)) {
+          //     creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
+          //   }
+          //   else {
+          //     creep.moveTo(creep.room.storage);
+          //   }
+          // }
           else if(source && !creep.pos.inRangeTo(source, 2)) {
             creep.moveTo(source);
           }
@@ -430,7 +443,7 @@ export class ClaimRoom extends Process
   shouldRun()
   {
     const targetRoom = Game.rooms[this.meta.target];
-    if(targetRoom && targetRoom.controller && targetRoom.controller.level >= 6 && targetRoom.spawns.length > 1) {
+    if(targetRoom && targetRoom.controller && targetRoom.storage && targetRoom.spawns.length > 1) {
       return false;
     }
 

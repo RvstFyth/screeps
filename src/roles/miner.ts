@@ -31,9 +31,20 @@ export class Miner
           }
         }
         else {
-          creep.harvest(source);
+          if(source.energy > 0) {
+              creep.harvest(source);
+          }
+          else {
+              const containers = creep.pos.findInRange(creep.room.containers, 1).filter((c: StructureContainer) => c.store[RESOURCE_ENERGY] > 0);
+              if(link && containers.length && link.energy < link.energyCapacity) {
+                creep.withdraw(containers[0], RESOURCE_ENERGY);
+              }
+          }
           if(link && creep.getActiveBodyparts(CARRY) > 0) {
-            if(creep.carry[RESOURCE_ENERGY] === creep.carryCapacity) {
+            const miningPower = creep.getActiveBodyparts(WORK) * HARVEST_POWER;
+            const freeCarry = creep.carryCapacity - creep.carry[RESOURCE_ENERGY];
+
+            if(freeCarry < miningPower) {
               creep.transfer(link, RESOURCE_ENERGY);
             }
           }
@@ -78,6 +89,32 @@ export class Miner
     //     bodyParts = [WORK, MOVE]; // 150
     // }
     // else
+
+    // POWER CREEPS STUFF
+    // 8, 10, 12, 14, 16
+    let powerCreeps: PowerCreep[] = [];
+    for(let n in Game.powerCreeps) {
+      if(Game.powerCreeps[n].shard && Game.powerCreeps[n].room && Game.powerCreeps[n].room.name === room.name) {
+        powerCreeps.push(Game.powerCreeps[n]);
+      }
+    }
+    if(powerCreeps.length) {
+        const pc: PowerCreep = powerCreeps[0];
+        if(pc.powers[PWR_REGEN_SOURCE]) {
+          const lvl = pc.powers[PWR_REGEN_SOURCE].level;
+          const parts = [5, 8, 10, 12, 14, 16];
+          let workParts = parts[lvl];
+          let body = [];
+          for(let i = 0; i < workParts; i++) {
+            body.push(MOVE);
+            body.push(WORK);
+          }
+          body.push(CARRY);
+          body.push(CARRY);
+          return body;
+        }
+    }
+
     if(room.energyCapacityAvailable <= 450) {
         bodyParts = [WORK,WORK,MOVE,MOVE]; // 300
     }

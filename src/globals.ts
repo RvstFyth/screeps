@@ -1,3 +1,5 @@
+import { MapHelper } from "helpers/map";
+
 global.LAB_STATE = {
     IDLE: 0,
     SUPPLY: 1,
@@ -64,6 +66,21 @@ global.BOOST_COMPONENTS = {
         [RESOURCE_CATALYZED_UTRIUM_ALKALIDE]: [RESOURCE_UTRIUM_ALKALIDE, RESOURCE_CATALYST]
 };
 
+global.findRouteCLI = function(room: string, target: string)
+{
+    let route = MapHelper.findRoute(room, target,  {
+        ignoreSK: true,
+        prioritizeHighways: true
+    });
+
+    if(route !== -2 && route.length) {
+        let rooms = route.map((s) => s.room);
+        console.log(`${room} to ${target} : ${rooms.length} rooms total:  ${JSON.stringify(rooms)}`)
+    }
+    else {
+        console.log(`Failed to find a route for: ${room} => ${target}`);
+    }
+}
 "use strict";
 // League Of Automated Nations allied users list by Kamots
 // Provides global.LOANlist as array of allied usernames. Array is empty if not in an alliance, but still defined.

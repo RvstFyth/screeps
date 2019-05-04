@@ -35,19 +35,27 @@ export class DismantleWall extends Process
         //this.state = 'killed';
         //this.meta.healer = '486_11251055';
 
-        //  if(this.ID == 506) {
-        //     this.meta.targetWall = '5bf84d5f57542e5b73d6e3c4';
-        // }
+          if(this.ID == 3836) {
+             //this.meta.target = 'W53S26';
+             this.meta.target = 'W52S26';
+         }
 
 
         const requiredBoosts = [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID];
+        // const healerBody = [
+        //     TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
+        //     MOVE,MOVE,
+        //     RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,
+        //     HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,
+        //     MOVE,MOVE,MOVE,MOVE,MOVE
+        // ];
         const healerBody = [
             TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
-            MOVE,MOVE,
-            RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,
-            HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,
-            MOVE,MOVE,MOVE,MOVE,MOVE
+            MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,
+            RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,
+            HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,HEAL
         ];
+
         const dismantlerBody = [
             TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
             MOVE,MOVE,
@@ -137,11 +145,15 @@ export class DismantleWall extends Process
                         }
                     }
                     healer.moveTo(dismantler);
-                    if(dismantler.hits < dismantler.hitsMax) {
+                    if(dismantler.getActiveBodyparts(TOUGH) < 7) {
                         healer.heal(dismantler);
                     }
                     else {
                         healer.heal(healer);
+                    }
+                    const hostiles = healer.pos.findInRange(healer.room.hostiles, 3);
+                    if(hostiles.length) {
+                        healer.rangedAttack(hostiles[0]);
                     }
                 }
                 else {
@@ -159,7 +171,7 @@ export class DismantleWall extends Process
         let labs;
 
         if(mKey === 'hBoosted') {
-            partsToBoost = [MOVE,TOUGH,HEAL];
+            partsToBoost = [MOVE,TOUGH,HEAL,RANGED_ATTACK];
             current = this.meta.hCurrent;
         }
         else if(mKey === 'dBoosted') {
@@ -170,8 +182,11 @@ export class DismantleWall extends Process
         if(typeof partsToBoost[current] === 'undefined') {
             this.meta[mKey] = true;
         }
-        else {
+        else { // catalyzed keanium alka
             switch(partsToBoost[current]) {
+                case RANGED_ATTACK:
+                    mineral = RESOURCE_CATALYZED_KEANIUM_ALKALIDE;
+                    break;
                 case MOVE:
                   mineral = RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE;
                   break;
@@ -231,7 +246,7 @@ export class DismantleWall extends Process
             if(this.meta.targetWall) {
                 let wall: StructureWall|StructureRampart|null = Game.getObjectById(this.meta.targetWall);
                 if(!wall) {
-                    wall = Game.getObjectById('5b9be992c176a8157dd3421a');
+                    wall = Game.getObjectById('5c627252cd665a6d42690e26');
                 }
                 if(wall) {
                     if(!dismantler.pos.isNearTo(wall)) {
@@ -259,43 +274,57 @@ export class DismantleWall extends Process
                     // if(dismantler.room.storage) {
                     //     target = dismantler.room.storage;
                     // }
-                    if(dismantler.room.spawns.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
+                    try {
+                        const structures = dismantler.room.find(FIND_STRUCTURES, {
+                            filter: (s: Structure) => s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_TOWER || s.structureType === STRUCTURE_EXTENSION ||
+                                s.structureType === STRUCTURE_LAB || s.structureType === STRUCTURE_OBSERVER || s.structureType === STRUCTURE_POWER_SPAWN
+                        });
+                        const withoutRamparts = structures.filter((s: Structure) => !s.pos.lookFor(LOOK_STRUCTURES).filter((s:Structure) => s.structureType === STRUCTURE_RAMPART).length);
+
+                        if(withoutRamparts.length) {
+                            const towers = withoutRamparts.filter((s:Structure) => s.structureType === STRUCTURE_TOWER);
+                            if(towers.length) target = dismantler.pos.findClosestByRange(towers);
+                            else {
+                                const spawns = withoutRamparts.filter((s:Structure) => s.structureType === STRUCTURE_SPAWN);
+                                if(spawns.length) target = dismantler.pos.findClosestByRange(spawns);
+                                else target = dismantler.pos.findClosestByRange(withoutRamparts);
+                            }
+                        }
                     }
-                    else if(dismantler.room.towers.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.towers);
+                    catch(e) {
+                        console.log(`Error in defining target for dismantler`);
                     }
-                    else if(dismantler.room.extensions.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
-                    }
-                    // else if(dismantler.room.terminal) {
-                    //     target = dismantler.room.terminal;
-                    // }
-                    else if(dismantler.room.spawns.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
-                    }
-                    else if(dismantler.room.extensions.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
-                    }
-                    // else if(dismantler.room.terminal) {
-                    //     target = dismantler.room.terminal;
-                    // }
-                    // else if(dismantler.room.storage) {
-                    //     target = dismantler.room.storage;
-                    // }
-                    else if(dismantler.room.labs.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.labs);
-                    }
-                    else if(dismantler.room.containers.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.containers);
-                    }
-                    else if(dismantler.room.links.length) {
-                        target = dismantler.pos.findClosestByRange(dismantler.room.links);
+
+                    if(!target) {
+                        if(dismantler.room.spawns.length) {
+                            target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
+                        }
+                        else if(dismantler.room.towers.length) {
+                            target = dismantler.pos.findClosestByRange(dismantler.room.towers);
+                        }
+                        else if(dismantler.room.extensions.length) {
+                            target = dismantler.pos.findClosestByRange(dismantler.room.extensions);
+                        }
+                        // else if(dismantler.room.terminal) {
+                        //     target = dismantler.room.terminal;
+                        // }
+                        // else if(dismantler.room.storage) {
+                        //     target = dismantler.room.storage;
+                        // }
+                        else if(dismantler.room.labs.length) {
+                            target = dismantler.pos.findClosestByRange(dismantler.room.labs);
+                        }
+                        else if(dismantler.room.containers.length) {
+                            target = dismantler.pos.findClosestByRange(dismantler.room.containers);
+                        }
+                        else if(dismantler.room.links.length) {
+                            target = dismantler.pos.findClosestByRange(dismantler.room.links);
+                        }
                     }
                     if(target) {
                         if(dismantler.dismantle(target) === ERR_NOT_IN_RANGE) {
                             if(dismantler.pos.isNearTo(healer) && dismantler.fatigue === 0 && healer.fatigue === 0) {
-                                dismantler.moveTo(target);
+                                dismantler.moveTo(target, {maxRooms: 1});
                             }
                             const structures = dismantler.pos.findInRange(dismantler.room.extensions, 1);
                             if(structures.length) {
@@ -388,7 +417,7 @@ export class DismantleWall extends Process
                 }
             }
         }
-        else if(healer.getActiveBodyparts(TOUGH) < 7) {
+        else if(healer.getActiveBodyparts(TOUGH) < 8) {
             healer.heal(healer);
         }
         else {
@@ -445,5 +474,10 @@ export class DismantleWall extends Process
                 }
             }
         }
+    }
+
+    defineDismantleTarget(room: Room)
+    {
+
     }
 }

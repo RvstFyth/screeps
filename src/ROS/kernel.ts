@@ -34,7 +34,6 @@ import {IntershardClaim2} from '../processes/intershardClaim2'
 import {AutoMakeBoosts} from '../processes/autoMakeBoosts'
 import {SourceKeeperAttacker} from '../processes/sourceKeeperAttacker'
 import {AlliResourceRequests} from '../processes/alliResourceRequests'
-import {Chemist} from '../processes/chemist';
 import {SmallDrainer} from '../processes/smallDrainer';
 import {Resources} from '../processes/resources';
 import {EmptyOwnedRoom} from '../processes/emptyOwnedRoom'
@@ -92,7 +91,6 @@ const Processes = <{[type: string]: any}> {
   'autoMakeBoosts': AutoMakeBoosts,
   'sourceKeeperAttacker': SourceKeeperAttacker,
   'alliResourceRequests': AlliResourceRequests,
-  'chemist': Chemist,
   'smallDrainer': SmallDrainer,
   'resources': Resources,
   'emptyOwnedRoom': EmptyOwnedRoom,

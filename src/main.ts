@@ -4,6 +4,7 @@ import {PathingHelper} from 'helpers/pathing'
 import 'prototypes/Room';
 import 'prototypes/Creep';
 import 'prototypes/RoomObject';
+import 'prototypes/RoomPosition';
 import 'prototypes/StructureLab';
 import 'prototypes/RoomVisual';
 import 'prototypes/Source';

@@ -122,9 +122,8 @@ export class RemoteMining extends Process
         }
         if(room.controller && room.controller.level >= 8 && room.storage && room.storage.my) {
           if(this.meta.lCreeps && this.meta.lCreeps.length) {
-            _.forEach(this.meta.lCreeps, n => n.suicide());
+            _.forEach(this.meta.lCreeps, n => Game.creeps[n].suicide());
           }
-          // console.log(1);
           this.handleCreeps();
           this.checkContainers();
         }

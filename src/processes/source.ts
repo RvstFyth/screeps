@@ -36,8 +36,18 @@ export class Source extends Process
           filter: (c: StructureContainer) => _.sum(c.store) > 0
         });
 
+      const filledContainers =  source.pos.findInRange(source.room.containers, 1, {
+          filter: (c: StructureContainer) => _.sum(c.store) === c.storeCapacity
+      });
       // hauler
-      const canSpawn = !link && source.room.storage && source.room.storage.my && (!this.meta.hauler || !Game.creeps[this.meta.hauler]);
+      let canSpawn = false;
+      if(filledContainers.length) {
+        canSpawn = true;
+      }
+      else if(!link && source.room.storage && source.room.storage.my && (!this.meta.hauler || !Game.creeps[this.meta.hauler])) {
+        canSpawn = true;
+      }
+
       this.handleHaulers(canSpawn);
     }
     else {
@@ -73,7 +83,7 @@ export class Source extends Process
       if(s) {
         const containers: StructureContainer[] = s.pos.findInRange(s.room.containers, 1);
         if(containers && containers.length) {
-          if(containers[0].store[RESOURCE_ENERGY] === containers[0].storeCapacity) {
+          if(s.room.controller.level < 8 && containers[0].store[RESOURCE_ENERGY] === containers[0].storeCapacity) {
             maxHaulers = 2;
           }
         }

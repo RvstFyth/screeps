@@ -70,7 +70,11 @@ export class FillNuke extends Process
                             let diff;
                             if(resource === RESOURCE_ENERGY) diff = room.nuker.energyCapacity - room.nuker.energy;
                             else  diff = room.nuker.ghodiumCapacity - room.nuker.ghodium;
-                            const amount = diff > creep.carryCapacity ? creep.carryCapacity : diff;
+                            let amount = diff > creep.carryCapacity ? creep.carryCapacity : diff;
+                            let targetAmount = target.store[resource];
+                            if(targetAmount && targetAmount < amount) {
+                                amount = targetAmount;
+                            }
                             creep.withdraw(target, resource, amount);
                             if(amount < creep.carryCapacity) creep.memory.harvesting = false;
                         }

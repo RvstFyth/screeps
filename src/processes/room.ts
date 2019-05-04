@@ -41,14 +41,25 @@ export class Room extends Process
       }
     }
 
+    if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('towers', 'room', room.name) && room.towers.length) {
+      global.OS.kernel.addProcess('towers', {room: room.name}, this.ID);
+    }
+
+    if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('spawns', 'room', room.name)) {
+      global.OS.kernel.addProcess('spawns', {room: room.name}, this.ID);
+    }
+
     //if(room.controller && room.controller.level > 3) StructuresHelper.planRoom(room);
     // console.log(`Running room ${room.name}`);
     let rcl = room.controller && room.controller.level ? room.controller.level : 0;
     if(Game.shard.name.toLowerCase() === 'shard3') {
       this.meta.support = false;
     }
-    if(typeof this.meta.support !== 'undefined' && this.meta.support && rcl < 6) {
+    if(typeof this.meta.support !== 'undefined' && this.meta.support && !room.storage) {
       return;
+    }
+    else if (this.meta.support && room.storage) {
+      this.meta.support = false;
     }
 
     if(rcl && rcl <= 8 && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('room_bootstrap', 'room', room.name)) {
@@ -64,20 +75,12 @@ export class Room extends Process
       }
     }
 
-    if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('spawns', 'room', room.name)) {
-      global.OS.kernel.addProcess('spawns', {room: room.name}, this.ID);
-    }
-
     if(typeof room.storage !== 'undefined' && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('transport', 'room', room.name)) {
       global.OS.kernel.addProcess('transport', {room: room.name}, this.ID);
     }
 
     if(typeof room.storage !== 'undefined' && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('upgradeRoom', 'room', room.name)) {
       global.OS.kernel.addProcess('upgradeRoom', {room: room.name}, this.ID);
-    }
-
-    if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('towers', 'room', room.name) && room.towers.length) {
-      global.OS.kernel.addProcess('towers', {room: room.name}, this.ID);
     }
 
     if(rcl && rcl >= 5) {

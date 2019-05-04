@@ -64,7 +64,8 @@ export class Worker
              const transporter = creep.room.find(FIND_MY_CREEPS, {
               filter: (c: Creep) => c.memory.target === 'transporter'
              });
-             if(!hasLink && storageCreeps.length < 2) {
+             const isRemote = creep.memory.role === 'claimRoom_builder' ;
+             if(!hasLink && storageCreeps.length < 2 && (!isRemote || (isRemote && creep.room.storage.store[RESOURCE_ENERGY] < 20000))) {
                target = 'storage';
                targetID = creep.room.storage.id;
              }
