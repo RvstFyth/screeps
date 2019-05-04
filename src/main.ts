@@ -83,17 +83,18 @@ export const loop = ErrorMapper.wrapLoop(() => {
     }
   }
 
-  const lastGCL = Memory.stats['gcl.'+Game.shard.name+'.progress'];
-  Memory.stats['gcl.'+Game.shard.name+'.tick'] = Game.gcl.progress - lastGCL > 0 ? Game.gcl.progress - lastGCL : Game.gcl.progress;
+  let stats: any = {};
+  //const lastGCL = Memory.stats['gcl.'+Game.shard.name+'.progress'];
+  //Memory.stats['gcl.'+Game.shard.name+'.tick'] = Game.gcl.progress - lastGCL > 0 ? Game.gcl.progress - lastGCL : Game.gcl.progress;
 
-  Memory.stats['cpu.'+Game.shard.name+'.getUsed'] = Game.cpu.getUsed()
-  Memory.stats['cpu.'+Game.shard.name+'.limit'] = Game.cpu.limit
-  Memory.stats['cpu.'+Game.shard.name+'.bucket'] = Game.cpu.bucket
-  Memory.stats['gcl.'+Game.shard.name+'.progress'] = Game.gcl.progress
-  Memory.stats['gcl.'+Game.shard.name+'.progressTotal'] = Game.gcl.progressTotal
-  Memory.stats['gcl.'+Game.shard.name+'.level'] = Game.gcl.level
-  Memory.stats['creepCount'] = undefined;
-  Memory.stats['creepCnt.'+Game.shard.name] = Object.keys(Game.creeps).length;
+  stats['cpu.'+Game.shard.name+'.getUsed'] = Game.cpu.getUsed()
+  stats['cpu.'+Game.shard.name+'.limit'] = Game.cpu.limit
+  stats['cpu.'+Game.shard.name+'.bucket'] = Game.cpu.bucket
+  stats['gcl.'+Game.shard.name+'.progress'] = Game.gcl.progress
+  stats['gcl.'+Game.shard.name+'.progressTotal'] = Game.gcl.progressTotal
+  stats['gcl.'+Game.shard.name+'.level'] = Game.gcl.level
+  stats['creepCount'] = undefined;
+  stats['creepCnt.'+Game.shard.name] = Object.keys(Game.creeps).length;
 
   let energyTotal = 0;
   for(let i in Game.rooms) {
@@ -102,23 +103,23 @@ export const loop = ErrorMapper.wrapLoop(() => {
       energyTotal += room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
       //energyTotal += room.terminal ? room.terminal.store[RESOURCE_ENERGY] : 0;
     }
-  }
+  } // 134k
 
-  Memory.stats['energy.'+Game.shard.name+'.total'] = energyTotal;
+  stats['energy.'+Game.shard.name+'.total'] = energyTotal;
 
   _.forEach(Object.keys(Game.rooms), function(roomName){
     let room = Game.rooms[roomName]
 
     if(room.controller && room.controller.my){
-      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.level'] = room.controller.level
-      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.progress'] = room.controller.progress
-      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.progressTotal'] = room.controller.progressTotal
+      stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.level'] = room.controller.level
+      stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.progress'] = room.controller.progress
+      stats['rooms.' + Game.shard.name + '.' + roomName + '.rcl.progressTotal'] = room.controller.progressTotal
 
-      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.spawn.energy'] = room.energyAvailable
-      Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.spawn.energyTotal'] = room.energyCapacityAvailable
+      stats['rooms.' + Game.shard.name + '.' + roomName + '.spawn.energy'] = room.energyAvailable
+      stats['rooms.' + Game.shard.name + '.' + roomName + '.spawn.energyTotal'] = room.energyCapacityAvailable
 
       if(room.storage){
-        Memory.stats['rooms.' + Game.shard.name + '.' + roomName + '.storage.energy'] = room.storage.store.energy
+        stats['rooms.' + Game.shard.name + '.' + roomName + '.storage.energy'] = room.storage.store.energy
       }
     }
   })
@@ -126,12 +127,12 @@ export const loop = ErrorMapper.wrapLoop(() => {
   if(typeof Game.cpu.getHeapStatistics !== 'undefined') {
     const heap = Game.cpu.getHeapStatistics();
     if(heap) {
-      Memory.stats['heap.'+Game.shard.name+'.usage'] = (heap.total_heap_size + heap.externally_allocated_size) / heap.heap_size_limit;
+      stats['heap.'+Game.shard.name+'.usage'] = (heap.total_heap_size + heap.externally_allocated_size) / heap.heap_size_limit;
     }
   }
 
   try {
-    RawMemory.segments[99] = JSON.stringify(Memory.stats);
+    RawMemory.segments[99] = JSON.stringify(stats);
   }
   catch(e) {
     console.log(`Failed to push stats to segment!`);
