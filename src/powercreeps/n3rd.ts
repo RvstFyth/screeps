@@ -123,7 +123,8 @@ export class N3RD
 
         if(!triggered && powerCreep.powers[PWR_OPERATE_EXTENSION]) {
             const extensions = powerCreep.room.extensions.filter((e: StructureExtension) => e.energy < e.energyCapacity);
-            if(extensions.length > 5 && powerCreep.room.storage) {
+            const cd: number|undefined = powerCreep.powers[PWR_OPERATE_EXTENSION].cooldown;
+            if(cd !== undefined && cd <= 0 && extensions.length > 5 && powerCreep.room.storage) {
                 triggered = true;
                 if(powerCreep.pos.inRangeTo(powerCreep.room.storage, 2)) {
                     powerCreep.usePower(PWR_OPERATE_EXTENSION, powerCreep.room.storage);
