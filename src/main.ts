@@ -56,6 +56,14 @@ if(!Memory.attackedRemotes) {
   Memory.attackedRemotes = {};
 }
 
+/**
+ * Memory.remotes['W51S31']['W51S32'][0] <= SourceID
+ * Memory.remotes['W51S31']['W51S32'][1] <= SourceID
+ */
+if(!Memory.remotes) {
+  Memory.remotes = {};
+}
+
 export const loop = ErrorMapper.wrapLoop(() => {
   Memory.triggeredConstruction = false;
   let cpu = Game.cpu.getUsed();

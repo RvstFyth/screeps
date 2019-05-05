@@ -80,6 +80,18 @@ export class RemoteMining extends Process
         this.initRoom(source, room);
       }
     }
+    try {
+      if(!Memory.remotes[this.meta.room]) Memory.remotes[this.meta.room] = {};
+      if(!Memory.remotes[this.meta.room][this.meta.target]) Memory.remotes[this.meta.room][this.meta.target] = [];
+      if(Memory.remotes[this.meta.room][this.meta.target].indexOf(this.meta.sourceID) < 0) {
+        Memory.remotes[this.meta.room][this.meta.target].push(this.meta.sourceID);
+        console.log(`Registered remote ${this.meta.target} for room ${this.meta.room}. SourceID: ${this.meta.sourceID}`);
+      }
+    }
+    catch(e) {
+      console.log(`Failed to register remote ${this.meta.target} | ${JSON.stringify(e)}`)
+    }
+
     // if(source && source.room.name === 'W59S23') {
     //   this.checkRoads(source.room)
     // }
