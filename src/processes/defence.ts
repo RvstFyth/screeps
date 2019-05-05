@@ -26,7 +26,7 @@ export class Defence extends Process
 
         const room = Game.rooms[this.meta.room];
         const creep = Game.creeps[this.meta.creep];
-        const shouldSpawn = room.storage && room.storage.store[RESOURCE_ENERGY] > 60000;
+        const shouldSpawn = room.storage && room.storage.store[RESOURCE_ENERGY] > 40000;
 
         if(room && room.controller && room.controller.my) {
             if(shouldSpawn && !creep && room.energyAvailable === room.energyCapacityAvailable) {
@@ -46,20 +46,17 @@ export class Defence extends Process
             else if(creep) {
                 if(!room.hostiles.length && this.meta.targetRoom === this.meta.room) {
                     // Nothing to do in the core rome, check if there is a remote under attack!
-                    const keys = Object.keys(Memory.attackedRemotes);
-                    if(keys && keys.length) {
-                        for(let i = 0, iEnd = keys.length; i < iEnd; i++) {
-                            if(Memory.attackedRemotes[keys[i]] <= 2) {
-                                this.meta.targetRoom = keys[i];
-                                break;
-                            }
+                    for(let i in Memory.attackedRemotes) {
+                        if(Memory.attackedRemotes[i] <= 2) {
+                            this.meta.targetRoom = i;
+                            break;
                         }
                     }
                 }
-                if(creep.room.name === this.meta.targetRoom && !creep.room.hostiles.length) {
+                if(creep.room.name !== this.meta.room && creep.room.name === this.meta.targetRoom && !creep.room.hostiles.length) {
                     this.meta.targetRoom = this.meta.room;
                 }
-                if(!Memory.attackedRemotes[this.meta.target]) {
+                if(!Memory.attackedRemotes[this.meta.targetRoom]) {
                     this.meta.targetRoom = this.meta.room;
                 }
                 if(!this.meta.shouldRenew && creep.ticksToLive && creep.ticksToLive < 600) {

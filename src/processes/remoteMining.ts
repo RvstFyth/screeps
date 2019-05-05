@@ -63,10 +63,16 @@ export class RemoteMining extends Process
 
   run()
   {
+
     const room = Game.rooms[this.meta.room];
     const source: Source|null = Game.getObjectById(this.meta.sourceID);
     if(this.suspendedTill && this.suspendedTill > 0 && Game.time < this.suspendedTill) {
       if(Memory.attackedRemotes[this.meta.target]) {
+        const hostiles = Game.rooms[this.meta.target].hostiles.filter((c: Creep) => c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(HEAL) || c.getActiveBodyparts(RANGED_ATTACK));
+        if(Game.rooms[this.meta.target] && !hostiles.length) {
+          Memory.attackedRemotes[this.meta.target] = undefined;
+          this.suspendedTill = 0;
+        }
         return;
       }
     }
@@ -110,7 +116,7 @@ export class RemoteMining extends Process
 
     if(room && room.controller && room.controller.my) {
       if((!this.suspendedTill || this.suspendedTill === 0) && Game.rooms[this.meta.target] && Game.rooms[this.meta.target].hostiles) {
-        const invaders: Creep[] = Game.rooms[this.meta.target].hostiles.filter((c: Creep) => c.owner.username.toLowerCase() === 'invader');
+        const invaders: Creep[] = Game.rooms[this.meta.target].hostiles.filter((c: Creep) => c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(HEAL) || c.getActiveBodyparts(RANGED_ATTACK));
         if(invaders.length) {
           const maxInvader: Creep = _.max(invaders, i => i.ticksToLive);
           if(maxInvader.ticksToLive) {
