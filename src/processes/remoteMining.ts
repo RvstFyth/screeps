@@ -67,7 +67,7 @@ export class RemoteMining extends Process
     const room = Game.rooms[this.meta.room];
     const source: Source|null = Game.getObjectById(this.meta.sourceID);
     if(this.suspendedTill && this.suspendedTill > 0 && Game.time < this.suspendedTill) {
-      if(Memory.attackedRemotes[this.meta.target]) {
+      if(Memory.attackedRemotes[this.meta.target] && Game.rooms[this.meta.target]) {
         const hostiles = Game.rooms[this.meta.target].hostiles.filter((c: Creep) => c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(HEAL) || c.getActiveBodyparts(RANGED_ATTACK));
         if(Game.rooms[this.meta.target] && !hostiles.length) {
           Memory.attackedRemotes[this.meta.target] = undefined;
