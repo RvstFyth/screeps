@@ -19,7 +19,7 @@ export class N3RD
                 powerCreep.memory.spawnID = powerSpawns[0].id;
             }
         }
-
+        let triggered = false;
         const powerSpawn: StructurePowerSpawn|null = Game.getObjectById(powerCreep.memory.spawnID);
         if(powerSpawn) {
             if(powerCreep.ticksToLive && powerCreep.ticksToLive < 4000) {
@@ -39,6 +39,7 @@ export class N3RD
                     else {
                         powerCreep.enableRoom(powerCreep.room.controller);
                     }
+                    triggered = true;
                 }
                 else {
                     if(_.sum(powerCreep.carry) === powerCreep.carryCapacity && powerCreep.carry['ops']) {
@@ -61,29 +62,10 @@ export class N3RD
             }
         }
 
-        // OPERATE_EXTENSIONS costs 2 OPS and ha sa 50t cooldown
-        // const ext = powerCreep.room.extensions.filter((e: StructureExtension) => e.energy < e.energyCapacity);
-        // if(powerCreep.powers[PWR_OPERATE_EXTENSION]) {
-        //     if(ext.length > 10) {
-        //         if(powerCreep.room.storage) {
-        //             if(!powerCreep.pos.inRangeTo(powerCreep.room.storage, 3)) {
-        //                 powerCreep.moveTo(powerCreep.room.storage);
-        //             }
-        //             else {
-        //                 const opExtCD: number|undefined = powerCreep.powers[PWR_OPERATE_EXTENSION].cooldown;
-        //                 if(opExtCD !== undefined && opExtCD <= 0) {
-
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
         const ops = powerCreep.carry['ops'];
-        let triggered = false;
 
         // Regen source
-        if(powerCreep.powers[PWR_REGEN_SOURCE]) {
+        if(!triggered && powerCreep.powers[PWR_REGEN_SOURCE]) {
             const cd: number|undefined = powerCreep.powers[PWR_REGEN_SOURCE].cooldown;
             if(cd !== undefined && cd <= 0) {
                 const sources: Source[] = powerCreep.room.sources.filter((s: Source) => (!s.memory.boostedTS || s.memory.boostedTS + 270 < Game.time));
