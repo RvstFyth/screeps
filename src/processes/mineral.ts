@@ -199,8 +199,8 @@ export class Mineral extends Process
     }
 
     this.meta.miners = this.meta.miners.filter((n: any) => n); // Remove NULL values
-
-    if(canSpawn && spawningCreeps === 0 && this.meta.miners.length < numMiners) {
+    const amountInStorage = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
+    if(amountInStorage > 50000 && canSpawn && spawningCreeps === 0 && this.meta.miners.length < numMiners) {
       if(SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
         SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], MineralMiner.defineBodyParts(Game.rooms[this.meta.room]), {role: 'mineralMiner'}, 'miners[]');
       }
