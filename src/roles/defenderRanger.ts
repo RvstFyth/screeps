@@ -8,7 +8,7 @@ export class DefenderRanger
             creep.heal(creep);
         }
         else {
-            const hostiles = creep.room.invaders;
+            const hostiles = creep.room.hostiles;
             if(hostiles && hostiles.length) {
                 const healers = hostiles.filter((c: Creep) => c.getActiveBodyparts(HEAL));
                 const inRange = creep.pos.findInRange(hostiles, 3);
