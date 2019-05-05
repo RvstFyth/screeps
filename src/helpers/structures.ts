@@ -69,9 +69,9 @@ export class StructuresHelper
   static rampartImportantStructures(room: Room)
   {
     let structures: Structure[] = [];
-    if(room.labs.length) structures.concat(room.labs);
-    if(room.towers.length)  structures.concat(room.towers);
-    if(room.spawns.length) structures.concat(room.spawns);
+    if(room.labs.length) structures.push(...room.labs);
+    if(room.towers.length)  structures.push(...room.towers);
+    if(room.spawns.length) structures.push(...room.spawns);
     if(room.nuker) structures.push(room.nuker);
     if(room.terminal) structures.push(room.terminal);
     if(room.storage) structures.push(room.storage);
