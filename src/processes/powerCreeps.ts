@@ -8,14 +8,20 @@ export class PowerCreeps extends Process
     public run()
     {
         if(Game.powerCreeps['N3RD'] && Game.powerCreeps['N3RD'].ticksToLive) {
-            const CPU = Game.cpu.getUsed();
             N3RD.run(Game.powerCreeps['N3RD']);
-            Memory.stats['cpu.N3RD.getUsed'] = Game.cpu.getUsed() - CPU;
         }
         else {
-            const powerSpawn: StructurePowerSpawn|null = Game.getObjectById('XXX');
-            if(powerSpawn) {
-                Game.powerCreeps['N3RD'].spawn(powerSpawn);
+            // const powerSpawn: StructurePowerSpawn|null = Game.getObjectById('XXX');
+            // if(powerSpawn) {
+            //     Game.powerCreeps['N3RD'].spawn(powerSpawn);
+            // }
+        }
+
+        // Game.powerCreeps['test'].spawn(Game.getObjectById('5ccb8fd090799614a21cad30'));
+        if(Game.powerCreeps['test'] && Game.powerCreeps['test'].ticksToLive) {
+            if(Game.flags['test']) {
+                const pc = Game.powerCreeps['test'];
+                pc.moveTo(Game.flags['test'].pos);
             }
         }
     }
