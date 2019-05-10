@@ -5,6 +5,26 @@ declare const require: (module: string) => any;
 // add your custom typings here
 declare var global: any;
 
+interface Memory {
+  stats: any
+  remotes: any
+  cpu: any
+  roomBlacklist: any
+  scoutReports: any
+  attackedRemotes: any
+  triggeredConstruction: boolean
+  ROS: any
+  lastLOANtime: any
+  LOANalliance: any
+  errors: any
+  spawnQueue: any
+  customLabsMem: any
+  paths: any
+  mySourcesMemory: any
+  marketLog: any
+  resourceRequests: any
+}
+
 interface RoomVisual
 {
   resource(type: ResourceConstant, x: number, y: number, size: number) : any,

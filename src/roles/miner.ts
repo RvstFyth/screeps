@@ -94,7 +94,8 @@ export class Miner
     // 8, 10, 12, 14, 16
     let powerCreeps: PowerCreep[] = [];
     for(let n in Game.powerCreeps) {
-      if(Game.powerCreeps[n].shard && Game.powerCreeps[n].room && Game.powerCreeps[n].room.name === room.name) {
+      const pc = Game.powerCreeps[n];
+      if(Game.powerCreeps[n].shard && pc.room && pc.room.name === room.name) {
         powerCreeps.push(Game.powerCreeps[n]);
       }
     }
