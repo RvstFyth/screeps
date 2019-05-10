@@ -9,19 +9,22 @@ OS.kernel.addProcess('makeBoosts', {room: 'W15S2', boost: RESOURCE_UTRIUM_HYDRID
 global.OS.kernel.addProcess('emptyLabs', {room: 'W51S31', boosted: true}, 0)
 OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALYZED_GHODIUM_ACID]}, 0);
 OS.kernel.addProcess('autoMakeBoosts', {room: 'W56S33'}, 0);
-OS.kernel.addProcess('defence', {room: 'W56S33'}, 0);
+OS.kernel.addProcess('defence', {room: 'W2N2'}, 0);
 
 OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID,RESOURCE_CATALYZED_KEANIUM_ALKALIDE]}, 0);
 
-OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_KEANIUM_ALKALIDE]}, 0);
+catalyzed ghodium acid
+OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALYZED_GHODIUM_ACID]}, 0);
 
 ## Market & resource management
 OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 14000}, 0);
 
-global.OS.kernel.addProcess('haulResources', {room: 'W51S31', resource: RESOURCE_POWER, amount: 15000}, 0);
+global.OS.kernel.addProcess('haulResources', {room: 'W58S23', resource: RESOURCE_POWER, amount: 10000}, 0);
 
 
 global.OS.kernel.addProcess('emptyTerminal', {room: 'W51S31'}, 0)
+global.OS.kernel.addProcess('powerCreeps', {}, 0)
+PowerCreeps
 // W58S23
 // SMokeman U room: W47S16
 // UPGRADE BOOSTS W51S37
@@ -41,14 +44,14 @@ _.forEach(Game.market.orders, (o) => !o.active ? Game.market.cancelOrder(o.id) :
 OS.kernel.addProcess('remoteMining', {room: 'W56S33', target: 'W57S34', sourceID: '59bbc3be2052a716c3ce6a6f'}, 0)
 OS.kernel.addProcess('claimController', {room: 'W52S41', target: 'W52S42'}, 0)
 
-OS.kernel.addProcess('remoteMining', {room: 'W2N2', target: 'W2N1', sourceID: '491f0774ad7dec8'}, 0)
+OS.kernel.addProcess('remoteMining', {room: 'W53S25', target: 'W52S25', sourceID: '59f19fc482100e1594f358b4'}, 0)
 
 
 ## Offensive
 global.OS.kernel.addProcess('attackController', {room: 'W51S31', target: 'W51S28'}, 0)
 
 global.OS.kernel.addProcess('observer', {room: 'W51S31'}, 0)
-global.OS.kernel.addProcess('lootRoom', {room: 'W59S39', target: "W51S39"}, 0)
+global.OS.kernel.addProcess('lootRoom', {room: 'W53S25', target: 'W52S25'}, 0)
 
 
 
@@ -68,7 +71,7 @@ OS.kernel.addProcess('smallDrainer', {room: 'W51S32', target: "W47S31", creep: '
 
 OS.kernel.addProcess('wishHappyNewYear', {room: 'W54S31', target: 'W51S29'}, 0);
 
-OS.kernel.addProcess('fillNuke', {room: 'W51S31'}, 0);
+OS.kernel.addProcess('fillNuke', {room: 'W51S37'}, 0);
 
 
 ## Helmut

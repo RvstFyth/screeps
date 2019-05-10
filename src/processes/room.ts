@@ -14,6 +14,10 @@ export class Room extends Process
       return;
     }
 
+    if(room.name === 'W2N2') {
+      StructuresHelper.planRoom(room);
+    }
+
     if(typeof this.meta.publicRamparts === 'undefined') {
       this.meta.publicRamparts = !room.hostiles.length;
     }
@@ -158,12 +162,14 @@ export class Room extends Process
 
   checkStructures(room: any)
   {
+    // console.log(`Triggered checkStructures for ${room.name}`)
     if(typeof room.controller !== 'undefined') {
         if(room.controller.level >= 3) {
           StructuresHelper.placeContainerNearSources(room);
         }
         if(room.controller.level >= 6) {
           try {
+            StructuresHelper.rampartImportantStructures(room);
             const tiles: RoomPosition[] = StructuresHelper.defineUpgraderSpots(room, 1);
             for(let i in tiles) {
               if(!tiles[i].lookFor(LOOK_STRUCTURES).filter((s: Structure) => s.structureType === STRUCTURE_RAMPART).length) {
