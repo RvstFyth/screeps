@@ -140,6 +140,9 @@ export class Room_Bootstrap extends Process
     // Builder creep
     if(!Game.creeps[this.meta.builder]) {
       let constructionSites = room.find(FIND_CONSTRUCTION_SITES);
+      if(constructionSites.length) {
+        constructionSites = constructionSites.filter((s: ConstructionSite) => s.structureType !== STRUCTURE_RAMPART);
+      }
       if(constructionSites && constructionSites.length && SpawnsHelper.spawnAvailable(room)) {
         let name = SpawnsHelper.spawnCreep(room, Builder.defineBodyParts(room), {role: 'builder'}, this.ID.toString());
         if(name !== '') {
