@@ -94,11 +94,11 @@ export class AutoMakeBoosts extends Process
     private handle(room: Room)
     {
         // if(room.name === 'W59S28') console.log(1);
-        if(room.storage && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('emptyLabs', 'room', room.name)) {
+        if(room.storage && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('stockBoostsLab', 'room', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('emptyLabs', 'room', room.name)) {
             const reaction = this.defineReaction(room);
             // if(room.name === 'W59S28') {
             //     console.log(reaction)
-            // }
+            // } // stockBoostsLab
             if(reaction) {
                 global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: reaction, amount: 3000}, this.ID);
             }

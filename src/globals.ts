@@ -88,7 +88,7 @@ global.findRouteCLI = function(room: string, target: string)
 // Usage: After you require this file, just add this to anywhere in your main loop to run every tick: global.populateLOANlist();
 // global.LOANlist will contain an array of usernames after global.populateLOANlist() runs twice in a row (two consecutive ticks).
 // Memory.LOANalliance will contain the alliance short name after global.populateLOANlist() runs twice in a row (two consecutive ticks).
-global.populateLOANlist = function(LOANuser = "LeagueOfAutomatedNations", LOANsegment = 99) {
+global.populateLOANlist = function(LOANuser: string = "LeagueOfAutomatedNations", LOANsegment: number = 99) {
     if ((typeof RawMemory.setActiveForeignSegment == "function") && !!~['shard0','shard1','shard2','shard3'].indexOf(Game.shard.name)) { // To skip running in sim or private servers which prevents errors
         if ((typeof Memory.lastLOANtime == "undefined") || (typeof global.LOANlist == "undefined")) {
             Memory.lastLOANtime = Game.time - 1001;
@@ -149,6 +149,8 @@ global.populateLOANlist = function(LOANuser = "LeagueOfAutomatedNations", LOANse
  */
 global.boostTier = (r: ResourceConstant) => Math.ceil(r.length / 2);
 
+global.formatNumber = (number: number) => new Intl.NumberFormat('de-DE').format(number);
+
 global.resourceStats = function()
 {
     let output = '';
@@ -159,7 +161,10 @@ global.resourceStats = function()
         const room: Room = Game.rooms[i];
         if(room && room.controller && room.controller.my) {
             const mineral = room.find(FIND_MINERALS)[0];
-            output += `${room.name}: ${mineral.mineralType} | Energy: ${room.energyAvailable} / ${room.energyCapacityAvailable} | Storage: ${room.storage ? Math.floor(_.sum(room.storage.store)/1000).toString() + `K (E: ${Math.floor(room.storage.store[RESOURCE_ENERGY]/1000)}K)` : '<i>n.a</i>'} \n`;
+            output += `<a href="#!/room/${Game.shard.name}/${room.name}">${room.name}</a>: ${mineral.mineralType} | Energy: ${room.energyAvailable} / ${room.energyCapacityAvailable} \
+            | Storage: ${room.storage ? Math.floor(_.sum(room.storage.store)/1000).toString() + `K (E: ${Math.floor(room.storage.store[RESOURCE_ENERGY]/1000)}K)` : '<i>n.a</i>'}\
+            | ${mineral.mineralType.toUpperCase()} Storage: ${global.formatNumber(room.storage ? room.storage.store[mineral.mineralType] || 0 : 0)} \
+            Terminal: ${global.formatNumber(room.terminal ? room.terminal.store[mineral.mineralType] || 0 : 0)} \n`;
             mineralCount[mineral.mineralType]++;
         }
     }
@@ -167,6 +172,41 @@ global.resourceStats = function()
     for(let r in mineralCount) {
         const color = mineralCount[r] === 0 ? 'red' : (mineralCount[r] < 2 ? 'orange' : 'green');
         output += `<span style="color:${color}">${mineralCount[r]} ${r} rooms</span> \n`
+    }
+    console.log(output);
+}
+
+global.resourceStats2 = function()
+{
+    let output = '<table><thead><tr><th>Room</th><th>   RCL</th><th>   Mineral</th><th>   Storage</th><th>   Terminal</th></tr><thead><tbody>';
+    let mineralCount: any = {
+        H:0, O:0, U:0, L:0, K:0, Z:0, X:0
+    };
+    for(let i in Game.rooms) {
+        const room: Room = Game.rooms[i];
+        if(room && room.controller && room.controller.my) {
+            const mineral = room.find(FIND_MINERALS)[0];
+            const storageSum = room.storage ? _.sum(room.storage.store) : 0;
+            const terminalSum = room.terminal ? _.sum(room.terminal.store) : 0;
+            const mineralInStorage = room.storage ? room.storage.store[mineral.mineralType] || 0 : 0;
+            const mineralInTerminal = room.terminal ? room.terminal.store[mineral.mineralType] || 0 : 0;
+            const energyInStorage = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
+            const energyInTerminal = room.terminal ? room.terminal.store[RESOURCE_ENERGY] : 0;
+
+            output += '<tr onMouseOver="this.style.color=\'#0F0\'" onMouseOut="this.style.color=\'\'">';
+            output += '<td><a href="#!/room/'+Game.shard.name+'/'+room.name+'">'+room.name+'</a></td>';
+            output += '<td>   '+room.controller.level+'</td>';
+            output += '<td>   '+mineral.mineralType.toUpperCase()+'</td>';
+            output += '<td>   '+ (Math.floor(storageSum/1000).toString()+'k').padEnd(5,' ') +'|E:'+(Math.floor(energyInStorage / 1000).toString()+'k').padEnd(5,' ')+'|'+mineral.mineralType.toUpperCase()+':'+Math.floor(mineralInStorage/1000).toString()+'k</td>';
+            output += '<td>   '+ (Math.floor(terminalSum/1000).toString()+'k').padEnd(5,' ') +'|E:'+(Math.floor(energyInTerminal / 1000).toString()+'k').padEnd(5,' ')+'|'+mineral.mineralType.toUpperCase()+':'+Math.floor(mineralInTerminal/1000).toString()+'k</td>';
+            output += '</tr>';
+            mineralCount[mineral.mineralType]++;
+        }
+    }
+    output += '</tbody></table> \n';
+    const missingMinerals = Object.keys(mineralCount).filter(e => mineralCount[e] === 0);
+    if(missingMinerals && missingMinerals.length) {
+        output += 'Missing '+missingMinerals.join(',')+' mineral room(s)';
     }
     console.log(output);
 }

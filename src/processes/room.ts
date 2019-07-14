@@ -118,6 +118,12 @@ export class Room extends Process
       }
     }
 
+    if(room.controller && room.controller.level > 6) {
+      if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('defence', 'room', room.name)) {
+        global.OS.kernel.addProcess('defence', {room: room.name}, this.ID);
+      }
+    }
+
     if(room.controller && room.spawns.length) {
       for(let i = 0, iEnd = room.spawns.length; i < iEnd; i++) {
         if(room.spawns[i].hits < room.spawns[i].hitsMax) {
@@ -125,6 +131,19 @@ export class Room extends Process
           console.log(`Actived safemode for room ${room.name}`);
         }
       }
+    }
+
+    // Check remotes
+    if(Game.time % 10 === 0) {
+        if(Memory.remotes[room.name]) {
+          for(let target in Memory.remotes[room.name]) {
+            for(let sourceID of Memory.remotes[room.name][target]) {
+              if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('remoteMining', 'sourceID', sourceID)) {
+                global.OS.kernel.addProcess('remoteMining', {room: room.name, target: target, sourceID: sourceID}, 0)
+              }
+            }
+          }
+        }
     }
 
     if(room.powerSpawn && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('processPower', 'room', room.name)) {
@@ -138,12 +157,20 @@ export class Room extends Process
 
           for(let n in Game.rooms) {
             const tr = Game.rooms[n];
-            if(tr.controller && tr.controller.my && tr.controller.level < 8 && tr.storage && tr.terminal && tr.terminal.my && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', tr.name)) {
+            if(tr.controller && tr.controller.my && tr.storage && tr.terminal && tr.terminal.my && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('sendResources', 'target', tr.name) &&!global.OS.kernel.hasProcessForNameAndMetaKeyValue('haulResources', 'room', tr.name)) {
               rooms.push(tr);
             }
           }
 
           if(rooms.length) {
+            const roomsBelow = rooms.filter((r: any) => r.controller && r.controller.level < 8);
+            let targets;
+            if(roomsBelow.length) {
+              targets = roomsBelow;
+            }
+            else {
+              targets = rooms;
+            }
             const target = _.min(rooms, r => r.storage.store[RESOURCE_ENERGY]);
             if(room.storage.store[RESOURCE_ENERGY] > target.storage.store[RESOURCE_ENERGY] * 1.5) {
               let amount = 20000;

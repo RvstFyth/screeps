@@ -55,7 +55,8 @@ export class DismantleWall extends Process
             RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,HEAL,HEAL,HEAL,HEAL,
             HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,HEAL,MOVE,HEAL
         ];
-
+        //this.meta.hBoosted = false;
+        //this.meta.dBoosted = false;
         const dismantlerBody = [
             TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
             MOVE,MOVE,
@@ -96,7 +97,12 @@ export class DismantleWall extends Process
             if(typeof this.meta.done !== 'undefined' && this.meta.done) {
                 this.state = 'killed';
             }
-            this.meta.hBoosted = false;
+            if(typeof this.meta.needBoosts !== 'undefined' && this.meta.needBoosts === false) {
+                this.meta.hBoosted = true;
+            }
+            else {
+                this.meta.hBoosted = false;
+            }
             this.meta.hCurrent = 0;
             if(dismantler) {
                 dismantler.suicide();
@@ -107,7 +113,12 @@ export class DismantleWall extends Process
             }
         }
         else if(healer && !dismantler) {
-            this.meta.dBoosted = false;
+            if(typeof this.meta.needBoosts !== 'undefined' && this.meta.needBoosts === false) {
+                this.meta.dBoosted = true;
+            }
+            else {
+                this.meta.dBoosted = false;
+            }
             this.meta.dCurrent = 0;
             if(!this.meta.done && SpawnsHelper.spawnAvailable(room)) {
                 // SpawnsHelper.requestSpawn(this.ID, room, [
@@ -121,10 +132,20 @@ export class DismantleWall extends Process
         }
         else {
             if(healer && !healer.spawning && !this.meta.hBoosted) {
-                this.boost(healer, 'hBoosted');
+                if(typeof this.meta.needBoosts !== 'undefined' && this.meta.needBoosts === false) {
+                    this.meta.hBoosted = true;
+                }
+                else {
+                    this.boost(healer, 'hBoosted');
+                }
             }
             if(dismantler && !dismantler.spawning && !this.meta.dBoosted) {
-                this.boost(dismantler, 'dBoosted');
+                if(typeof this.meta.needBoosts !== 'undefined' && this.meta.needBoosts === false) {
+                    this.meta.hBoosted = true;
+                }
+                else {
+                    this.boost(dismantler, 'dBoosted');
+                }
             }
             if(this.meta.hBoosted && this.meta.dBoosted) {
                 if(Game.flags[this.ID + '_p']) {
@@ -246,7 +267,15 @@ export class DismantleWall extends Process
             if(this.meta.targetWall) {
                 let wall: StructureWall|StructureRampart|null = Game.getObjectById(this.meta.targetWall);
                 if(!wall) {
-                    wall = Game.getObjectById('5c627252cd665a6d42690e26');
+                    if(!wall) {
+                        wall = Game.getObjectById('5c6fd58f9276b32612cff2ba');
+                    }
+                    if(!wall) {
+                        if(typeof this.meta.needBoosts === 'undefined' && !dismantler.room.towers) {
+                            this.meta.needBoosts = false;
+                        }
+                        wall = Game.getObjectById('5c70a009c43260426cf4101a');
+                    }
                 }
                 if(wall) {
                     if(!dismantler.pos.isNearTo(wall)) {
@@ -296,6 +325,9 @@ export class DismantleWall extends Process
                     }
 
                     if(!target) {
+                        healer.suicide();
+                        dismantler.suicide();
+                        this.state = 'killed';
                         if(dismantler.room.spawns.length) {
                             target = dismantler.pos.findClosestByRange(dismantler.room.spawns);
                         }

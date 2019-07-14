@@ -11,7 +11,7 @@ OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALY
 OS.kernel.addProcess('autoMakeBoosts', {room: 'W56S33'}, 0);
 OS.kernel.addProcess('defence', {room: 'W2N2'}, 0);
 
-OS.kernel.addProcess('stockBoostsLab', {room: 'W51S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID,RESOURCE_CATALYZED_KEANIUM_ALKALIDE]}, 0);
+OS.kernel.addProcess('stockBoostsLab', {room: 'W54S31', boosts: [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,RESOURCE_CATALYZED_GHODIUM_ALKALIDE,RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,RESOURCE_CATALYZED_ZYNTHIUM_ACID,RESOURCE_CATALYZED_KEANIUM_ALKALIDE]}, 0);
 
 catalyzed ghodium acid
 OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALYZED_GHODIUM_ACID]}, 0);
@@ -19,7 +19,7 @@ OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALY
 ## Market & resource management
 OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 14000}, 0);
 
-global.OS.kernel.addProcess('haulResources', {room: 'W58S23', resource: RESOURCE_POWER, amount: 10000}, 0);
+global.OS.kernel.addProcess('haulResources', {room: 'W54S31', resource: RESOURCE_ENERGY, amount: 200000}, 0);
 
 
 global.OS.kernel.addProcess('emptyTerminal', {room: 'W51S31'}, 0)
@@ -28,8 +28,8 @@ PowerCreeps
 // W58S23
 // SMokeman U room: W47S16
 // UPGRADE BOOSTS W51S37
-global.OS.kernel.addProcess('sendResources', {room: 'W51S37', target: 'W51S31', resource: RESOURCE_ENERGY, amount: 150000}, 0)
-
+global.OS.kernel.addProcess('sendResources', {room: 'W51S31', target: 'W49S27', resource: RESOURCE_HYDROGEN, amount: 100000}, 0)
+ 14
 
 global.OS.kernel.addProcess('sendResources', {room: 'W51S31', target: 'W52S41', resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 10000}, 0)
 
@@ -41,19 +41,19 @@ global.OS.kernel.addProcess('sendResources', {room: 'W56S33', target: 'W55S17', 
 _.forEach(Game.market.orders, (o) => !o.active ? Game.market.cancelOrder(o.id) : '');
 
 
-OS.kernel.addProcess('remoteMining', {room: 'W56S33', target: 'W57S34', sourceID: '59bbc3be2052a716c3ce6a6f'}, 0)
+OS.kernel.addProcess('remoteMining', {room: 'W41S26', target: 'W42S26', sourceID: '5982fc2eb097071b4adbcf7c'}, 0)
 OS.kernel.addProcess('claimController', {room: 'W52S41', target: 'W52S42'}, 0)
 
 OS.kernel.addProcess('remoteMining', {room: 'W53S25', target: 'W52S25', sourceID: '59f19fc482100e1594f358b4'}, 0)
 
 
 ## Offensive
-global.OS.kernel.addProcess('attackController', {room: 'W51S31', target: 'W51S28'}, 0)
+global.OS.kernel.addProcess('attackController', {room: 'W51S31', target: 'W54S29'}, 0)
 
 global.OS.kernel.addProcess('observer', {room: 'W51S31'}, 0)
-global.OS.kernel.addProcess('lootRoom', {room: 'W53S25', target: 'W52S25'}, 0)
+global.OS.kernel.addProcess('lootRoom', {room: 'W41S26', target: 'W41S28'}, 0)
 
-
+Game.getObjectById('5bf61cb7debaf75b610a4d10').launchNuke(new RoomPosition(31,9,'W54S29'));Game.getObjectById('5c2a40acce4be142a36b8116').launchNuke(new RoomPosition(31,9,'W54S29'));Game.getObjectById('5c1d118cde2fd8092db59717').launchNuke(new RoomPosition(31,9,'W54S29'));
 
 OS.kernel.addProcess('claimRoom', {room: 'W51S32', target: 'E0S1'}, 0);
 
@@ -63,7 +63,7 @@ OS.kernel.addProcess('claimRoom', {room: 'W51S32', target: 'E0S1'}, 0);
 OS.kernel.addProcess('sourceKeeperAttacker', {room: 'W15S6', target: 'W15S5'}, 0)
 
 
-OS.kernel.addProcess('harrasRemote', {room: 'W54S31', target: "W54S31"}, 0)
+OS.kernel.addProcess('harrasRemote', {room: 'W51S31', target: "W55S29"}, 0)
 
 OS.kernel.addProcess('smallDrainer', {room: 'W51S32', target: "W47S31", creep: '3721_13920286'}, 0)
 
@@ -71,11 +71,11 @@ OS.kernel.addProcess('smallDrainer', {room: 'W51S32', target: "W47S31", creep: '
 
 OS.kernel.addProcess('wishHappyNewYear', {room: 'W54S31', target: 'W51S29'}, 0);
 
-OS.kernel.addProcess('fillNuke', {room: 'W51S37'}, 0);
+OS.kernel.addProcess('fillNuke', {room: 'W51S31'}, 0);
 
 
 ## Helmut
-OS.kernel.addProcess('dismantleWall', {room: 'W54S31', target: 'W52S26', targetWall: '5c62724f570b88549f8949f8'}, 0);
+OS.kernel.addProcess('dismantleWall', {room: 'W51S31', target: 'W54S29', targetWall: '5c6fef017eb3f2248802961d'}, 0);
 OS.kernel.addProcess('dismantleWall', {room: 'W52S41', target: 'W52S42', targetWall: '5bb39860163ccb197c5dc7fa'}, 0);
 
 _.forEach(Game.rooms['W55S23'].find(FIND_STRUCTURES), c => c.destroy())

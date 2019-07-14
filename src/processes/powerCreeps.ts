@@ -7,6 +7,10 @@ export class PowerCreeps extends Process
 
     public run()
     {
+        //
+        if(Game.powerCreeps['R3T4RD'] && Game.powerCreeps['R3T4RD'].ticksToLive) {
+            N3RD.run(Game.powerCreeps['R3T4RD']);
+        }
         if(Game.powerCreeps['N3RD'] && Game.powerCreeps['N3RD'].ticksToLive) {
             N3RD.run(Game.powerCreeps['N3RD']);
         }

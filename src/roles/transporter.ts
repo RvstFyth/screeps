@@ -161,7 +161,7 @@ export class Transporter
         bodyParts = [CARRY,CARRY, MOVE, MOVE];
     }
 
-    else if(room.controller && room.controller.level > 6 && room.energyCapacityAvailable > 1500) {
+    else if(room.controller && room.controller.level > 6 && room.energyAvailable > 1500) {
       return [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY, CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
     }
 

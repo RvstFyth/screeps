@@ -70,8 +70,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
   global.populateLOANlist();
   OS.run();
   const cpuUsed = Game.cpu.getUsed() - cpu;
-  if(Game.time % 20 === 0) {
+  if(Game.time % 5 === 0) {
     // console.log(`${Game.shard.name} | Tick: ${Game.time} | CPU: ${cpuUsed.toFixed(2)} | ${Object.keys(Game.rooms).length} rooms in vision | ${Memory.ROS.processes.length} processes in mem`);
+    _.forEach(Game.market.orders, (o) => !o.active ? Game.market.cancelOrder(o.id) : '');
   }
   // Automatically delete memory of missing creeps
 
@@ -131,6 +132,8 @@ export const loop = ErrorMapper.wrapLoop(() => {
       }
     }
   })
+
+  stats['credits'] = Game.market.credits;
 
   if(typeof Game.cpu.getHeapStatistics !== 'undefined') {
     const heap = Game.cpu.getHeapStatistics();

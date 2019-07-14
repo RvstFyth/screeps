@@ -55,6 +55,7 @@ export class Mineral extends Process
       // }
 
       const storageAmount = room.storage ? room.storage.store[mineral.mineralType] : null;
+      const terminalAmount = room.terminal ? room.terminal.store[mineral.mineralType] : null;
       const sellTreshould = 300000; // replace with a constant
 
       if(storageAmount && storageAmount > sellTreshould) {
@@ -86,10 +87,10 @@ export class Mineral extends Process
       //   mineral.say(`${this.meta.miningSpots} spots`);
       // }
 
-      if(mineral.mineralAmount > 0) {
+      //if(mineral.mineralAmount > 0) {
         try {
           //if(!storageAmount || storageAmount < 200000) {
-            const canSpawn = !storageAmount || storageAmount < 200000;
+            const canSpawn = mineral.mineralAmount > 0 && ((!storageAmount || storageAmount < 200000) || (!terminalAmount || terminalAmount < 30000));
             this.handleMiners(canSpawn);
           //}
           //else {
@@ -99,7 +100,7 @@ export class Mineral extends Process
         catch(e) {
           console.log("HandleMiner crashed: "+e.message);
         }
-      }
+      //}
       try {
         this.handleHauler(room, mineral.pos.x, mineral.pos.y);
       }

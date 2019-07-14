@@ -11,7 +11,7 @@ export class Defence extends Process
             this.run2();
         }
         catch(e) {
-            console.log(`Defence process crashed :/ `);
+            console.log(`Defence process crashed :/ ${e.message}`);
         }
     }
 
@@ -48,8 +48,10 @@ export class Defence extends Process
                     // Nothing to do in the core rome, check if there is a remote under attack!
                     for(let i in Memory.attackedRemotes) {
                         if(Memory.attackedRemotes[i] <= 2) {
-                            this.meta.targetRoom = i;
-                            break;
+                            if(Memory.remotes[room.name] && Memory.remotes[room.name][i]) {
+                                this.meta.targetRoom = i;
+                                break;
+                            }
                         }
                     }
                 }

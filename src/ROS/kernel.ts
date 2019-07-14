@@ -45,7 +45,7 @@ import {Observer} from '../processes/observer';
 import {PowerFarming} from "../processes/powerFarming";
 import {ClaimController} from "../processes/claimController";
 import {RemoteBuilder} from "../processes/remoteBuilder";
-
+import {HaulResourcesTerminal} from '../processes/haulResourcesTerminal'
 class ProcessTable
 {
     queue: Process[] = new Array()
@@ -101,7 +101,8 @@ const Processes = <{[type: string]: any}> {
   'observer': Observer,
   'powerFarming': PowerFarming,
   'claimController': ClaimController,
-  'remoteBuilder': RemoteBuilder
+  'remoteBuilder': RemoteBuilder,
+  'haulResourcesTerminal': HaulResourcesTerminal
 };
 
 export class Kernel

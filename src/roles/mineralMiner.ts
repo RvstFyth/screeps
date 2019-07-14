@@ -1,3 +1,5 @@
+import { SpawnsHelper } from "helpers/spawns";
+
 export class MineralMiner
 {
 
@@ -35,13 +37,16 @@ export class MineralMiner
       }
     }
     else if(creep.memory.harvesting) {
-      if(mineral) {
+      if(mineral && mineral.mineralAmount > 0) {
         if(!creep.pos.isNearTo(mineral)) {
           creep.moveTo(mineral);
         }
         else {
           if(creep.room.extractor && !creep.room.extractor.cooldown) {
             creep.harvest(mineral);
+            if(mineral.mineralAmount === 0) {
+              creep.memory.harvesting = false;
+            }
           }
           else {
             const thombstones = creep.pos.findInRange(FIND_TOMBSTONES, 1,{
@@ -50,6 +55,14 @@ export class MineralMiner
             if(thombstones.length) {
               creep.withdraw(thombstones[0], mineral.mineralType);
             }
+          }
+        }
+      }
+      else if(mineral && mineral.mineralAmount === 0 && _.sum(creep.carry) === 0) {
+        const spawns = SpawnsHelper.getAvailableSpawns(creep.room);
+        if(spawns.length) {
+          if(spawns[0].recycleCreep(creep) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(spawns[0]);
           }
         }
       }

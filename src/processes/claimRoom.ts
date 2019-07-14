@@ -426,7 +426,7 @@ export class ClaimRoom extends Process
         else {
           if(creep.room.controller) {
             if(!creep.pos.isNearTo(creep.room.controller)) {
-              creep.moveTo(creep.room.controller);
+              creep.moveTo(creep.room.controller, {maxRooms: 1});
             }
             else {
               creep.claimController(creep.room.controller);
@@ -443,7 +443,7 @@ export class ClaimRoom extends Process
   shouldRun()
   {
     const targetRoom = Game.rooms[this.meta.target];
-    if(targetRoom && targetRoom.controller && targetRoom.storage) {
+    if(targetRoom && targetRoom.controller && targetRoom.storage && targetRoom.storage.my) {
       return false;
     }
 
