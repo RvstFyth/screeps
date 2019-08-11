@@ -41,7 +41,7 @@ export class Source extends Process
       });
       // hauler
       let canSpawn = false;
-      if(filledContainers.length) {
+      if(filledContainers.length && source.room.storage) {
         canSpawn = true;
       }
       else if(!link && source.room.storage && source.room.storage.my && (!this.meta.hauler || !Game.creeps[this.meta.hauler])) {

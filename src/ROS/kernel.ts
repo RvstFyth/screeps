@@ -46,6 +46,9 @@ import {PowerFarming} from "../processes/powerFarming";
 import {ClaimController} from "../processes/claimController";
 import {RemoteBuilder} from "../processes/remoteBuilder";
 import {HaulResourcesTerminal} from '../processes/haulResourcesTerminal'
+import {RoomProcess} from '../processes/RoomProcess';
+import {AlliDefender} from '../processes/alliDefender'
+
 class ProcessTable
 {
     queue: Process[] = new Array()
@@ -57,7 +60,7 @@ class ProcessTable
 
 const Processes = <{[type: string]: any}> {
   'init': Init,
-  'room': Room,
+  'room': RoomProcess,
   'room_bootstrap': Room_Bootstrap,
   'towers': Towers,
   'source': Source,
@@ -102,7 +105,8 @@ const Processes = <{[type: string]: any}> {
   'powerFarming': PowerFarming,
   'claimController': ClaimController,
   'remoteBuilder': RemoteBuilder,
-  'haulResourcesTerminal': HaulResourcesTerminal
+  'haulResourcesTerminal': HaulResourcesTerminal,
+  'alliDefender': AlliDefender
 };
 
 export class Kernel

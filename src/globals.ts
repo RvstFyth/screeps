@@ -1,11 +1,15 @@
 import { MapHelper } from "helpers/map";
-
+import {ConsoleHelper} from 'helpers/console'
 global.LAB_STATE = {
     IDLE: 0,
     SUPPLY: 1,
     REACTING: 2,
     BOOSTING: 3
 };
+
+ConsoleHelper.registerCommand('test', (a:any,b:any,c:any) => {console.log([a,b,c])}, 'Test Test Test Test Test Test Test');
+ConsoleHelper.registerCommand('testAAA', (a:any,b:any,c:any) => {console.log([a,b,c])}, '2222222222 Test Test Test Test Test Test Test');
+global.cli = ConsoleHelper;
 
 global.UNIT_COST = (body: BodyPartConstant[]) => _.sum(body, (p: BodyPartConstant) => BODYPART_COST[p]);
 
@@ -17,6 +21,20 @@ global.killProcess = function(pID: number) {
         }
     }
 };
+
+global.SetBlueprint = function (roomName: string, type: string, key: string, centerX: number, centerY: number) {
+    const room = Game.rooms[roomName];
+    if (room && room.controller && room.controller.my) {
+        room.memory.blueprintType = type;
+        room.memory.blueprintKey = key;
+        room.memory.centerX = centerX;
+        room.memory.centerY = centerY;
+        console.log(`Saved blueprint ${type} - ${key} for ${roomName}`);
+    }
+    else {
+        console.log(`Can't set blueprint for room ${roomName}`);
+    }
+}
 
 global.RECIPES = {};
 for (const a in REACTIONS) {
@@ -152,31 +170,6 @@ global.boostTier = (r: ResourceConstant) => Math.ceil(r.length / 2);
 global.formatNumber = (number: number) => new Intl.NumberFormat('de-DE').format(number);
 
 global.resourceStats = function()
-{
-    let output = '';
-    let mineralCount: any = {
-        H:0, O:0, U:0, L:0, K:0, Z:0, X:0
-    };
-    for(let i in Game.rooms) {
-        const room: Room = Game.rooms[i];
-        if(room && room.controller && room.controller.my) {
-            const mineral = room.find(FIND_MINERALS)[0];
-            output += `<a href="#!/room/${Game.shard.name}/${room.name}">${room.name}</a>: ${mineral.mineralType} | Energy: ${room.energyAvailable} / ${room.energyCapacityAvailable} \
-            | Storage: ${room.storage ? Math.floor(_.sum(room.storage.store)/1000).toString() + `K (E: ${Math.floor(room.storage.store[RESOURCE_ENERGY]/1000)}K)` : '<i>n.a</i>'}\
-            | ${mineral.mineralType.toUpperCase()} Storage: ${global.formatNumber(room.storage ? room.storage.store[mineral.mineralType] || 0 : 0)} \
-            Terminal: ${global.formatNumber(room.terminal ? room.terminal.store[mineral.mineralType] || 0 : 0)} \n`;
-            mineralCount[mineral.mineralType]++;
-        }
-    }
-    output += '\n';
-    for(let r in mineralCount) {
-        const color = mineralCount[r] === 0 ? 'red' : (mineralCount[r] < 2 ? 'orange' : 'green');
-        output += `<span style="color:${color}">${mineralCount[r]} ${r} rooms</span> \n`
-    }
-    console.log(output);
-}
-
-global.resourceStats2 = function()
 {
     let output = '<table><thead><tr><th>Room</th><th>   RCL</th><th>   Mineral</th><th>   Storage</th><th>   Terminal</th></tr><thead><tbody>';
     let mineralCount: any = {

@@ -84,8 +84,11 @@ export class Rampart
     if(room.energyAvailable <= 400) {
         return [WORK, CARRY, MOVE];
     }
-    else if(room.controller && room.controller.level === 8 && room.energyAvailable > 4000) {
+    else if(room.controller && room.controller.level === 8 && room.energyAvailable > 4000 && room.storage && room.storage.store[RESOURCE_ENERGY] > 120000) {
       return [WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY, MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+    }
+    else if(room.controller && room.controller.level === 8){
+      return [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
     }
     else if(room.energyAvailable > 1000) {
         return [WORK,WORK,CARRY,MOVE,MOVE,MOVE, WORK,WORK,CARRY,MOVE,MOVE,MOVE];

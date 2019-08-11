@@ -34,8 +34,11 @@ export class DefenderRanger
                     creep.flee(inRangeAttack, 2);
                 }
                 else {
-
-                    if(healers.length) {
+                    const attackers = hostiles.filter((c: Creep) => c.getActiveBodyparts(ATTACK));
+                    if(attackers.length) {
+                        creep.moveTo(attackers[0], {maxRooms:1, range:3});
+                    }
+                    else if(healers.length) {
                         creep.moveTo(healers[0], {maxRooms:1, range: 3});
                     }
                     else {

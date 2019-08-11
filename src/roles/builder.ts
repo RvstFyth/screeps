@@ -35,11 +35,11 @@ export class Builder
       }
     }
     else {
-      let constructionSites: ConstructionSite[] = creep.room.find(FIND_CONSTRUCTION_SITES).filter((c: ConstructionSite) => c.structureType !== STRUCTURE_RAMPART && c.structureType !== STRUCTURE_WALL);
-      if(constructionSites && constructionSites.length) {
-        let target = creep.pos.findClosestByRange(constructionSites);
-        if(target && creep.build(target) === ERR_NOT_IN_RANGE) {
-          creep.moveTo(target);
+      //let constructionSites: ConstructionSite[] = creep.room.find(FIND_CONSTRUCTION_SITES).filter((c: ConstructionSite) => c.structureType !== STRUCTURE_RAMPART && c.structureType !== STRUCTURE_WALL);
+      const cs = creep.room.buildTarget;
+      if(cs) {
+        if(creep.build(cs) === ERR_NOT_IN_RANGE) {
+          creep.moveTo(cs);
         }
       }
       else {

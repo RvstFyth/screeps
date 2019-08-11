@@ -4,7 +4,7 @@ export class Transporter
 {
 
 
-  static run(creep: Creep)
+  static run(creep: Creep, spot: { x: number, y: number } | null)
   {
     if(!creep.memory.targetID) {
       this.defineTarget(creep, '');
@@ -42,7 +42,10 @@ export class Transporter
         const target: any = Game.getObjectById(creep.memory.targetID);
         if(target) {
           if(creep.pos.isNearTo(target)) {
-            if(creep.transfer(target, RESOURCE_ENERGY) === OK && creep.carry[RESOURCE_ENERGY] > 0) {
+            const missing = target.energyCapacity - target.energy;
+            const amount = creep.carry[RESOURCE_ENERGY] > missing ? missing : creep.carry[RESOURCE_ENERGY];
+            const filled = target.energy + creep.carry[RESOURCE_ENERGY] >= target.energyCapacity;
+            if(creep.transfer(target, RESOURCE_ENERGY) === OK && creep.carry[RESOURCE_ENERGY] > amount && filled) {
               this.defineTarget(creep, creep.memory.targetID);
               if(creep.memory.targetID && _.sum(creep.carry) > 0) {
                 const t: AnyStructure|null = Game.getObjectById(creep.memory.targetID);
@@ -56,9 +59,17 @@ export class Transporter
                 }
               }
             }
+            else if(creep.carry[RESOURCE_ENERGY] <= amount) {
+              creep.memory.harvesting = false;
+              if(creep.room.storage) creep.moveTo(creep.room.storage, {maxRooms: 1});
+            }
           }
           else {
             creep.moveTo(target);
+            const inRange = creep.pos.findInRange(creep.room.extensions, 1).filter((e: StructureExtension) => e.energy < e.energyCapacity);
+            if(inRange.length) {
+              creep.transfer(inRange[0], RESOURCE_ENERGY);
+            }
           }
           if(target.energy === target.energyCapacity) {
             this.defineTarget(creep, creep.memory.targetID);
@@ -80,7 +91,8 @@ export class Transporter
         }
         else {
           // TODO: renewCreep on a available spawn SpawnsHelper.getAvailableSpawns(room)
-          if(creep.ticksToLive && creep.ticksToLive < 500 &&  SpawnsHelper.spawnAvailable(creep.room)) {
+          const transporters = creep.room.find(FIND_MY_CREEPS, {filter: (c:Creep) => c.memory.role === 'transporter'});
+          if(transporters.length < 2 && creep.ticksToLive && creep.ticksToLive < 500 &&  SpawnsHelper.spawnAvailable(creep.room)) {
             const target = creep.pos.findClosestByRange(SpawnsHelper.getAvailableSpawns(creep.room));
             if(target && creep.pos.isNearTo(target)) {
               target.renewCreep(creep);
@@ -91,18 +103,9 @@ export class Transporter
           }
           else {
             // Get off the road
-            creep.say('!!!!!!');
-            const {x,y} = creep.pos;
-            // const r = creep.room.lookForAtArea(LOOK_TERRAIN, y - 1, x - 1, y + 1, x + 1, true);
-            // for(let i in r) {
-            //   if(r[i].terrain === 'plain') {
-            //     if(!creep.room.lookForAt(LOOK_STRUCTURES, r[i].x, r[i].y).length) {
-            //       if(creep.moveTo(r[i].x, r[i].y) === OK) {
-            //         break;
-            //       }
-            //     }
-            //   }
-            // }
+            if(spot && (creep.pos.x !== spot.x || creep.pos.y !== spot.y)) {
+              creep.moveTo(spot.x, spot.y);
+            }
           }
         }
       }

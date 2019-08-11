@@ -16,6 +16,12 @@ export class ClaimRoom extends Process
 
       // The room from where the creeps are spawned
       const room = Game.rooms[this.meta.room];
+      const targetRoom = Game.rooms[this.meta.target];
+      if(targetRoom && targetRoom.controller && targetRoom.controller.my) {
+        if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('room', 'name', this.meta.target)) {
+          global.OS.kernel.addProcess('room', {name: this.meta.target, support: true}, 0);
+        }
+      }
       this.handleClaimer(room);
       try {
           this.handleBuilder(room);
@@ -265,6 +271,7 @@ export class ClaimRoom extends Process
                     if(creep.harvest(source) === ERR_NOT_IN_RANGE) {
                       creep.moveTo(source);
                     }
+                    if(creep.pos.isNearTo(source) && source.energy === 0 && creep.carry[RESOURCE_ENERGY] > 0) creep.memory.harvesting = false;
                   }
                   else {
                     // TODO:
@@ -316,7 +323,7 @@ export class ClaimRoom extends Process
                 Game.rooms[this.meta.target].createConstructionSite(Game.flags[this.meta.target + '_spawn'].pos.x, Game.flags[this.meta.target + '_spawn'].pos.y, STRUCTURE_RAMPART);
               }
               else {
-                const rampartConstructionSites = room.constructionSites.filter((c: ConstructionSite) => c.structureType === STRUCTURE_RAMPART);
+                const rampartConstructionSites = Game.rooms[this.meta.target].constructionSites.filter((c: ConstructionSite) => c.structureType === STRUCTURE_SPAWN);
                 if(rampartConstructionSites.length) {
                   this.meta.spawnX = rampartConstructionSites[0].pos.x;
                   this.meta.spawnY = rampartConstructionSites[0].pos.y;

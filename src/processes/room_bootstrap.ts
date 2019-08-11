@@ -144,10 +144,7 @@ export class Room_Bootstrap extends Process
         constructionSites = constructionSites.filter((s: ConstructionSite) => s.structureType !== STRUCTURE_RAMPART);
       }
       if(constructionSites && constructionSites.length && SpawnsHelper.spawnAvailable(room)) {
-        let name = SpawnsHelper.spawnCreep(room, Builder.defineBodyParts(room), {role: 'builder'}, this.ID.toString());
-        if(name !== '') {
-          this.meta.builder = name;
-        }
+        SpawnsHelper.requestSpawn(this.ID, room, Builder.defineBodyParts(room), {role: 'builder'}, 'builder');
       }
     }
     else if(Game.creeps[this.meta.builder].spawning) {
@@ -174,6 +171,9 @@ export class Room_Bootstrap extends Process
     if(typeof room.controller !== 'undefined'  && room.controller.level >= 3) {
       if(room.controller.level < 8 && room.storage && room.storage.store[RESOURCE_ENERGY] > 200000) {
         return 2;
+      }
+      else if(room.controller.level < 8 && room.storage && room.storage.store[RESOURCE_ENERGY] < 50000) {
+        return 1;
       }
       //return 3;
     }

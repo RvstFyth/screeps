@@ -63,7 +63,9 @@ export class RemoteMining extends Process
 
   run()
   {
-
+    if(this.meta.room === 'W5N3' && (this.meta.target === 'W5N4' || this.meta.target === 'W6N3')) {
+      this.state = 'killed';
+    }
     const room = Game.rooms[this.meta.room];
     const source: Source|null = Game.getObjectById(this.meta.sourceID);
     if(this.suspendedTill && this.suspendedTill > 0 && Game.time < this.suspendedTill) {

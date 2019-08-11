@@ -5,6 +5,15 @@ declare const require: (module: string) => any;
 // add your custom typings here
 declare var global: any;
 
+interface MemHack {
+  register(): void;
+  pretick(): void;
+}
+
+interface RawMemory {
+  _parsed: any
+}
+
 interface Memory {
   stats: any
   remotes: any
@@ -23,6 +32,13 @@ interface Memory {
   mySourcesMemory: any
   marketLog: any
   resourceRequests: any
+}
+
+interface RoomMemory {
+  blueprintType: string;
+  blueprintKey: string;
+  centerX: number;
+  centerY: number;
 }
 
 interface RoomVisual
@@ -59,6 +75,7 @@ interface Room
   mineral: Mineral|undefined
   nuker: StructureNuker|undefined
   powerSpawn: StructurePowerSpawn|undefined
+  buildTarget: ConstructionSite|null
 }
 
 interface StructureLab

@@ -116,10 +116,10 @@ export class Miner
         }
     }
 
-    if(room.energyCapacityAvailable <= 450) {
+    if(room.energyAvailable <= 450) {
         bodyParts = [WORK,WORK,MOVE,MOVE]; // 300
     }
-    else if(room.energyCapacityAvailable <= 700 ){
+    else if(room.energyAvailable <= 700 ){
         bodyParts = [WORK, WORK, WORK, WORK, MOVE, MOVE]; // 550
     }
     else if(room.energyAvailable <= 800){

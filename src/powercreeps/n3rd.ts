@@ -36,7 +36,7 @@ export class N3RD
                 // Enable power if not active!
                 if(powerCreep.room.controller && !powerCreep.room.controller.isPowerEnabled) {
                     if(!powerCreep.pos.isNearTo(powerCreep.room.controller)) {
-                        powerCreep.moveTo(powerCreep.room.controller);
+                        powerCreep.moveTo(powerCreep.room.controller, {ignoreCreeps: true});
                     }
                     else {
                         powerCreep.enableRoom(powerCreep.room.controller);
@@ -55,9 +55,16 @@ export class N3RD
                         }
                     }
                     else {
-                        // Move to power spawn
-                        if(!powerCreep.pos.isNearTo(powerSpawn)) {
-                            powerCreep.moveTo(powerSpawn);
+                        if(powerCreep.room.memory.centerX && powerCreep.room.memory.centerY) {
+                            if(powerCreep.pos.x !== powerCreep.room.memory.centerX || powerCreep.pos.y  !== powerCreep.room.memory.centerY) {
+                                powerCreep.moveTo(powerCreep.room.memory.centerX, powerCreep.room.memory.centerY);
+                            }
+                        }
+                        else {
+                            // Move to power spawn
+                            if(!powerCreep.pos.isNearTo(powerSpawn)) {
+                                powerCreep.moveTo(powerSpawn);
+                            }
                         }
                     }
                 }

@@ -56,10 +56,17 @@ export class Spawns extends Process
     Memory.spawnQueue[this.meta.room] = [];
   }
 
+  /**
+   * TODO:
+   * sometimes there is a lot of energy in the terminal, and empty extensions/spawns. Spawn a transporter under these conditions!
+   *
+   * @param room
+   * @param entries
+   */
   getNextSpawn(room: Room, entries: any[])
   {
     const sorted = _.groupBy(entries, e => e.memory.role);
-    if(room.storage && room.storage.store[RESOURCE_ENERGY] > 20000) {
+    if(room.storage && room.storage.store[RESOURCE_ENERGY] > 20000 || (room.terminal && room.terminal.store[RESOURCE_ENERGY] > 10000)) {
       if(sorted['transporter'] && sorted['transporter'].length) {
         return sorted['transporter'][0];
       }

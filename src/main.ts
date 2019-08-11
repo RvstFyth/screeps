@@ -1,6 +1,7 @@
+// import * as MemHack from './MemHack';
 import { ErrorMapper } from "utils/ErrorMapper";
 import { ROS } from "ROS/ROS";
-import {PathingHelper} from 'helpers/pathing'
+//import {PathingHelper} from 'helpers/pathing'
 import 'prototypes/Room';
 import 'prototypes/Creep';
 import 'prototypes/RoomObject';
@@ -15,7 +16,7 @@ import 'globals';
 
 if(!Memory.stats){ Memory.stats = {} }
 
-PathingHelper.initialize();
+//PathingHelper.initialize();
 const OS = new ROS();
 global.cache = {}
 global.OS = OS;
@@ -63,8 +64,9 @@ if(!Memory.attackedRemotes) {
 if(!Memory.remotes) {
   Memory.remotes = {};
 }
-
+// MemHack.register()
 export const loop = ErrorMapper.wrapLoop(() => {
+  //MemHack.pretick();
   Memory.triggeredConstruction = false;
   let cpu = Game.cpu.getUsed();
   global.populateLOANlist();
@@ -90,6 +92,12 @@ export const loop = ErrorMapper.wrapLoop(() => {
     if (!(name in Game.creeps)) {
       delete Memory.creeps[name];
     }
+  }
+
+  // Bunkerflag
+  if(Game.flags['bunker']) {
+    const flag = Game.flags['bunker'];
+    new RoomVisual(flag.pos.roomName).rect(flag.pos.x - 6, flag.pos.y - 6, 12, 12, {fill: '#ffffff', stroke: '#f00', strokeWidth: 1, opacity: 0.1});
   }
 
   let stats: any = {};

@@ -26,6 +26,7 @@ export class AutoMakeBoosts extends Process
             this.init();
         }
         const room: Room = Game.rooms[this.meta.room];
+
         if(room && room.storage && room.labs.length) {
             try {
                 this.handle(room);
@@ -41,7 +42,7 @@ export class AutoMakeBoosts extends Process
 
     private buyResources(room: Room, resource: ResourceConstant) :number
     {
-        if(Game.market.credits < 5000000) return 0;
+        if(Game.market.credits < 1000000) return 0;
         // Amount to buy is locked at 3k for the moment.
         let amountBought = 0, orders = Game.market.getAllOrders({type: ORDER_SELL, resourceType: resource});
         if(orders.length && room.terminal) {
@@ -93,12 +94,8 @@ export class AutoMakeBoosts extends Process
 
     private handle(room: Room)
     {
-        // if(room.name === 'W59S28') console.log(1);
         if(room.storage && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('stockBoostsLab', 'room', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('makeBoosts', 'room', room.name) && !global.OS.kernel.hasProcessForNameAndMetaKeyValue('emptyLabs', 'room', room.name)) {
             const reaction = this.defineReaction(room);
-            // if(room.name === 'W59S28') {
-            //     console.log(reaction)
-            // } // stockBoostsLab
             if(reaction) {
                 global.OS.kernel.addProcess('makeBoosts', {room: room.name, boost: reaction, amount: 3000}, this.ID);
             }

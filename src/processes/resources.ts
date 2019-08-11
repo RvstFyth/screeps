@@ -52,7 +52,7 @@ export class Resources extends Process
                         const amount = orders[0].remainingAmount > 1000 ? 1000 : orders[0].remainingAmount;
                         const res = Game.market.deal(orders[0].id, amount, room.name);
                         if(res === OK) {
-                            console.log(`${room.name} accepted buy order for ${amount} ${mineral.mineralType} for ${(orders[0].price * amount).toFixed(3)} Credits`);
+                            console.log(`<span style="color:cyan">${room.name} accepted buy order for ${amount} ${mineral.mineralType} for ${(orders[0].price * amount).toFixed(3)} Credits</span>`);
                         }
                     }
                 }
@@ -81,7 +81,7 @@ export class Resources extends Process
                     }
                     const res = Game.market.createOrder(ORDER_SELL, mineral.mineralType, price, 1000, room.name);
                     if(res === OK) {
-                        console.log(`${room.name} placed a sell order for ${mineral.mineralType} ${price}`)
+                        console.log(`<span style="color:cyan">${room.name} placed a sell order for ${mineral.mineralType} ${price}</span>`)
                     }
                 }
             }

@@ -15,6 +15,7 @@ export class Upgrader
             filter: (l: StructureLink) => l.energy > 0
           })[0];
         }
+        const missingInExtensions = _.sum(creep.room.extensions, e => e.energyCapacity - e.energy);
         if(upgradersLink) {
           const res = creep.withdraw(upgradersLink, RESOURCE_ENERGY);
           if(res === ERR_NOT_IN_RANGE) {
@@ -24,7 +25,7 @@ export class Upgrader
             creep.memory.harvesting = false;
           }
         }
-        else if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] >= creep.carryCapacity) {
+        else if(typeof creep.room.storage !== 'undefined' && creep.room.storage.store[RESOURCE_ENERGY] >= missingInExtensions) {
           if(creep.withdraw(creep.room.storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.moveTo(creep.room.storage);
           }
@@ -50,15 +51,18 @@ export class Upgrader
     }
     else {
       // creep.say('🔺');
-      creep.say(String.fromCodePoint(0x1F53A));
+      // creep.say(String.fromCodePoint(0x1F53A));
       if(typeof creep.room.controller !== 'undefined' && creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(creep.room.controller);
+        creep.moveTo(creep.room.controller, {maxRooms: 1, range: 3});
       }
     }
   }
 
   static defineBodyParts(room: Room)
   {
+    if(room.controller && room.controller.level === 8 && room.storage && room.storage.store[RESOURCE_ENERGY] < 120000) { // 18m8w10c
+      return [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
+    }
     if(room.controller && room.controller.level === 8) { // 25m15w10c
       return [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
     }

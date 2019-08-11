@@ -13,7 +13,7 @@ export class Claimer
                     creep.claimController(creep.room.controller);
                 }
                 else {
-                    creep.moveTo(creep.room.controller, {maxRooms: 1});
+                    creep.moveTo(creep.room.controller, {maxRooms: 1, ignoreCreeps: true});
                 }
             }
         }

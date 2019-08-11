@@ -1,5 +1,6 @@
 import {Process} from '../ROS/process'
 import {SpawnsHelper} from '../helpers/spawns'
+import { BlueprintsHelper } from 'helpers/blueprint';
 
 
 export class Links extends Process
@@ -82,10 +83,33 @@ export class Links extends Process
             }
             else {
                 if(creep.room.storage) {
-                    if(!creep.pos.isNearTo(creep.room.storage)) {
-                        creep.moveTo(creep.room.storage);
+
+                    if(!creep.memory.targetX || !creep.memory.targetY) {
+                        const room = creep.room;
+                        if (room.memory.blueprintType && room.memory.blueprintKey) {
+                            if (BlueprintsHelper.transporterSpots[room.memory.blueprintType] && BlueprintsHelper.transporterSpots[room.memory.blueprintType][room.memory.blueprintKey]) {
+                                if (BlueprintsHelper.transporterSpots[room.memory.blueprintType][room.memory.blueprintKey][0]) {
+                                    const pos = BlueprintsHelper.storageLinkerSpots[room.memory.blueprintType][room.memory.blueprintKey][0];
+                                    if (pos) {
+                                        creep.memory.targetX = room.memory.centerX + pos.x;
+                                        creep.memory.targetY = room.memory.centerY + pos.y;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if(creep.memory.targetX && creep.memory.targetY) {
+                        if(creep.pos.x !== creep.memory.targetX || creep.pos.y !== creep.memory.targetY) {
+                            creep.moveTo(creep.memory.targetX, creep.memory.targetY);
+                        }
                     }
                     else {
+                        if(!creep.pos.isNearTo(creep.room.storage)) {
+                            creep.moveTo(creep.room.storage);
+                        }
+                    }
+                    if(creep.pos.isNearTo(creep.room.storage)) {
                         creep.transfer(creep.room.storage, _.findKey(creep.carry) as ResourceConstant);
                     }
                 }

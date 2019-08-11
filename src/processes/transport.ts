@@ -1,6 +1,7 @@
 import {Process} from '../ROS/process'
 import {Transporter} from '../roles/transporter'
 import {SpawnsHelper} from '../helpers/spawns'
+import {BlueprintsHelper} from '../helpers/blueprint'
 
 export class Transport extends Process
 {
@@ -18,7 +19,7 @@ export class Transport extends Process
     if(!this.meta.creeps) {
       this.meta.creeps = [];
     }
-
+    let cnt = 0;
     for(let i in this.meta.creeps) {
       if(!Game.creeps[this.meta.creeps[i]]) {
         this.meta.creeps[i] = null;
@@ -27,13 +28,28 @@ export class Transport extends Process
 
       }
       else if(Game.creeps[this.meta.creeps[i]]) {
-        Transporter.run(Game.creeps[this.meta.creeps[i]]);
+        let spot = null;
+        if (room.memory.blueprintType && room.memory.blueprintKey) {
+            if (BlueprintsHelper.transporterSpots[room.memory.blueprintType] && BlueprintsHelper.transporterSpots[room.memory.blueprintType][room.memory.blueprintKey]) {
+                if (BlueprintsHelper.transporterSpots[room.memory.blueprintType][room.memory.blueprintKey][cnt]) {
+                    const pos = BlueprintsHelper.transporterSpots[room.memory.blueprintType][room.memory.blueprintKey][cnt];
+                    if (pos) {
+                        spot = {
+                            x: room.memory.centerX + pos.x,
+                            y: room.memory.centerY + pos.y
+                        }
+                    }
+                }
+            }
+        }
+        Transporter.run(Game.creeps[this.meta.creeps[i]], spot);
       }
+      cnt++;
     }
 
     this.meta.creeps = this.meta.creeps.filter((n: any) => n);
 
-    if(this.meta.creeps.length < this.defineTotalTransporters())  {
+    if(this.meta.creeps.length < this.defineTotalTransporters(room))  {
       const room = Game.rooms[this.meta.room];
       if(room && room.storage && room.storage.my && SpawnsHelper.spawnAvailable(Game.rooms[this.meta.room])) {
         // let name = SpawnsHelper.spawnCreep(Game.rooms[this.meta.room], Transporter.defineBodyParts(Game.rooms[this.meta.room]), {role: 'transporter'}, this.ID.toString());
@@ -45,8 +61,8 @@ export class Transport extends Process
     }
   }
 
-  defineTotalTransporters()
+  defineTotalTransporters(room: Room) : number
   {
-    return 1;
+    return room.spawns.length > 2 ? 2 : room.spawns.length;
   }
 }

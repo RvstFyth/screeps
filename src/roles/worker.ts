@@ -74,12 +74,10 @@ export class Worker
                const constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES, {
                   filter: (s: ConstructionSite) => /**s.structureType !== STRUCTURE_WALL && */ s.structureType !== STRUCTURE_RAMPART
                });
-               if(constructionSites.length) {
-                  const t = creep.pos.findClosestByRange(constructionSites);
-                  if(t) {
-                    targetID = t.id;
-                    target = 'build';
-                  }
+               const cs = creep.room.buildTarget;
+               if(cs) {
+                  targetID = cs.id;
+                  target = 'build';
                }
                else {
                  // Repair stuff
@@ -98,15 +96,19 @@ export class Worker
            }
            else {
              // Build stuff
-             const constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES, {
-              filter: (s: ConstructionSite) => /**s.structureType !== STRUCTURE_WALL && */ s.structureType !== STRUCTURE_RAMPART
-              });
-              if(constructionSites.length) {
-                const t = creep.pos.findClosestByRange(constructionSites);
-                  if(t) {
-                    targetID = t.id;
-                    target = 'build';
-                  }
+            //  const constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES, {
+            //   filter: (s: ConstructionSite) => /**s.structureType !== STRUCTURE_WALL && */ s.structureType !== STRUCTURE_RAMPART
+            //   });
+            let cs;
+            cs = creep.room.buildTarget;
+              if(cs) {
+                targetID = cs.id;
+                target = 'build';
+                // const t = creep.pos.findClosestByRange(constructionSites);
+                //   if(t) {
+                //     targetID = cs.id;
+                //     target = 'build';
+                //   }
               }
               else {
                 // Repair stuff
@@ -254,7 +256,7 @@ export class Worker
         }
         if(typeof creep.room.controller !== 'undefined') {
             if(creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-              creep.moveTo(creep.room.controller);
+              creep.moveTo(creep.room.controller, {maxRooms:1, range: 3});
             }
           //}
         }

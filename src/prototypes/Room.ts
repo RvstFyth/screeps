@@ -167,9 +167,12 @@ Object.defineProperty(Room.prototype, 'hostiles', {
   get: function()
   {
     if(!this._hostiles) {
-      // const hostiles = this.find(FIND_HOSTILE_CREEPS).concat(this.find(FIND_HOSTILE_POWER_CREEPS))
+      let alliList = global.LOANlist;
+      if(!alliList.length) {
+        alliList = ['Kamots'];
+      }
       this._hostiles = this.find(FIND_HOSTILE_CREEPS, {
-        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) === -1 || c.owner.username === 'Zenga' || c.owner.username === 'BarryOSeven'
+        filter: (c: Creep) => alliList.indexOf(c.owner.username) === -1
       });
     }
 
@@ -181,8 +184,12 @@ Object.defineProperty(Room.prototype, 'allies', {
   get: function()
   {
     if(!this._allies) {
+      let alliList = global.LOANlist;
+      if(!alliList.length) {
+        alliList = ['Kamots'];
+      }
       this._allies = this.find(FIND_HOSTILE_CREEPS, {
-        filter: (c: Creep) => global.LOANlist.indexOf(c.owner.username) > -1 && c.owner.username !== 'Zenga'
+        filter: (c: Creep) => alliList.indexOf(c.owner.username) > -1
       });
     }
 
@@ -247,3 +254,33 @@ Object.defineProperty(Room.prototype, 'nuker', {
     return this._nuker;
   }
 });
+
+Object.defineProperty(Room.prototype, 'buildTarget', {
+  get: function()
+  {
+    if(!this._buildTarget) {
+      if(this.memory.buildTarget) {
+        const target = Game.getObjectById(this.memory.buildTarget);
+        if(!target) this.memory.buildTarget = null;
+      }
+      if(!this.memory.buildTarget) {
+        const constructionSites: ConstructionSite[] = this.constructionSites;
+        if(constructionSites.length) {
+          const priority: any = {
+            STRUCTURE_SPAWN: 9,
+            STRUCTURE_STORAGE: 8,
+            STRUCTURE_TERMINAL: 8,
+            STRUCTURE_TOWER: 7,
+            STRUCTURE_EXTENSION: 6
+          };
+          const max = _.max(constructionSites, c => priority[c.structureType] || 0)
+          if(max) {
+            this.memory.buildTarget = max.id;
+          }
+        }
+      }
+      this._buildTarget = Game.getObjectById(this.memory.buildTarget);
+    }
+    return this._buildTarget;
+  }
+})
