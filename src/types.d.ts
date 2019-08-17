@@ -39,6 +39,7 @@ interface RoomMemory {
   blueprintKey: string;
   centerX: number;
   centerY: number;
+  boostToProduce: string;
 }
 
 interface RoomVisual

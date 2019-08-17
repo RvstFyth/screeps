@@ -146,9 +146,9 @@ export class RoomProcess extends Process
       this.meta.lastStructureCheck = Game.time;
     }
 
-    if(room.controller && room.controller.level >= 6 && room.storage && room.terminal && room.labs.length > 2) {
-      if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('autoMakeBoosts', 'room', room.name)) {
-        global.OS.kernel.addProcess('autoMakeBoosts', {room: room.name}, this.ID);
+    if(room.name === 'W12N19' && room.controller && room.controller.level >= 6 && room.storage && room.terminal && room.labs.length > 2) {
+      if(!global.OS.kernel.hasProcessForNameAndMetaKeyValue('handleLabs', 'room', room.name)) {
+          global.OS.kernel.addProcess('handleLabs', {room: 'W12N19'}, 0)
       }
     }
 

@@ -57,6 +57,14 @@ export class BlueprintsHelper {
         }
     }
 
+    static labHandlerSpots: any = {
+        bunkers: {
+            1: [
+                {x: -1, y: 3}
+            ]
+        }
+    }
+
     static blueprints: any = {
         bunkers: {
             1: {

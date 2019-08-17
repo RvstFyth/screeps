@@ -4,7 +4,7 @@ import { Scout } from '../roles/scout';
 
 export class ScoutRoom extends Process {
     public run() {
-        this.state = 'killed';
+        //this.state = 'killed';
         const room = Game.rooms[this.meta.room];
         if (room && room.controller && room.controller.my) {
             if (typeof this.meta.shouldKill === 'undefined') this.meta.shouldKill = false;

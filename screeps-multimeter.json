@@ -1,5 +1,8 @@
 {
-  "shard": "shard2",
-  "token": "b9789556-6ce2-4834-a5c0-548240558555",
+  "shard": "shard0",
+  "password": "atxder413",
+  "username": "phpgeweld@gmail.com",
+  "port": "21025",
+  "hostname": "server1.screepspl.us",
   "plugins": []
 }

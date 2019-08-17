@@ -47,7 +47,8 @@ import {ClaimController} from "../processes/claimController";
 import {RemoteBuilder} from "../processes/remoteBuilder";
 import {HaulResourcesTerminal} from '../processes/haulResourcesTerminal'
 import {RoomProcess} from '../processes/RoomProcess';
-import {AlliDefender} from '../processes/alliDefender'
+import {AlliDefender} from '../processes/alliDefender';
+import {HandleLabs} from '../processes/handleLabs'
 
 class ProcessTable
 {
@@ -106,7 +107,8 @@ const Processes = <{[type: string]: any}> {
   'claimController': ClaimController,
   'remoteBuilder': RemoteBuilder,
   'haulResourcesTerminal': HaulResourcesTerminal,
-  'alliDefender': AlliDefender
+  'alliDefender': AlliDefender,
+  'handleLabs': HandleLabs
 };
 
 export class Kernel

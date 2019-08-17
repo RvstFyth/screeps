@@ -1,10 +1,9 @@
 export class MarketHelper
 {
 
-
     public static buyResources(room: Room, resource: ResourceConstant) :number
     {
-        if(Game.market.credits < 5000000) return 0;
+        if(Game.market.credits < 1000000) return 0;
         // Amount to buy is locked at 3k for the moment.
         let amountBought = 0, orders = Game.market.getAllOrders({type: ORDER_SELL, resourceType: resource});
         if(orders.length && room.terminal) {

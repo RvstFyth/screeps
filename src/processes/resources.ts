@@ -18,7 +18,7 @@ export class Resources extends Process
             this.run2();
         }
         catch(e) {
-            console.log(`Resources process crashed ${JSON.stringify(e)}`);
+            console.log(`Resources process crashed ${JSON.stringify(e)} for ${this.meta.room} | pID: ${this.ID}`);
         }
     }
 

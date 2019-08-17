@@ -15,11 +15,12 @@ OS.kernel.addProcess('stockBoostsLab', {room: 'W54S31', boosts: [RESOURCE_CATALY
 
 catalyzed ghodium acid
 OS.kernel.addProcess('stockBoostsLab', {room: 'W59S39', boosts: [RESOURCE_CATALYZED_GHODIUM_ACID]}, 0);
-
+37, 27 bunker
+SetBlueprint('E19S7', 'bunkers','1',37,27)
 ## Market & resource management
 OS.kernel.addProcess('sellResources', {room: 'W56S33', resourceType: RESOURCE_HYDROGEN, amount: 14000}, 0);
 
-global.OS.kernel.addProcess('haulResources', {room: 'W54S31', resource: RESOURCE_ENERGY, amount: 200000}, 0);
+global.OS.kernel.addProcess('haulResources', {room: 'W51S31', resource: RESOURCE_POWER, amount: 100000}, 0);
 
 
 global.OS.kernel.addProcess('emptyTerminal', {room: 'W51S31'}, 0)
@@ -41,10 +42,10 @@ global.OS.kernel.addProcess('sendResources', {room: 'W56S33', target: 'W55S17', 
 _.forEach(Game.market.orders, (o) => !o.active ? Game.market.cancelOrder(o.id) : '');
 
 
-OS.kernel.addProcess('remoteMining', {room: 'W41S26', target: 'W42S26', sourceID: '5982fc2eb097071b4adbcf7c'}, 0)
+OS.kernel.addProcess('remoteMining', {room: 'E19S7', target: 'E19S8', sourceID: '5d446991a7631f001632af7b'}, 0)
 OS.kernel.addProcess('claimController', {room: 'W52S41', target: 'W52S42'}, 0)
 
-OS.kernel.addProcess('remoteMining', {room: 'W53S25', target: 'W52S25', sourceID: '59f19fc482100e1594f358b4'}, 0)
+OS.kernel.addProcess('alliDefender', {room: 'W51S37', target: 'W51S34'}, 0)
 
 
 ## Offensive
@@ -55,8 +56,9 @@ global.OS.kernel.addProcess('lootRoom', {room: 'W41S26', target: 'W41S28'}, 0)
 
 Game.getObjectById('5bf61cb7debaf75b610a4d10').launchNuke(new RoomPosition(31,9,'W54S29'));Game.getObjectById('5c2a40acce4be142a36b8116').launchNuke(new RoomPosition(31,9,'W54S29'));Game.getObjectById('5c1d118cde2fd8092db59717').launchNuke(new RoomPosition(31,9,'W54S29'));
 
-OS.kernel.addProcess('claimRoom', {room: 'W51S32', target: 'E0S1'}, 0);
+OS.kernel.addProcess('claimRoom', {room: 'W7N17', target: 'W9N17'}, 0);
 
+SetBluePrint('W9N17','bunkers','1',12,20)
 
 
 

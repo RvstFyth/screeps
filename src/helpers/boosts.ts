@@ -26,7 +26,7 @@ export class BoostsHelper
             for(let x in global.BOOST_COMPONENTS) {
                 const tier = BoostsHelper.defineTier(x as ResourceConstant);
                 const amount = room.storage.store[x as ResourceConstant] || 0;
-                const max = tier === 3 ? 12000 : 3000;
+                const max = tier === 3 ? 15000 : 3000;
                 if(amount < max) {
                     minerals.push({
                         resource: x,
@@ -50,20 +50,10 @@ export class BoostsHelper
                     break;
                 }
                 else {
-                    try {
-                        if(RoomsHelper.requestResources(room, (fAmount < 3000 ? ingredients[0] : ingredients[1]))) {
-
-                        }
-                        else {
-                            const ingredient = (fAmount < 3000 ? ingredients[0] : ingredients[1]);
-                            if(ingredient.length === 1 && room.terminal && !room.terminal.cooldown) {
-                                const amountBought = MarketHelper.buyResources(room, ingredient);
-                                if(amountBought > 0) break;
-                            }
-                        }
-                    }
-                    catch(e) {
-                        console.log(`${e.message}`);
+                    const ingredient = (fAmount < 3000 ? ingredients[0] : ingredients[1]);
+                    if(ingredient.length === 1 && room.terminal && !room.terminal.cooldown) {
+                        const amountBought = MarketHelper.buyResources(room, ingredient);
+                        if(amountBought > 0) break;
                     }
                 }
             }
