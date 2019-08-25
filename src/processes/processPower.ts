@@ -1,5 +1,6 @@
 import {Process} from '../ROS/process'
 import {SpawnsHelper} from '../helpers/spawns'
+import { MarketHelper } from 'helpers/Market';
 
 // META
 // room
@@ -40,6 +41,24 @@ export class ProcessPower extends Process
                 this.processPower(spawn);
             }
 
+            const energy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
+            const sAmount = room.storage && room.storage.store[RESOURCE_POWER] ? room.storage.store[RESOURCE_POWER] || 0 : 0;
+            const terminalAmount = room.terminal && room.terminal.store[RESOURCE_POWER] ? room.terminal.store[RESOURCE_POWER] || 0 : 0;
+            const powerInRoom = sAmount + terminalAmount;
+
+            if(energy && energy > 150000 && powerInRoom < 100) {
+                // Check if we can request power from other rooms!
+                if(!this.requestPower(room)) {
+                    // Buy power when credits are above a certain treshold.
+                    if(Game.market.credits > 3500000) {
+                        const amountBought = MarketHelper.buyResources(room, RESOURCE_POWER, 0.4);
+                        if(!amountBought) {
+                            // TODO: place order? If so, check if there is not a order before buying power! Or just place and remove existing order when bought
+                        }
+                    }
+                }
+            }
+
             if(this.meta.shouldKill) {
                 if(!Game.creeps[this.meta.transporter]) {
                     this.state = 'killed';
@@ -47,17 +66,10 @@ export class ProcessPower extends Process
             }
             else if((!this.meta.transporter || !creep) && !this.meta.shouldProcess) {
                 if(room.storage) {
-                    const sAmount = room.storage.store[RESOURCE_POWER] || 0;
-                    const energy = room.storage.store[RESOURCE_ENERGY];
-                    const terminalAmount = room.terminal && room.terminal.store[RESOURCE_POWER] ? room.terminal.store[RESOURCE_POWER] : 0;
-                    if(sAmount && sAmount > 100 && energy && energy > 200000) {
+                    if(powerInRoom > 100 && energy && energy > 150000) {
                         if(SpawnsHelper.spawnAvailable(room)) {
                             SpawnsHelper.requestSpawn(this.ID, Game.rooms[this.meta.room], [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], {role: 'processPowerHauler'}, 'transporter');
                         }
-                    }
-                    else if((!sAmount || sAmount < 100) && (!terminalAmount || terminalAmount < 200) && energy && energy > 200000) {
-                        // Check if we can request power from other rooms!
-                        this.requestPower(room);
                     }
                 }
             }
@@ -90,11 +102,12 @@ export class ProcessPower extends Process
                     const totalPower = (tr.terminal.store[RESOURCE_POWER] || 0) + (tr.storage.store[RESOURCE_POWER] || 0);
                     if(totalPower > 3000) {
                         global.OS.kernel.addProcess('sendResources', {room: tr.name, target: room.name, resource: RESOURCE_POWER, amount: 1000}, 0);
-                        break;
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
     processPower(spawn: StructurePowerSpawn)
@@ -126,9 +139,15 @@ export class ProcessPower extends Process
                     if(creep.room.storage && creep.room.storage.store[RESOURCE_POWER]) {
                         const sAmount = creep.room.storage.store[RESOURCE_POWER];
                         const needed = spawn.powerCapacity - spawn.power;
+                        const terminalAmount = creep.room.terminal && creep.room.terminal.store[RESOURCE_POWER] ? creep.room.terminal.store[RESOURCE_POWER] : 0;
                         if(sAmount && sAmount > 100) {
                             if(creep.withdraw(creep.room.storage, RESOURCE_POWER, needed) === ERR_NOT_IN_RANGE) {
                                 creep.moveTo(creep.room.storage);
+                            }
+                        }
+                        else if(creep.room.terminal && terminalAmount && terminalAmount > 100) {
+                            if(creep.withdraw(creep.room.terminal, RESOURCE_POWER, needed) === ERR_NOT_IN_RANGE) {
+                                creep.moveTo(creep.room.terminal);
                             }
                         }
                     }
