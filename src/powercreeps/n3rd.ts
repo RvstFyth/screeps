@@ -126,9 +126,12 @@ export class N3RD
                 }
             }
 
-            if(powerCreep.powers[PWR_GENERATE_OPS]) {
+            if(powerCreep.powers[PWR_GENERATE_OPS] && powerCreep.room.storage) {
+                const opsInStorage = powerCreep.room.storage.store[RESOURCE_OPS] || 0;
+                const freeSpaceInStorage = powerCreep.room.storage.storeCapacity - _.sum(powerCreep.room.storage.store);
                 const genOpsCD: number|undefined = powerCreep.powers[PWR_GENERATE_OPS].cooldown;
-                if(genOpsCD !== undefined && genOpsCD <= 0) {
+                const opsInCarry = powerCreep.carry[RESOURCE_OPS] || 0;
+                if(genOpsCD !== undefined && genOpsCD <= 0 && (opsInCarry < powerCreep.carryCapacity / 2 || freeSpaceInStorage > 100000 && opsInStorage < 150000)) {
                     powerCreep.usePower(PWR_GENERATE_OPS);
                 }
             }
